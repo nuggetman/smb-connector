@@ -1,0 +1,13 @@
+#Mac OS X
+.DS_Store
+
+# Maven
+target/
+
+# Java
+*.class
+*.jar
+*.war
+
+# Mule Studio
+.studio

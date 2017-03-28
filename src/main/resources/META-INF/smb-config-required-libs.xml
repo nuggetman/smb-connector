@@ -1,0 +1,6 @@
+<namespace xmlns="http://www.mulesoft.org/schema/mule/tooling.attributes" xmlns:mule="http://www.mulesoft.org/schema/mule/core">
+    <require>
+       <jar name="JCIFS Protocol Driver (jcifs-1.3.17.jar)" fileName="jcifs(.*)\.jar" targetFolder="/lib/jcifs" 
+       targetRuntimeFolder="/plugins" className="jcifs.smb.SmbFile"/>
+    </require>
+</namespace>
