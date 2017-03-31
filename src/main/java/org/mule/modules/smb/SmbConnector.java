@@ -8,81 +8,61 @@
 
 package org.mule.modules.smb;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Strings.isNullOrEmpty;
-
-import java.net.MalformedURLException;
+import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
-
-import org.mule.api.MuleContext;
+import org.apache.logging.log4j.core.config.plugins.validation.constraints.Required;
 import org.mule.api.annotations.Config;
 import org.mule.api.annotations.Connector;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.display.FriendlyName;
-import org.mule.api.annotations.lifecycle.Start;
 import org.mule.api.annotations.param.ConnectionKey;
 import org.mule.api.annotations.param.Default;
+import org.mule.api.annotations.param.Optional;
 import org.mule.api.annotations.param.RefOnly;
 import org.mule.modules.smb.config.SMBConnectorConfig;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import jcifs.smb.SmbException;
+import org.mule.modules.smb.utils.Utilities;
 
 @Connector(name = "SMB", friendlyName = "SMB Connector")
-// @OnException(handler=ErrorHandler.class)
 public class SmbConnector {
 
-    private static final Logger logger = LoggerFactory.getLogger(SmbConnector.class);
+    // private static final Logger logger = LoggerFactory.getLogger(SmbConnector.class);
 
     @Config
     SMBConnectorConfig config;
-
-    // The connector asks for the manager of the mule context
-    @Inject
-    protected MuleContext muleContext;
-
-    /**
-     * Takes all the steps needed in order to initialize this class.
-     */
-    @Start
-    public void initialize() {
-        this.getConfig().setMuleContext(muleContext);
-    }
 
     /**
      * Read file processor for reading in the contents of a file
      *
      * @param fileName
      *            File name to read in
+     * @param fileAge
+     *            Required file age before read can occur (ms)
+     * @param autoDelete
+     *            Should the file be deleted after reading
      * @return The file contents as a byte[]
      */
     @Processor
-    public byte[] readFile(@ConnectionKey @FriendlyName("File Name") String fileName) {
-        return this.getConfig().getSmbClient().readFile(fileName);
+    public byte[] fileRead(@ConnectionKey @FriendlyName("File Name") String fileName, @Default("500") @FriendlyName("File age (ms)") Integer fileAge,
+            @Default("false") @FriendlyName("Delete after reading") boolean autoDelete) {
+        return this.getConfig().getSmbClient().readFile(fileName, fileAge, autoDelete);
     }
 
     /**
      * Write file processor for writing out data to a file
      *
      * @param fileName
-     *            Folder qualififed file name to be used for the write operation.
+     *            File name to be used for the write operation.
+     * @param append
+     *            Append payload to file, if it exists already
      * @param fileContent
-     *            A byte[] or inputstream containing the contents of the file to write.
+     *            A byte[], String or InputStream containing the contents of the file to write.
      * @return void
      */
     @Processor
-    public void write(@ConnectionKey @FriendlyName("File Name") String fileName, @RefOnly @Default("#[payload]") Object fileContent) {
-        // Return a boolean?
-        checkArgument(!isNullOrEmpty(fileName));
-        try {
-            this.getConfig().getSmbClient().writeFile(fileName, fileContent);
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            logger.error(e.getLocalizedMessage());
-        }
+    public boolean fileWrite(@ConnectionKey @FriendlyName("File Name") @Required String fileName, @Default("false") @FriendlyName("Append to file") boolean append,
+            @RefOnly @Default("#[payload]") Object fileContent) {
+        return this.getConfig().getSmbClient().writeFile(fileName, append, fileContent);
     }
 
     /**
@@ -93,8 +73,8 @@ public class SmbConnector {
      * @return void
      */
     @Processor
-    public void delete(@ConnectionKey @FriendlyName("File Name") String fileName) {
-        // Return a boolean?
+    public boolean fileDelete(@ConnectionKey @FriendlyName("File Name") String fileName) {
+        return this.getConfig().getSmbClient().deleteFile(fileName);
     }
 
     /**
@@ -102,12 +82,16 @@ public class SmbConnector {
      *
      * @param dirName
      *            Folder name to be used for the list operation.
-     * @return void
+     * @param wildcard
+     *            DOS style wildcard filter
+     * @return A list of Maps, each Map containing attributes for each file
      */
     @Processor
-    public Map<?, ?> listDir(@ConnectionKey @FriendlyName("Folder Name") String dirName) {
-        // Return a map of files & metadata?
-        return null;
+    public List<Map<String, Object>> directoryList(@ConnectionKey @FriendlyName("Folder Name") @Optional String dirName, @Default("*") @FriendlyName("Wildcard") String wildcard) {
+        if (!Utilities.isNotBlankOrEmptyOrNull(wildcard)) {
+            wildcard = "*";
+        }
+        return this.getConfig().getSmbClient().listDirectory(dirName, wildcard);
     }
 
     /**
@@ -118,29 +102,39 @@ public class SmbConnector {
      * @return void
      */
     @Processor
-    public void create(@ConnectionKey @FriendlyName("Folder Name") String dirName) {
-        try {
-            this.getConfig().getSmbClient().createDirectory(dirName);
-        } catch (MalformedURLException | SmbException e) {
-            // TODO Auto-generated catch block
-            logger.error("Error creating directory: ", e.getLocalizedMessage());
-        }
+    public boolean directoryCreate(@ConnectionKey @Required @FriendlyName("Folder Name") String dirName) {
+        return this.getConfig().getSmbClient().createDirectory(dirName);
     }
 
-    public SMBConnectorConfig getConfig() {
-        return config;
+    /**
+     * Delete direcotry processor for deleting a directory
+     *
+     * @param dirName
+     *            Directory name to be used for the delete operation.
+     * @return void
+     */
+    @Processor
+    public boolean directoryDelete(@ConnectionKey @FriendlyName("Directory Name") String dirName) {
+        return this.getConfig().getSmbClient().deleteDir(dirName);
     }
 
+    /**
+     * Set the config
+     *
+     * @param config
+     *            SMBConnectorConfig to be used
+     * @return void
+     */
     public void setConfig(SMBConnectorConfig config) {
         this.config = config;
     }
 
-    public MuleContext getMuleContext() {
-        return muleContext;
+    /**
+     * Convenience method for getting the config
+     *
+     * @return The config as an SMBConnectorConfig
+     */
+    public SMBConnectorConfig getConfig() {
+        return config;
     }
-
-    public void setMuleContext(MuleContext muleContext) {
-        this.muleContext = muleContext;
-    }
-
 }
