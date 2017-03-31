@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
+import org.mule.api.ConnectionException;
 import org.mule.api.ConnectionExceptionCode;
 import org.mule.modules.smb.config.SMBConnectorConfig;
 import org.mule.modules.smb.utils.Utilities;
@@ -33,7 +34,7 @@ import jcifs.smb.SmbFileOutputStream;
 
 public class SmbClient {
 
-    private static final Logger logger = LoggerFactory.getLogger(SmbClient.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SmbClient.class);
 
     private SMBConnectorConfig config;
 
@@ -56,19 +57,17 @@ public class SmbClient {
      * Check to see if we are connected
      */
     public boolean isConnected() {
-        if (getRootSmbDir() == null) {
-            return false;
-        } else {
-            try {
-                if (getRootSmbDir().canRead()) {
-                    return true;
-                } else {
-                    return false;
-                }
-            } catch (SmbException e) {
-                logger.error("Error checking connection status: " + e.getLocalizedMessage());
+        try {
+            if (getRootSmbDir().canRead()) {
+                return true;
+            } else {
                 return false;
             }
+        } catch (NullPointerException npe) {
+            return false;
+        } catch (SmbException e) {
+            LOG.error("Error checking connection status", e.getLocalizedMessage());
+            return false;
         }
     }
 
@@ -93,12 +92,12 @@ public class SmbClient {
             long lastMod = file.getLastModified();
             long now = System.currentTimeMillis();
             long currentAge = now - lastMod;
-            if (logger.isDebugEnabled()) {
-                logger.debug("fileAge = " + currentAge + ", expected = " + minimumAge + ", now = " + now + ", lastMod = " + lastMod);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("fileAge = " + currentAge + ", expected = " + minimumAge + ", now = " + now + ", lastMod = " + lastMod);
             }
             if (currentAge < minimumAge) {
-                if (logger.isInfoEnabled()) {
-                    logger.info("The file has not aged enough yet, will return nothing for: " + file.getName());
+                if (LOG.isInfoEnabled()) {
+                    LOG.info("The file has not aged enough yet, will return nothing for: " + file.getName());
                 }
                 return false;
             }
@@ -119,13 +118,13 @@ public class SmbClient {
      * @return boolean stating whether client connected correctly
      * @throws Exception
      */
-    public boolean connect() throws Exception {
-        logger.debug("connecting to: smb://" + this.getConfig().getHost() + this.getConfig().getPath());
+    public boolean connect() throws MalformedURLException, SmbAuthException, SmbException, ConnectionException {
+        LOG.debug("connecting to: smb://" + this.getConfig().getHost() + this.getConfig().getPath());
         this.setCredentials(this.getConfig().getDomain(), this.getConfig().getUsername(), this.getConfig().getPassword());
         SmbFile smbFile = new SmbFile("smb://" + this.getConfig().getHost() + this.getConfig().getPath(), this.getCredentials());
         smbFile.setConnectTimeout(this.getConfig().getTimeout());
         if (!smbFile.canRead()) {
-            throw new org.mule.api.ConnectionException(ConnectionExceptionCode.UNKNOWN, null, "not connected", null);
+            throw new ConnectionException(ConnectionExceptionCode.UNKNOWN, null, "not connected", null);
         }
         return isConnected();
     }
@@ -157,16 +156,27 @@ public class SmbClient {
                         if (autoDelete) {
                             this.deleteFile(smbFile);
                         }
+                        smbFileInputStream.close();
                     }
-                    logger.debug("Done reading file:" + smbFile.getUncPath());
+                    LOG.debug("Done reading file", smbFile.getUncPath());
                 } else {
-                    logger.info("unable to read file: " + smbFile.getUncPath());
+                    LOG.info("unable to read file", smbFile.getUncPath());
                 }
             } else {
-                logger.error("file not found: " + fileName);
+                LOG.error("file not found", fileName);
             }
-        } catch (Exception e) {
-            logger.error("unable to read file: " + fileName, e.getMessage());
+        } catch (NullPointerException e) {
+            LOG.error("smbfile not defined", e.getLocalizedMessage());
+        } catch (SmbAuthException e) {
+            LOG.error("smb authentication error", e.getLocalizedMessage());
+        } catch (SmbException e) {
+            LOG.error("smb connection error", e.getLocalizedMessage());
+        } catch (MalformedURLException e) {
+            LOG.error("malformed url error", e.getLocalizedMessage());
+        } catch (UnknownHostException e) {
+            LOG.error("unknown host error", e.getLocalizedMessage());
+        } catch (IOException e) {
+            LOG.error("I/O error", e.getLocalizedMessage());
         }
         return data;
     }
@@ -185,8 +195,9 @@ public class SmbClient {
         boolean success = false;
         try {
             SmbFile smbFile = getSmbFileFromRoot(fileName);
-            SmbFileOutputStream out = new SmbFileOutputStream(smbFile, append);
+            SmbFileOutputStream out = null;
             try {
+                out = new SmbFileOutputStream(smbFile, append);
                 if (data instanceof InputStream) {
                     InputStream is = ((InputStream) data);
                     IOUtils.copy(is, out);
@@ -201,22 +212,22 @@ public class SmbClient {
                     IOUtils.write(dataBytes, out);
                     success = true;
                 } else {
-                    logger.error("unsupported object type" + data.getClass().toString());
+                    LOG.error("unsupported object type", data.getClass().toString());
                 }
             } finally {
                 out.flush();
                 out.close();
             }
         } catch (SmbAuthException sae) {
-            logger.error("insufficient permissions to write file: " + sae.getLocalizedMessage());
+            LOG.error("insufficient permissions to write file", sae.getLocalizedMessage());
         } catch (SmbException se) {
-            logger.error("error writing out file: " + se.getLocalizedMessage());
+            LOG.error("error writing out file", se.getLocalizedMessage());
         } catch (MalformedURLException mue) {
-            logger.error("malformed file path for: " + fileName + ", " + mue.getLocalizedMessage());
+            LOG.error("malformed file path for", fileName + ", " + mue.getLocalizedMessage());
         } catch (UnknownHostException uhe) {
-            logger.error("unknown host error writing to: " + fileName + ", " + uhe.getLocalizedMessage());
+            LOG.error("unknown host error writing to: " + fileName, uhe.getLocalizedMessage());
         } catch (IOException ie) {
-            logger.error("i/o error: " + ie.getLocalizedMessage());
+            LOG.error("i/o error", ie.getLocalizedMessage());
         }
         return success;
     }
@@ -232,19 +243,19 @@ public class SmbClient {
         try {
             SmbFile directory = getSmbFileFromRoot(dirName);
 
-            logger.debug("creating a directory: " + directory.getUncPath());
+            LOG.debug("creating a directory: " + directory.getUncPath());
 
             if (!directory.exists()) {
                 directory.mkdirs();
                 success = true;
-                logger.debug("done creating directory:" + directory.getUncPath());
+                LOG.debug("done creating directory:" + directory.getUncPath());
             } else {
-                logger.debug("directory already exists: " + directory.getUncPath());
+                LOG.debug("directory already exists: " + directory.getUncPath());
             }
         } catch (SmbAuthException sae) {
-            logger.error("insufficient permissions to create: " + dirName, sae.getMessage());
+            LOG.error("insufficient permissions to create: " + dirName, sae.getMessage());
         } catch (SmbException se) {
-            logger.error("unable to create directory: " + dirName, se.getMessage());
+            LOG.error("unable to create directory: " + dirName, se.getMessage());
         }
         return success;
     }
@@ -263,7 +274,7 @@ public class SmbClient {
                 success = this.deleteFile(smbFile);
             }
         } catch (SmbException e) {
-            logger.error("unable to determine type for deletion: " + fileName);
+            LOG.error("unable to determine type for deletion: " + fileName);
         }
         return success;
     }
@@ -282,7 +293,7 @@ public class SmbClient {
                 success = this.deleteFile(smbFile);
             }
         } catch (SmbException e) {
-            logger.error("unable to determine type for deletion: " + dirName);
+            LOG.error("unable to determine type for deletion: " + dirName);
         }
         return success;
     }
@@ -299,9 +310,9 @@ public class SmbClient {
             smbFile.delete();
             success = true;
         } catch (SmbAuthException sae) {
-            logger.error("insufficient permissions to delete file: " + smbFile.getUncPath() + ", " + sae.getLocalizedMessage());
+            LOG.error("insufficient permissions to delete file: " + smbFile.getUncPath() + ", " + sae.getLocalizedMessage());
         } catch (SmbException se) {
-            logger.error("unable to delete file: " + smbFile.getName() + ", " + se.getLocalizedMessage());
+            LOG.error("unable to delete file: " + smbFile.getName() + ", " + se.getLocalizedMessage());
         }
         return success;
     }
@@ -344,13 +355,13 @@ public class SmbClient {
                         }
                     }
                 } else {
-                    logger.error("cannot read: " + smbDir.canRead());
+                    LOG.error("cannot read: " + smbDir.canRead());
                 }
             }
         } catch (SmbAuthException sae) {
-            logger.error("insufficient permissions to list directory: " + dirName, sae.getMessage());
+            LOG.error("insufficient permissions to list directory: " + dirName, sae.getMessage());
         } catch (SmbException se) {
-            logger.error("unable to list directory: " + dirName, se.getMessage());
+            LOG.error("unable to list directory: " + dirName, se.getMessage());
         }
 
         return results;
@@ -369,7 +380,7 @@ public class SmbClient {
             f.setConnectTimeout(this.getConfig().getTimeout());
             return f;
         } catch (MalformedURLException mue) {
-            logger.error("malformed file path: " + this.getRootSmbDir().getPath() + Utilities.normalizeFile(fileName) + ", " + mue.getLocalizedMessage());
+            LOG.error("malformed file path: " + this.getRootSmbDir().getPath() + Utilities.normalizeFile(fileName) + ", " + mue.getLocalizedMessage());
             return null;
         }
     }
@@ -387,7 +398,7 @@ public class SmbClient {
             f.setConnectTimeout(this.getConfig().getTimeout());
             return f;
         } catch (MalformedURLException mue) {
-            logger.error("malformed file path: " + this.getRootSmbDir().getPath() + Utilities.normalizePath(folderName) + ", " + mue.getLocalizedMessage());
+            LOG.error("malformed file path: " + this.getRootSmbDir().getPath() + Utilities.normalizePath(folderName) + ", " + mue.getLocalizedMessage());
             return null;
         }
     }
@@ -412,7 +423,7 @@ public class SmbClient {
                 }
             }
         } catch (MalformedURLException mue) {
-            logger.error("malformed file path: " + this.getConfig().getHost() + this.getConfig().getPath() + ", " + mue.getLocalizedMessage());
+            LOG.error("malformed file path: " + this.getConfig().getHost() + this.getConfig().getPath() + ", " + mue.getLocalizedMessage());
             return null;
         }
     }
