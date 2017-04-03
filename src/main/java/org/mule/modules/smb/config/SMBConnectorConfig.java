@@ -15,13 +15,11 @@ import org.mule.api.annotations.param.Optional;
 import org.mule.modules.smb.internal.SmbClient;
 import org.mule.modules.smb.utils.Utilities;
 import org.mule.util.NumberUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @ConnectionManagement(friendlyName = "Configuration")
 public class SMBConnectorConfig {
 
-    private static final Logger logger = LoggerFactory.getLogger(SMBConnectorConfig.class);
+    // private static final Logger logger = LoggerFactory.getLogger(SMBConnectorConfig.class);
 
     private SmbClient smbClient = new SmbClient(this);
 

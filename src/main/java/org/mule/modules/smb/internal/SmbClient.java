@@ -34,7 +34,7 @@ import jcifs.smb.SmbFileOutputStream;
 
 public class SmbClient {
 
-    private static final Logger LOG = LoggerFactory.getLogger(SmbClient.class);
+    private static final Logger logger = LoggerFactory.getLogger(SmbClient.class);
 
     private SMBConnectorConfig config;
 
@@ -58,15 +58,9 @@ public class SmbClient {
      */
     public boolean isConnected() {
         try {
-            if (getRootSmbDir().canRead()) {
-                return true;
-            } else {
-                return false;
-            }
-        } catch (NullPointerException npe) {
-            return false;
-        } catch (SmbException e) {
-            LOG.error("Error checking connection status", e.getLocalizedMessage());
+            return getRootSmbDir().canRead();
+        } catch (Exception e) {
+            logger.error("Error checking connection status", e);
             return false;
         }
     }
@@ -92,12 +86,12 @@ public class SmbClient {
             long lastMod = file.getLastModified();
             long now = System.currentTimeMillis();
             long currentAge = now - lastMod;
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("fileAge = " + currentAge + ", expected = " + minimumAge + ", now = " + now + ", lastMod = " + lastMod);
+            if (logger.isDebugEnabled()) {
+                logger.debug("fileAge = " + currentAge + ", expected = " + minimumAge + ", now = " + now + ", lastMod = " + lastMod);
             }
             if (currentAge < minimumAge) {
-                if (LOG.isInfoEnabled()) {
-                    LOG.info("The file has not aged enough yet, will return nothing for: " + file.getName());
+                if (logger.isInfoEnabled()) {
+                    logger.info("The file has not aged enough yet, will return nothing for: " + file.getName());
                 }
                 return false;
             }
@@ -118,8 +112,8 @@ public class SmbClient {
      * @return boolean stating whether client connected correctly
      * @throws Exception
      */
-    public boolean connect() throws MalformedURLException, SmbAuthException, SmbException, ConnectionException {
-        LOG.debug("connecting to: smb://" + this.getConfig().getHost() + this.getConfig().getPath());
+    public boolean connect() throws MalformedURLException, SmbException, ConnectionException {
+        logger.debug("connecting to: smb://" + this.getConfig().getHost() + this.getConfig().getPath());
         this.setCredentials(this.getConfig().getDomain(), this.getConfig().getUsername(), this.getConfig().getPassword());
         SmbFile smbFile = new SmbFile("smb://" + this.getConfig().getHost() + this.getConfig().getPath(), this.getCredentials());
         smbFile.setConnectTimeout(this.getConfig().getTimeout());
@@ -147,36 +141,28 @@ public class SmbClient {
         SmbFileInputStream smbFileInputStream = null;
         try {
             SmbFile smbFile = getSmbFileFromRoot(fileName);
-            if (smbFile.exists()) {
-                if (smbFile.canRead()) {
-                    if (checkIsFileOldEnough(smbFile, fileAge)) {
-                        smbFileInputStream = new SmbFileInputStream(smbFile);
-                        data = new byte[(int) smbFile.length()];
-                        smbFileInputStream.read(data);
-                        if (autoDelete) {
-                            this.deleteFile(smbFile);
-                        }
-                        smbFileInputStream.close();
-                    }
-                    LOG.debug("Done reading file", smbFile.getUncPath());
-                } else {
-                    LOG.info("unable to read file", smbFile.getUncPath());
+            if (smbFile != null) {
+                if (checkIsFileOldEnough(smbFile, fileAge) && autoDelete) {
+                    smbFileInputStream = new SmbFileInputStream(smbFile);
+                    data = new byte[(int) smbFile.length()];
+                    smbFileInputStream.read(data);
+                    smbFileInputStream.close();
                 }
+                logger.debug("Done reading file", smbFile.getUncPath());
+
             } else {
-                LOG.error("file not found", fileName);
+                logger.error("file not found", fileName);
             }
-        } catch (NullPointerException e) {
-            LOG.error("smbfile not defined", e.getLocalizedMessage());
         } catch (SmbAuthException e) {
-            LOG.error("smb authentication error", e.getLocalizedMessage());
+            logger.error("smb authentication error", e);
         } catch (SmbException e) {
-            LOG.error("smb connection error", e.getLocalizedMessage());
+            logger.error("smb connection error", e);
         } catch (MalformedURLException e) {
-            LOG.error("malformed url error", e.getLocalizedMessage());
+            logger.error("malformed url error", e);
         } catch (UnknownHostException e) {
-            LOG.error("unknown host error", e.getLocalizedMessage());
+            logger.error("unknown host error", e);
         } catch (IOException e) {
-            LOG.error("I/O error", e.getLocalizedMessage());
+            logger.error("I/O error", e);
         }
         return data;
     }
@@ -199,7 +185,7 @@ public class SmbClient {
             try {
                 out = new SmbFileOutputStream(smbFile, append);
                 if (data instanceof InputStream) {
-                    InputStream is = ((InputStream) data);
+                    InputStream is = (InputStream) data;
                     IOUtils.copy(is, out);
                     is.close();
                     success = true;
@@ -212,22 +198,22 @@ public class SmbClient {
                     IOUtils.write(dataBytes, out);
                     success = true;
                 } else {
-                    LOG.error("unsupported object type", data.getClass().toString());
+                    logger.error("unsupported object type");
                 }
             } finally {
                 out.flush();
                 out.close();
             }
-        } catch (SmbAuthException sae) {
-            LOG.error("insufficient permissions to write file", sae.getLocalizedMessage());
-        } catch (SmbException se) {
-            LOG.error("error writing out file", se.getLocalizedMessage());
-        } catch (MalformedURLException mue) {
-            LOG.error("malformed file path for", fileName + ", " + mue.getLocalizedMessage());
-        } catch (UnknownHostException uhe) {
-            LOG.error("unknown host error writing to: " + fileName, uhe.getLocalizedMessage());
-        } catch (IOException ie) {
-            LOG.error("i/o error", ie.getLocalizedMessage());
+        } catch (SmbAuthException e) {
+            logger.error("insufficient permissions to write file", e);
+        } catch (SmbException e) {
+            logger.error("error writing out file", e);
+        } catch (MalformedURLException e) {
+            logger.error("malformed file path for " + fileName, e);
+        } catch (UnknownHostException e) {
+            logger.error("unknown host error writing to: " + fileName, e);
+        } catch (IOException e) {
+            logger.error("i/o error", e);
         }
         return success;
     }
@@ -243,19 +229,19 @@ public class SmbClient {
         try {
             SmbFile directory = getSmbFileFromRoot(dirName);
 
-            LOG.debug("creating a directory: " + directory.getUncPath());
+            logger.debug("creating a directory: " + directory.getUncPath());
 
             if (!directory.exists()) {
                 directory.mkdirs();
                 success = true;
-                LOG.debug("done creating directory:" + directory.getUncPath());
+                logger.debug("done creating directory:" + directory.getUncPath());
             } else {
-                LOG.debug("directory already exists: " + directory.getUncPath());
+                logger.debug("directory already exists: " + directory.getUncPath());
             }
-        } catch (SmbAuthException sae) {
-            LOG.error("insufficient permissions to create: " + dirName, sae.getMessage());
-        } catch (SmbException se) {
-            LOG.error("unable to create directory: " + dirName, se.getMessage());
+        } catch (SmbAuthException e) {
+            logger.error("insufficient permissions to create: " + dirName, e);
+        } catch (SmbException e) {
+            logger.error("unable to create directory: " + dirName, e);
         }
         return success;
     }
@@ -274,7 +260,7 @@ public class SmbClient {
                 success = this.deleteFile(smbFile);
             }
         } catch (SmbException e) {
-            LOG.error("unable to determine type for deletion: " + fileName);
+            logger.error("unable to determine type for deletion: " + fileName);
         }
         return success;
     }
@@ -293,7 +279,7 @@ public class SmbClient {
                 success = this.deleteFile(smbFile);
             }
         } catch (SmbException e) {
-            LOG.error("unable to determine type for deletion: " + dirName);
+            logger.error("unable to determine type for deletion: " + dirName);
         }
         return success;
     }
@@ -310,9 +296,9 @@ public class SmbClient {
             smbFile.delete();
             success = true;
         } catch (SmbAuthException sae) {
-            LOG.error("insufficient permissions to delete file: " + smbFile.getUncPath() + ", " + sae.getLocalizedMessage());
+            logger.error("insufficient permissions to delete file: " + smbFile.getUncPath() + ", " + sae.getLocalizedMessage());
         } catch (SmbException se) {
-            LOG.error("unable to delete file: " + smbFile.getName() + ", " + se.getLocalizedMessage());
+            logger.error("unable to delete file: " + smbFile.getName() + ", " + se.getLocalizedMessage());
         }
         return success;
     }
@@ -337,31 +323,25 @@ public class SmbClient {
             }
             if (smbDir != null) {
                 SmbFile[] smbFiles;
-                if (smbDir.canRead() && smbDir.isDirectory()) {
-                    smbFiles = smbDir.listFiles(wildcard);
-                    if (smbFiles.length > 0) {
-                        results = new ArrayList<Map<String, Object>>();
-                        for (SmbFile file : smbFiles) {
-                            HashMap<String, Object> metaData = new HashMap<String, Object>();
-                            metaData.put("name", file.getName());
-                            metaData.put("last modified", file.getLastModified());
-                            metaData.put("created on", file.createTime());
-                            metaData.put("size", file.length());
-                            metaData.put("is file", file.isFile());
-                            metaData.put("is directory", file.isDirectory());
-                            metaData.put("read-only", !file.canWrite());
-                            metaData.put("hidden", file.isHidden());
-                            results.add(metaData);
-                        }
-                    }
-                } else {
-                    LOG.error("cannot read: " + smbDir.canRead());
+                smbFiles = smbDir.listFiles(wildcard);
+                results = new ArrayList<Map<String, Object>>();
+                for (SmbFile file : smbFiles) {
+                    HashMap<String, Object> metaData = new HashMap<String, Object>();
+                    metaData.put("name", file.getName());
+                    metaData.put("last modified", file.getLastModified());
+                    metaData.put("created on", file.createTime());
+                    metaData.put("size", file.length());
+                    metaData.put("is file", file.isFile());
+                    metaData.put("is directory", file.isDirectory());
+                    metaData.put("read-only", !file.canWrite());
+                    metaData.put("hidden", file.isHidden());
+                    results.add(metaData);
                 }
             }
         } catch (SmbAuthException sae) {
-            LOG.error("insufficient permissions to list directory: " + dirName, sae.getMessage());
+            logger.error("insufficient permissions to list directory: " + dirName, sae.getMessage());
         } catch (SmbException se) {
-            LOG.error("unable to list directory: " + dirName, se.getMessage());
+            logger.error("unable to list directory: " + dirName, se.getMessage());
         }
 
         return results;
@@ -379,8 +359,8 @@ public class SmbClient {
             SmbFile f = new SmbFile(this.getRootSmbDir().getPath() + Utilities.normalizeFile(fileName), this.getCredentials());
             f.setConnectTimeout(this.getConfig().getTimeout());
             return f;
-        } catch (MalformedURLException mue) {
-            LOG.error("malformed file path: " + this.getRootSmbDir().getPath() + Utilities.normalizeFile(fileName) + ", " + mue.getLocalizedMessage());
+        } catch (MalformedURLException e) {
+            logger.error("malformed file path for: " + Utilities.normalizeFile(fileName) + ", " + e.getMessage());
             return null;
         }
     }
@@ -398,7 +378,7 @@ public class SmbClient {
             f.setConnectTimeout(this.getConfig().getTimeout());
             return f;
         } catch (MalformedURLException mue) {
-            LOG.error("malformed file path: " + this.getRootSmbDir().getPath() + Utilities.normalizePath(folderName) + ", " + mue.getLocalizedMessage());
+            logger.error("malformed file path: " + this.getRootSmbDir().getPath() + Utilities.normalizePath(folderName) + ", " + mue.getLocalizedMessage());
             return null;
         }
     }
@@ -423,7 +403,7 @@ public class SmbClient {
                 }
             }
         } catch (MalformedURLException mue) {
-            LOG.error("malformed file path: " + this.getConfig().getHost() + this.getConfig().getPath() + ", " + mue.getLocalizedMessage());
+            logger.error("malformed file path: " + this.getConfig().getHost() + this.getConfig().getPath() + ", " + mue.getLocalizedMessage());
             return null;
         }
     }
@@ -443,8 +423,8 @@ public class SmbClient {
      * @return void
      */
     public void setCredentials(String domain, String username, String password) {
-        NtlmPasswordAuthentication credentials = new NtlmPasswordAuthentication(domain, username, password);
-        this.credentials = credentials;
+        NtlmPasswordAuthentication c = new NtlmPasswordAuthentication(domain, username, password);
+        this.credentials = c;
     }
 
 }

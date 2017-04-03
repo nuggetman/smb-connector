@@ -65,4 +65,11 @@ public class Utilities {
         }
     }
 
+    /**
+     * Do not allow creation of this class
+     */
+    private Utilities() {
+        throw new IllegalAccessError("Utility class");
+    }
+
 }

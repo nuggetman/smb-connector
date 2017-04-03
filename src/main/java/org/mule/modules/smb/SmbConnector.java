@@ -88,10 +88,11 @@ public class SmbConnector {
      */
     @Processor
     public List<Map<String, Object>> directoryList(@ConnectionKey @FriendlyName("Folder Name") @Optional String dirName, @Default("*") @FriendlyName("Wildcard") String wildcard) {
-        if (!Utilities.isNotBlankOrEmptyOrNull(wildcard)) {
-            wildcard = "*";
+        String w = wildcard;
+        if (!Utilities.isNotBlankOrEmptyOrNull(w)) {
+            w = "*";
         }
-        return this.getConfig().getSmbClient().listDirectory(dirName, wildcard);
+        return this.getConfig().getSmbClient().listDirectory(dirName, w);
     }
 
     /**
