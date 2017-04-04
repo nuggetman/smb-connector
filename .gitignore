@@ -11,3 +11,5 @@ target/
 
 # Mule Studio
 .studio
+
+**/automation-credentials.properties
