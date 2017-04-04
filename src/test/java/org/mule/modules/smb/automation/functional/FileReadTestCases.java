@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mule.api.ConnectionException;
 import org.mule.modules.smb.SmbConnector;
 import org.mule.tools.devkit.ctf.junit.AbstractTestCase;
 
@@ -30,7 +31,12 @@ public class FileReadTestCases extends AbstractTestCase<SmbConnector> {
         java.lang.String fileName = null;
         java.lang.Integer fileAge = null;
         boolean autoDelete = false;
-        assertEquals(getConnector().fileRead(fileName, fileAge, autoDelete), expected);
+        try {
+            assertEquals(getConnector().fileRead(fileName, fileAge, autoDelete), expected);
+        } catch (ConnectionException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
 }

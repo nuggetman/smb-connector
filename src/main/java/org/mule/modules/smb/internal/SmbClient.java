@@ -260,7 +260,7 @@ public class SmbClient {
                 success = this.deleteFile(smbFile);
             }
         } catch (SmbException e) {
-            logger.error("unable to determine type for deletion: " + fileName);
+            logger.error("unable to determine type for deletion: " + fileName, e);
         }
         return success;
     }
@@ -279,7 +279,7 @@ public class SmbClient {
                 success = this.deleteFile(smbFile);
             }
         } catch (SmbException e) {
-            logger.error("unable to determine type for deletion: " + dirName);
+            logger.error("unable to determine type for deletion: " + dirName, e);
         }
         return success;
     }
@@ -295,10 +295,10 @@ public class SmbClient {
         try {
             smbFile.delete();
             success = true;
-        } catch (SmbAuthException sae) {
-            logger.error("insufficient permissions to delete file: " + smbFile.getUncPath() + ", " + sae.getLocalizedMessage());
-        } catch (SmbException se) {
-            logger.error("unable to delete file: " + smbFile.getName() + ", " + se.getLocalizedMessage());
+        } catch (SmbAuthException e) {
+            logger.error("insufficient permissions to delete file: " + smbFile.getUncPath(), e);
+        } catch (SmbException e) {
+            logger.error("unable to delete file: " + smbFile.getName(), e);
         }
         return success;
     }
@@ -338,10 +338,10 @@ public class SmbClient {
                     results.add(metaData);
                 }
             }
-        } catch (SmbAuthException sae) {
-            logger.error("insufficient permissions to list directory: " + dirName, sae.getMessage());
-        } catch (SmbException se) {
-            logger.error("unable to list directory: " + dirName, se.getMessage());
+        } catch (SmbAuthException e) {
+            logger.error("insufficient permissions to list directory: " + dirName, e);
+        } catch (SmbException e) {
+            logger.error("unable to list directory: " + dirName, e);
         }
 
         return results;

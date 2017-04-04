@@ -19,8 +19,6 @@ import org.mule.util.NumberUtils;
 @ConnectionManagement(friendlyName = "Configuration")
 public class SMBConnectorConfig {
 
-    // private static final Logger logger = LoggerFactory.getLogger(SMBConnectorConfig.class);
-
     private SmbClient smbClient = new SmbClient(this);
 
     private String domain;

@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.logging.log4j.core.config.plugins.validation.constraints.Required;
+import org.mule.api.ConnectionException;
 import org.mule.api.annotations.Config;
 import org.mule.api.annotations.Connector;
 import org.mule.api.annotations.Processor;
@@ -25,8 +26,6 @@ import org.mule.modules.smb.utils.Utilities;
 
 @Connector(name = "SMB", friendlyName = "SMB Connector")
 public class SmbConnector {
-
-    // private static final Logger logger = LoggerFactory.getLogger(SmbConnector.class);
 
     @Config
     SMBConnectorConfig config;
@@ -44,7 +43,7 @@ public class SmbConnector {
      */
     @Processor
     public byte[] fileRead(@ConnectionKey @FriendlyName("File Name") String fileName, @Default("500") @FriendlyName("File age (ms)") Integer fileAge,
-            @Default("false") @FriendlyName("Delete after reading") boolean autoDelete) {
+            @Default("false") @FriendlyName("Delete after reading") boolean autoDelete) throws ConnectionException {
         return this.getConfig().getSmbClient().readFile(fileName, fileAge, autoDelete);
     }
 
@@ -61,7 +60,7 @@ public class SmbConnector {
      */
     @Processor
     public boolean fileWrite(@ConnectionKey @FriendlyName("File Name") @Required String fileName, @Default("false") @FriendlyName("Append to file") boolean append,
-            @RefOnly @Default("#[payload]") Object fileContent) {
+            @RefOnly @Default("#[payload]") Object fileContent) throws ConnectionException {
         return this.getConfig().getSmbClient().writeFile(fileName, append, fileContent);
     }
 
@@ -73,7 +72,7 @@ public class SmbConnector {
      * @return void
      */
     @Processor
-    public boolean fileDelete(@ConnectionKey @FriendlyName("File Name") String fileName) {
+    public boolean fileDelete(@ConnectionKey @FriendlyName("File Name") String fileName) throws ConnectionException {
         return this.getConfig().getSmbClient().deleteFile(fileName);
     }
 
@@ -87,7 +86,8 @@ public class SmbConnector {
      * @return A list of Maps, each Map containing attributes for each file
      */
     @Processor
-    public List<Map<String, Object>> directoryList(@ConnectionKey @FriendlyName("Folder Name") @Optional String dirName, @Default("*") @FriendlyName("Wildcard") String wildcard) {
+    public List<Map<String, Object>> directoryList(@ConnectionKey @FriendlyName("Folder Name") @Optional String dirName, @Default("*") @FriendlyName("Wildcard") String wildcard)
+            throws ConnectionException {
         String w = wildcard;
         if (!Utilities.isNotBlankOrEmptyOrNull(w)) {
             w = "*";
@@ -103,7 +103,7 @@ public class SmbConnector {
      * @return void
      */
     @Processor
-    public boolean directoryCreate(@ConnectionKey @Required @FriendlyName("Folder Name") String dirName) {
+    public boolean directoryCreate(@ConnectionKey @Required @FriendlyName("Folder Name") String dirName) throws ConnectionException {
         return this.getConfig().getSmbClient().createDirectory(dirName);
     }
 
@@ -115,7 +115,7 @@ public class SmbConnector {
      * @return void
      */
     @Processor
-    public boolean directoryDelete(@ConnectionKey @FriendlyName("Directory Name") String dirName) {
+    public boolean directoryDelete(@ConnectionKey @FriendlyName("Directory Name") String dirName) throws ConnectionException {
         return this.getConfig().getSmbClient().deleteDir(dirName);
     }
 
