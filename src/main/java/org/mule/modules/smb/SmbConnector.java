@@ -21,14 +21,14 @@ import org.mule.api.annotations.param.ConnectionKey;
 import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.Optional;
 import org.mule.api.annotations.param.RefOnly;
-import org.mule.modules.smb.config.SMBConnectorConfig;
+import org.mule.modules.smb.config.SmbConnectorConfig;
 import org.mule.modules.smb.utils.Utilities;
 
 @Connector(name = "SMB", friendlyName = "SMB Connector")
 public class SmbConnector {
 
     @Config
-    SMBConnectorConfig config;
+    SmbConnectorConfig config;
 
     /**
      * Read file processor for reading in the contents of a file
@@ -59,9 +59,9 @@ public class SmbConnector {
      * @return void
      */
     @Processor
-    public boolean fileWrite(@ConnectionKey @FriendlyName("File Name") @Required String fileName, @Default("false") @FriendlyName("Append to file") boolean append,
+    public void fileWrite(@ConnectionKey @FriendlyName("File Name") @Required String fileName, @Default("false") @FriendlyName("Append to file") boolean append,
             @RefOnly @Default("#[payload]") Object fileContent) throws ConnectionException {
-        return this.getConfig().getSmbClient().writeFile(fileName, append, fileContent);
+        this.getConfig().getSmbClient().writeFile(fileName, append, fileContent);
     }
 
     /**
@@ -72,8 +72,8 @@ public class SmbConnector {
      * @return void
      */
     @Processor
-    public boolean fileDelete(@ConnectionKey @FriendlyName("File Name") String fileName) throws ConnectionException {
-        return this.getConfig().getSmbClient().deleteFile(fileName);
+    public void fileDelete(@ConnectionKey @FriendlyName("File Name") String fileName) throws ConnectionException {
+        this.getConfig().getSmbClient().deleteFile(fileName);
     }
 
     /**
@@ -103,20 +103,20 @@ public class SmbConnector {
      * @return void
      */
     @Processor
-    public boolean directoryCreate(@ConnectionKey @Required @FriendlyName("Folder Name") String dirName) throws ConnectionException {
-        return this.getConfig().getSmbClient().createDirectory(dirName);
+    public void directoryCreate(@ConnectionKey @Required @FriendlyName("Folder Name") String dirName) throws ConnectionException {
+        this.getConfig().getSmbClient().createDirectory(dirName);
     }
 
     /**
-     * Delete direcotry processor for deleting a directory
+     * Delete directory processor for deleting a directory
      *
      * @param dirName
      *            Directory name to be used for the delete operation.
      * @return void
      */
     @Processor
-    public boolean directoryDelete(@ConnectionKey @FriendlyName("Directory Name") String dirName) throws ConnectionException {
-        return this.getConfig().getSmbClient().deleteDir(dirName);
+    public void directoryDelete(@ConnectionKey @FriendlyName("Directory Name") String dirName) throws ConnectionException {
+        this.getConfig().getSmbClient().deleteDir(dirName);
     }
 
     /**
@@ -126,7 +126,7 @@ public class SmbConnector {
      *            SMBConnectorConfig to be used
      * @return void
      */
-    public void setConfig(SMBConnectorConfig config) {
+    public void setConfig(SmbConnectorConfig config) {
         this.config = config;
     }
 
@@ -135,7 +135,7 @@ public class SmbConnector {
      *
      * @return The config as an SMBConnectorConfig
      */
-    public SMBConnectorConfig getConfig() {
+    public SmbConnectorConfig getConfig() {
         return config;
     }
 }

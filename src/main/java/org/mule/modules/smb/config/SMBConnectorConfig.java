@@ -17,7 +17,7 @@ import org.mule.modules.smb.utils.Utilities;
 import org.mule.util.NumberUtils;
 
 @ConnectionManagement(friendlyName = "Configuration")
-public class SMBConnectorConfig {
+public class SmbConnectorConfig {
 
     private SmbClient smbClient = new SmbClient(this);
 

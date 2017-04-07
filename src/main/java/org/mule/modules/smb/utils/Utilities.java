@@ -55,7 +55,7 @@ public class Utilities {
      */
     public static boolean isNotBlankOrEmptyOrNull(String string) {
         if (string != null) {
-            return StringUtils.isNotBlank(string) && StringUtils.isNotEmpty(string);
+            return StringUtils.isNotEmpty(string);
         } else {
             return false;
         }
