@@ -18,6 +18,7 @@
         <category>Community</category>
         <licensePath>LICENSE.md</licensePath>
         <devkit.studio.package.skip>false</devkit.studio.package.skip>
+	    <skipTests>true</skipTests>
     </properties>
     <repositories>
         <repository>
@@ -38,6 +39,16 @@
     </dependencies>
     
     <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.12.4</version>
+        <configuration>
+          <skipTests>${skipTests}</skipTests>
+        </configuration>
+      </plugin>
+    </plugins>
     <!-- plugins>
        <plugin>
             <groupId>org.mule.certification</groupId>
