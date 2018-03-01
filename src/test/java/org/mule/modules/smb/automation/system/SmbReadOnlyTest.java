@@ -29,7 +29,7 @@ public class SmbReadOnlyTest {
                 credentials.getProperty("config.username"), credentials.getProperty("config.password"), credentials.getProperty("config.timeout"));
 
         // write out a test file
-        config.getSmbClient().writeFile(fileName, true, fileContent.getBytes());
+        config.getSmbClient().writeFile(fileName, true, fileContent.getBytes(), "UTF-8");
 
         // reconnect with RO credentials
         config.connect(credentials.getProperty("config.readonly.domain"), credentials.getProperty("config.readonly.host"), credentials.getProperty("config.readonly.path"),
@@ -54,7 +54,7 @@ public class SmbReadOnlyTest {
 
     @Test(expected = SmbConnectionException.class)
     public void invalidWriteTest() throws SmbConnectionException {
-        config.getSmbClient().writeFile(fileName, true, fileContent.getBytes());
+        config.getSmbClient().writeFile(fileName, true, fileContent.getBytes(), "UTF-8");
     }
 
     @Test(expected = SmbConnectionException.class)
