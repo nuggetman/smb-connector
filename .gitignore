@@ -11,5 +11,11 @@ target/
 
 # Mule Studio
 .studio
+bin/
+.classpath
+.settings/
+.project
+.factorypath
+.metadata
 
 **/automation-credentials.properties
