@@ -24,7 +24,7 @@ import org.mule.api.annotations.param.RefOnly;
 import org.mule.modules.smb.config.SmbConnectorConfig;
 import org.mule.modules.smb.utils.Utilities;
 
-@Connector(name = "SMB", friendlyName = "SMB Connector")
+@Connector(name = "smb", friendlyName = "SMB Connector")
 public class SmbConnector {
 
     @Config

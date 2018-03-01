@@ -1,6 +1,6 @@
-# Anypoint Smb Connector
+# Anypoint SMB Connector
 
-The Smb connector allows Mule to connect to a Samba share to read and write file based data.
+The SMB connector allows Mule to connect to a Samba share to read and write file based data.
 
 # Mule supported versions
 Examples:

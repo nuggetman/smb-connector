@@ -6,7 +6,7 @@
     <artifactId>smb-connector</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <packaging>mule-module</packaging>
-    <name>Anypoint Smb Connector</name>
+    <name>Anypoint SMB Connector</name>
 
     <parent>
         <groupId>org.mule.tools.devkit</groupId>
