@@ -11,7 +11,7 @@ Anypoint Connector for SMB provides the capability to perform operations (such a
 
 See:
 
-* link:/doc/release-notes[Connector Release Notes]
+* link:/doc/release-notes.adoc[Connector Release Notes]
 * link:/[Technical Reference]
 * link:https://www.mulesoft.com/exchange#!/?filters=smb&sortBy=rank[Anypoint Exchange demo applications].
 
