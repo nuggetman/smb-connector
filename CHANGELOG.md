@@ -1,14 +1,17 @@
-# SMB Connector Release Notes
+# Smb Release Notes
 # --------------------------------------------------------------------
-Date: Mar-2018
-Version: 1.0
-Supported driver: 
-JCIFS v1.3.19
+# Date: <DD-MMM-YYYY>
+Example: 24-Jan-2015
+# Version: (default value: 0.1)
+# Supported API versions: 
+Example: Salesforce Bulk API v.28, SOAP API V.28 (include links to API docs)
 # Supported Mule Runtime Versions: 
 ${project.devkitVersion}
 # New Features and Functionality
-Initial version 
+(default value: Initial version) 
+Example: Added support for Query. http://github.com/mulesoft/smb/issues/61
+# Closed Issues in this release 
+(include issue link when possible)
+Example: Fixed problem with lost telefone on Bulk Update (CLDCONNECT-123).
 # Known Issues in this release
-Streaming is currently not supported in DevKit 3.9 (current edition)
-The underlying JCIFS library cannot be distributed with the connector, the .jar driver can be downloaded from https://jcifs.samba.org/
-JCifs provides no way to “disconnect” from a resource, but it naturally times out after 15 secs of no activity
+Example: Session ID expires after  30 days. http://github.com/mulesoft/smb/issues/62

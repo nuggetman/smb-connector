@@ -1,5 +1,7 @@
 package org.mule.modules.smb.automation.functional;
 
+import java.io.IOException;
+
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Test;
@@ -29,7 +31,7 @@ public class FileWriteTest extends AbstractTestCase<SmbConnector> {
     @Test
     public void verifyWriteNoAppend() {
         try {
-            getConnector().fileWrite(fileName, false, fileContent, "UTF-8");
+            getConnector().fileWrite(fileName, false, fileContent);
         } catch (ConnectionException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -38,7 +40,7 @@ public class FileWriteTest extends AbstractTestCase<SmbConnector> {
     @Test
     public void verifyWriteAppendString() {
         try {
-            getConnector().fileWrite(fileName, true, fileContent, "UTF-8");
+            getConnector().fileWrite(fileName, true, fileContent);
         } catch (ConnectionException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -47,8 +49,8 @@ public class FileWriteTest extends AbstractTestCase<SmbConnector> {
     @Test
     public void verifyWriteAppendInputStream() {
         try {
-            getConnector().fileWrite(fileName, true, IOUtils.toInputStream(fileContent), "UTF-8");
-        } catch (ConnectionException e) {
+            getConnector().fileWrite(fileName, true, IOUtils.toInputStream(fileContent, "UTF-8"));
+        } catch (ConnectionException | IOException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
@@ -56,7 +58,7 @@ public class FileWriteTest extends AbstractTestCase<SmbConnector> {
     @Test
     public void verifyWriteAppendByteArray() {
         try {
-            getConnector().fileWrite(fileName, true, fileContent.getBytes(), "UTF-8");
+            getConnector().fileWrite(fileName, true, fileContent.getBytes());
         } catch (ConnectionException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -65,7 +67,7 @@ public class FileWriteTest extends AbstractTestCase<SmbConnector> {
     @Test
     public void verifyWriteAppendInteger() {
         try {
-            getConnector().fileWrite(fileName, true, integerContent, "UTF-8");
+            getConnector().fileWrite(fileName, true, integerContent);
         } catch (ConnectionException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

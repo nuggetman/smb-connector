@@ -191,10 +191,8 @@ public class SmbClient {
      *            boolean indicating whether to append this new content to the file otherwise overwrite
      * @param data
      *            InputStream or byte[] of data to write into the file
-     * @param encoding
-     * 			  Character encoding of contents to write
      */
-    public void writeFile(String fileName, boolean append, Object data, String encoding) throws SmbConnectionException {
+    public void writeFile(String fileName, boolean append, Object data) throws SmbConnectionException {
         SmbFileOutputStream out = null;
         try {
             SmbFile smbFile = getSmbFileFromRoot(fileName);
@@ -207,7 +205,7 @@ public class SmbClient {
                 byte[] dataBytes = (byte[]) data;
                 IOUtils.write(dataBytes, out);
             } else if (data instanceof String) {
-                byte[] dataBytes = ((String) data).getBytes(encoding);
+                byte[] dataBytes = ((String) data).getBytes();
                 IOUtils.write(dataBytes, out);
             } else {
                 logger.error("unsupported object type");
