@@ -24,7 +24,7 @@ import org.mule.api.annotations.param.RefOnly;
 import org.mule.modules.smb.config.SmbConnectorConfig;
 import org.mule.modules.smb.utils.Utilities;
 
-@Connector(name = "SMB", friendlyName = "SMB Connector")
+@Connector(name = "smb", friendlyName = "SMB Connector")
 public class SmbConnector {
 
     @Config
@@ -56,12 +56,14 @@ public class SmbConnector {
      *            Append payload to file, if it exists already
      * @param fileContent
      *            A byte[], String or InputStream containing the contents of the file to write.
+     * @param encoding
+     * 			  Character encoding of contents to write
      * @return void
      */
     @Processor
     public void fileWrite(@ConnectionKey @FriendlyName("File Name") @Required String fileName, @Default("false") @FriendlyName("Append to file") boolean append,
-            @RefOnly @Default("#[payload]") Object fileContent) throws ConnectionException {
-        this.getConfig().getSmbClient().writeFile(fileName, append, fileContent);
+            @RefOnly @Default("#[payload]") Object fileContent, @Required @Default("UTF-8") String encoding) throws ConnectionException {
+        this.getConfig().getSmbClient().writeFile(fileName, append, fileContent, encoding);
     }
 
     /**

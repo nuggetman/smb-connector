@@ -1,3 +1,18 @@
-<!-- BEGIN_INCLUDE(smb:greet) -->
-    <smb:greet config-ref="" friend="#[map-payload:friend]" />
-<!-- END_INCLUDE(smb:greet) -->
+<!-- BEGIN_INCLUDE(smb:directory-create) -->
+    <smb:directory-create config-ref="SMB_Connector__Configuration" dirName="#[flowVars.folder]" doc:name="SMB Connector"/>
+<!-- END_INCLUDE(smb:directory-create) -->
+<!-- BEGIN_INCLUDE(smb:directory-delete) -->
+	<smb:directory-delete config-ref="SMB_Connector__Configuration" dirName="#[flowVars.folder]" doc:name="SMB Connector"/>
+<!-- END_INCLUDE(smb:directory-delete) -->
+<!-- BEGIN_INCLUDE(smb:directorylist) -->
+	<smb:directory-list config-ref="SMB_Connector__Configuration" dirName="#[flowVars.folder]" doc:name="SMB Connector"/>
+<!-- END_INCLUDE(smb:directorylist) -->
+<!-- BEGIN_INCLUDE(smb:file-delete) -->
+	<smb:file-delete config-ref="SMB_Connector__Configuration" fileName="#[flowVars.fileName]" doc:name="SMB Connector"/>
+<!-- END_INCLUDE(smb:file-delete) -->
+<!-- BEGIN_INCLUDE(smb:file-read) -->
+	<smb:file-read config-ref="SMB_Connector__Configuration" fileName="#[flowVars.fileName]" autoDelete="false" doc:name="SMB Connector"/>
+<!-- END_INCLUDE(smb:file-read) -->
+<!-- BEGIN_INCLUDE(smb:file-write) -->
+	<smb:file-write config-ref="SMB_Connector__Configuration" fileName="#[flowVars.fileName]" append="false" doc:name="SMB Connector"/>
+<!-- END_INCLUDE(smb:file-write) -->

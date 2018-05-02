@@ -18,7 +18,7 @@ public class FileDeleteTest extends AbstractTestCase<SmbConnector> {
     @Before
     public void setup() {
         try {
-            getConnector().fileWrite(fileName, false, fileContent.getBytes());
+            getConnector().fileWrite(fileName, false, fileContent.getBytes(), "UTF-8");
         } catch (ConnectionException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

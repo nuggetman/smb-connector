@@ -1,0 +1,94 @@
+#%RAML 0.8
+title: SMB Connector Demo API
+version: 1.0
+baseUri: http://localhost:8081/api
+
+/directory:
+  displayName: directory management
+  /{directory_name}:
+    get:
+      description: list a directory contents
+      responses: 
+        200:
+          body: 
+            application/json:
+        400:
+          body: 
+            application/json:
+              example: |
+                { "successful" : "false" }
+
+    post:
+      description: create a directory
+      responses: 
+        200:
+          body: 
+        400:
+          body: 
+            application/json:
+              example: |
+                { "successful" : "false" }
+
+    delete:
+      description: delete a directory 
+      responses: 
+        200:
+          body: 
+            application/json:
+              example: |
+                { "successful" : "true" }
+        400:
+          body: 
+            application/json:
+              example: |
+                { "successful" : "false" }
+/file:
+  displayName: File management
+  /{file_name}:
+    get:
+      description: get file contents
+      responses: 
+        200:
+          body: 
+        400:
+          body: 
+            application/json:
+              example: |
+                { "successful" : "false" }
+    post:
+      description: write file contents to a new file
+      body: 
+      responses: 
+        200:
+          body: 
+        400:
+          body: 
+            application/json:
+              example: |
+                { "successful" : "false" }
+
+    put:
+      description: append file contents
+      body: 
+      responses: 
+        200:
+          body: 
+        400:
+          body: 
+            application/json:
+              example: |
+                { "successful" : "false" }
+
+    delete:
+      description: delete a file
+      responses: 
+        200:
+          body: 
+            application/json:
+              example: |
+                { "successful" : "true" }
+        400:
+          body: 
+            application/json:
+              example: |
+                { "successful" : "false" }

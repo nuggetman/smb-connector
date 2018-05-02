@@ -1,0 +1,104 @@
+= SMB Connector
+
+toc::[]
+
+
+[[overview]]
+== Overview
+
+
+Anypoint Connector for SMB provides the capability to perform operations (such as create directory, list directory contents, delete a directory, read a file, write a file, delete a file) against a Windows SMB share.
+
+See:
+
+* link:/doc/release-notes[Connector Release Notes]
+* link:/[Technical Reference]
+* link:https://www.mulesoft.com/exchange#!/?filters=smb&sortBy=rank[Anypoint Exchange demo applications].
+
+
+This document assumes that you are familiar with Mule, Anypoint Connectors, Anypoint Studio, Mule Concepts, and Global Elements.
+
+[[install]]
+== How to Install
+
+You can install the connector in Anypoint Studio using the instructions in
+link:/getting-started/anypoint-exchange#installing-a-connector-from-anypoint-exchange[Installing a Connector from Anypoint Exchange].
+
+If you are upgrading from a previous version of the connector, a small popup appears in the bottom right corner of Anypoint Studio with the "Updates Available" message. Click the popup and follow the prompts to install the latest version.
+
+[[ns-schema]]
+== Connector Namespace and Schema
+
+When designing your application in Anypoint Studio, when you drag the connector from the palette onto the Anypoint Studio canvas, Studio automatically populates the XML code with the connector *namespace* and *schema location*.
+
+* *Namespace*: `+http://www.mulesoft.org/schema/mule/smb+` +
+* *Schema Location*: `+http://www.mulesoft.org/schema/mule/smb/current/mule-smb.xsd+`
+
+[TIP]
+If you are manually coding the Mule application in Studio's XML editor or another text editor, define the namespace and schema location in the header of your *Configuration XML*, inside the `<mule>` tag.
+
+[source, xml, linenums]
+----
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:connector="http://www.mulesoft.org/schema/mule/smb"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core
+               http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/smb
+               http://www.mulesoft.org/schema/mule/smb/current/mule-smb.xsd">
+
+      <!-- put your global configuration elements and flows here -->
+
+</mule>
+----
+
+NOTE: Use `current` in the schema path. Studio interprets this to the current Mule version.
+
+[[maven]]
+== Maven Dependency Information
+
+For Maven dependency management, include this XML snippet in your `pom.xml` file.
+
+[source,xml,linenums]
+----
+<dependency>
+    <groupId>org.mule.modules</groupId>
+    <artifactId>mule-module-smb</artifactId>
+    <version>1.0.0</version>
+</dependency>
+----
+
+Inside the `<version>` tags, put the desired version number, the word `RELEASE` for the latest release, or `SNAPSHOT` for the latest available version.
+
+[[configure]]
+== How to Configure
+
+Place the connector in your flow as applicable for your use case.
+
+To use the SMB connector in your Mule application, you must configure a global SMB element that can be used by the SMB connector. The SMB connector provides the following global configuration, requiring the following information:
+
+[%header%autowidth.spread]
+|===
+|Field |Description
+|Domain |Enter a Windows domain for the user to log in with.
+|Username |Enter the username to log in with.
+|Password |Enter the corresponding password.
+|Host |Hostname of server hosting SMB share.
+|Path |Named path of the SMB share.
+|Connection timeout |Timeout for connection, in milliseconds.
+|===
+
+[[operations]]
+== Operations
+
+[%header,cols="20%,80%"]
+|===
+|Name | Description
+|Read a file |Reads the contents of a file from the SMB share
+|Write a file |Writes data out to a file, optional property to append data to an existing file
+|Delete a file |Delete a file from the SMB share
+|Create a directory |Create a new directory on the SMB share
+|List directory contents |List the contents of a directory on the SMB share
+|Delete a directory |Delete a directory from the SMB share
+|===
