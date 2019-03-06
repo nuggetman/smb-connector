@@ -9,7 +9,7 @@ target/
 *.jar
 *.war
 
-# Mule Studio
+# dev tools 
 .studio
 bin/
 .classpath
@@ -17,5 +17,6 @@ bin/
 .project
 .factorypath
 .metadata
+.idea/
 
 **/automation-credentials.properties
