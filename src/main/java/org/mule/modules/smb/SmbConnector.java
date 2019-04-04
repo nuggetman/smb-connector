@@ -85,16 +85,18 @@ public class SmbConnector {
      *            Folder name to be used for the list operation.
      * @param wildcard
      *            DOS style wildcard filter
+     * @param fileAge
+     *            Required file age before read can occur (ms)
      * @return A list of Maps, each Map containing attributes for each file
      */
     @Processor
-    public List<Map<String, Object>> directoryList(@ConnectionKey @FriendlyName("Folder Name") @Optional String dirName, @Default("*") @FriendlyName("Wildcard") String wildcard)
-            throws ConnectionException {
+    public List<Map<String, Object>> directoryList(@ConnectionKey @FriendlyName("Folder Name") @Optional String dirName, @Default("*") @FriendlyName("Wildcard") String wildcard, 
+    			@Default("500") @FriendlyName("File age (ms)") Integer fileAge) throws ConnectionException {
         String w = wildcard;
         if (!Utilities.isNotBlankOrEmptyOrNull(w)) {
             w = "*";
         }
-        return this.getConfig().getSmbClient().listDirectory(dirName, w);
+        return this.getConfig().getSmbClient().listDirectory(dirName, w, fileAge);
     }
 
     /**
