@@ -341,7 +341,8 @@ public class SmbClient {
             
             if (smbDir != null) {
                 SmbFile[] smbFiles;
-                smbFiles = smbDir.listFiles(wildcard); // TODO: SmbFileFilter or SmbFilenameFilter
+                DosFileFilter filter = new DosFileFilter(wildcard, null);
+                smbFiles = smbDir.listFiles(filter);
                 results = new ArrayList<Map<String, Object>>();
                 for (SmbFile file : smbFiles) {
                 		if (checkIsFileOldEnough(file, this.getConfig().getFileage())) {

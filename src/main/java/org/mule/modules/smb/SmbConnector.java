@@ -86,11 +86,11 @@ public class SmbConnector {
      * @return A list of Maps, each Map containing attributes for each file
      */
     @Processor
-    public List<Map<String, Object>> directoryList(@ConnectionKey @FriendlyName("Folder Name") @Optional String dirName, @Default("*") @FriendlyName("Wildcard") String wildcard, 
+    public List<Map<String, Object>> directoryList(@ConnectionKey @FriendlyName("Folder Name") @Optional String dirName, @Default("*.*") @FriendlyName("Wildcard") String wildcard, 
     			throws ConnectionException {
         String w = wildcard;
         if (!Utilities.isNotBlankOrEmptyOrNull(w)) {
-            w = "*";
+            w = "*.*";
         }
         return this.getConfig().getSmbClient().listDirectory(dirName, w);
     }
