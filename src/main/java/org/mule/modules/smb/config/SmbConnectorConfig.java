@@ -41,6 +41,9 @@ public class SmbConnectorConfig {
      * @return void
      */
     public void setHost(String host) {
+    		if (!host.startsWith("smb://")) {
+    			host = "smb://" + host;
+    		}
         this.host = host;
     }
 
@@ -115,7 +118,11 @@ public class SmbConnectorConfig {
      * @return void
      */
     public void setUsername(String u) {
-        this.username = u;
+    		if (u.length() == 0) {
+    			this.username = null;
+    		}
+    		else
+    			this.username = u;
     }
 
     /**
@@ -133,7 +140,11 @@ public class SmbConnectorConfig {
      * @return void
      */
     public void setPassword(String p) {
-        this.password = p;
+    		if (p.length() == 0) {
+			this.password = null;
+		}
+		else
+			this.password = p;
     }
 
     /**
@@ -169,9 +180,12 @@ public class SmbConnectorConfig {
      */
     @Connect
     @TestConnectivity
-    public void connect(@ConnectionKey @FriendlyName("Domain") String domain, @ConnectionKey @FriendlyName("Host") String host,
-            @ConnectionKey @Optional @FriendlyName("Path") String path, @FriendlyName("Username") String username, @Password @FriendlyName("Password") String password,
-            @Optional @FriendlyName("Connection timeout") String timeout) throws ConnectionException {
+    public void connect(@ConnectionKey @FriendlyName("Domain") String domain, 
+    		@ConnectionKey @FriendlyName("Host") String host,
+        @ConnectionKey @Optional @FriendlyName("Path") String path, 
+        @Optional @FriendlyName("Username") String username,
+        @Optional @Password @FriendlyName("Password") String password, 
+        @Optional @FriendlyName("Connection timeout") String timeout) throws ConnectionException {
 
         try {
             this.setDomain(domain);

@@ -56,8 +56,8 @@ public class SmbClient {
      */
     public boolean isConnected() {
         try {
-            if (getRootSmbDir() != null) {
-                return getRootSmbDir().canRead();
+            if (this.getConnection() != null) {
+                return this.getConnection().canRead();
             } else {
                 return false;
             }
@@ -118,15 +118,11 @@ public class SmbClient {
             logger.debug("connecting to: smb://" + this.getConfig().getHost() + this.getConfig().getPath());
 
             this.setCredentials(this.getConfig().getDomain(), this.getConfig().getUsername(), this.getConfig().getPassword());
-            SmbFile smbFile;
-
-            smbFile = new SmbFile("smb://" + this.getConfig().getHost() + this.getConfig().getPath(), this.getCredentials());
-            smbFile.setConnectTimeout(this.getConfig().getTimeout());
+            SmbFile smbFile = this.getConnection();
+            
             if (!smbFile.canRead()) {
                 throw new SmbConnectionException(ConnectionExceptionCode.CANNOT_REACH, null, "not connected", null);
             }
-        } catch (MalformedURLException e) {
-            throw new SmbConnectionException(ConnectionExceptionCode.UNKNOWN, null, e.getMessage(), e);
         } catch (SmbAuthException e) {
             throw new SmbConnectionException(ConnectionExceptionCode.INCORRECT_CREDENTIALS, null, e.getMessage(), e);
         } catch (SmbException e) {
@@ -152,7 +148,7 @@ public class SmbClient {
         byte[] data = null;
         SmbFileInputStream smbFileInputStream = null;
         try {
-            SmbFile smbFile = getSmbFileFromRoot(fileName);
+            SmbFile smbFile = this.getConnection(Utilities.normalizeFile(fileName));
             if (smbFile != null) {
                 if (checkIsFileOldEnough(smbFile, fileAge)) {
                     smbFileInputStream = new SmbFileInputStream(smbFile);
@@ -197,7 +193,7 @@ public class SmbClient {
     public void writeFile(String fileName, boolean append, Object data, String encoding) throws SmbConnectionException {
         SmbFileOutputStream out = null;
         try {
-            SmbFile smbFile = getSmbFileFromRoot(fileName);
+            SmbFile smbFile = this.getConnection(Utilities.normalizeFile(fileName));
             out = new SmbFileOutputStream(smbFile, append);
             if (data instanceof InputStream) {
                 InputStream is = (InputStream) data;
@@ -242,7 +238,7 @@ public class SmbClient {
      *            String value of the directory name
      */
     public void createDirectory(String dirName) throws SmbConnectionException {
-        SmbFile directory = getSmbFileFromRoot(dirName);
+        SmbFile directory = this.getConnection(Utilities.normalizeFile(dirName));
 
         logger.debug("creating a directory: " + directory.getUncPath());
 
@@ -267,7 +263,7 @@ public class SmbClient {
      *            String value of the file name to delete
      */
     public void deleteFile(String fileName) throws SmbConnectionException {
-        SmbFile smbFile = getSmbFileFromRoot(fileName);
+        SmbFile smbFile = this.getConnection(Utilities.normalizeFile(fileName));
         if (smbFile != null) {
             try {
                 logger.info("deleting file: " + fileName);
@@ -292,7 +288,7 @@ public class SmbClient {
      *            String value of the directory to delete
      */
     public void deleteDir(String dirName) throws SmbConnectionException {
-        SmbFile smbFile = getSmbDirFromRoot(dirName);
+        SmbFile smbFile = this.getConnection(Utilities.normalizePath(dirName));
         try {
             if (smbFile.isDirectory()) {
                 this.deleteSmbFile(smbFile);
@@ -329,32 +325,39 @@ public class SmbClient {
      *            String of the directory name
      * @param wildcard
      *            String of the DOS wildcard filter
+     * @param fileAge
+     *            Integer of the minimum file age before file is read in
      * @return A List<Map<String,Object>> where each item in the list is a file or directory and the Map structure contains the attributes for the item
+     * 
      */
-    public List<Map<String, Object>> listDirectory(String dirName, String wildcard) throws SmbConnectionException {
+    public List<Map<String, Object>> listDirectory(String dirName, String wildcard, Integer fileAge) throws SmbConnectionException {
         List<Map<String, Object>> results = null;
         SmbFile smbDir;
         try {
             if (dirName != null) {
-                smbDir = getSmbDirFromRoot(dirName);
+                smbDir = this.getConnection(Utilities.normalizePath(dirName));
             } else {
-                smbDir = getRootSmbDir();
+                smbDir = this.getConnection();
             }
+            
+            // TODO: SmbFileFilter or SmbFilenameFilter
             if (smbDir != null) {
                 SmbFile[] smbFiles;
                 smbFiles = smbDir.listFiles(wildcard);
                 results = new ArrayList<Map<String, Object>>();
                 for (SmbFile file : smbFiles) {
-                    HashMap<String, Object> metaData = new HashMap<String, Object>();
-                    metaData.put("name", file.getName());
-                    metaData.put("last modified", file.getLastModified());
-                    metaData.put("created on", file.createTime());
-                    metaData.put("size", file.length());
-                    metaData.put("is file", file.isFile());
-                    metaData.put("is directory", file.isDirectory());
-                    metaData.put("read-only", !file.canWrite());
-                    metaData.put("hidden", file.isHidden());
-                    results.add(metaData);
+                		if (checkIsFileOldEnough(file, fileAge)) {
+	                    HashMap<String, Object> metaData = new HashMap<String, Object>();
+	                    metaData.put("name", file.getName());
+	                    metaData.put("last modified", file.getLastModified());
+	                    metaData.put("created on", file.createTime());
+	                    metaData.put("size", file.length());
+	                    metaData.put("is file", file.isFile());
+	                    metaData.put("is directory", file.isDirectory());
+	                    metaData.put("read-only", !file.canWrite());
+	                    metaData.put("hidden", file.isHidden());
+	                    results.add(metaData);
+                		}
                 }
             }
         } catch (SmbAuthException e) {
@@ -363,61 +366,6 @@ public class SmbClient {
             throw new SmbConnectionException(ConnectionExceptionCode.CANNOT_REACH, null, e.getMessage(), e);
         }
         return results;
-    }
-
-    /**
-     * Helper method for ensuring path naming consistency for files
-     * 
-     * @param fileName
-     *            String value of the file name to append to the root folder
-     * @return SmbFile object based on appended file name
-     */
-    private SmbFile getSmbFileFromRoot(String fileName) throws SmbConnectionException {
-        try {
-            SmbFile f = new SmbFile(this.getRootSmbDir().getPath() + Utilities.normalizeFile(fileName), this.getCredentials());
-            f.setConnectTimeout(this.getConfig().getTimeout());
-            return f;
-        } catch (MalformedURLException e) {
-            throw new SmbConnectionException(ConnectionExceptionCode.UNKNOWN, null, e.getMessage(), e);
-        }
-    }
-
-    /**
-     * Helper method for ensuring path naming consistency for directories
-     * 
-     * @param folderName
-     *            String value of the folder name to append to the root folder
-     * @return SmbFile object based on appended folder name
-     */
-    private SmbFile getSmbDirFromRoot(String folderName) throws SmbConnectionException {
-        try {
-            SmbFile f = new SmbFile(this.getRootSmbDir().getPath() + Utilities.normalizePath(folderName), this.getCredentials());
-            f.setConnectTimeout(this.getConfig().getTimeout());
-            return f;
-        } catch (MalformedURLException e) {
-            throw new SmbConnectionException(ConnectionExceptionCode.UNKNOWN, null, e.getMessage(), e);
-        }
-    }
-
-    /**
-     * Helper method to track base path for SMB mount
-     * 
-     * @return SmbFile for the base mount path
-     */
-    private SmbFile getRootSmbDir() throws SmbConnectionException {
-        try {
-            if (this.getConfig().getHost() != null && this.getConfig().getPath() != null) {
-
-                SmbFile f = new SmbFile("smb://" + this.getConfig().getHost() + this.getConfig().getPath(), this.getCredentials());
-                f.setConnectTimeout(this.getConfig().getTimeout());
-                return f;
-            } else {
-                return null;
-            }
-
-        } catch (MalformedURLException e) {
-            throw new SmbConnectionException(ConnectionExceptionCode.UNKNOWN, null, e.getMessage(), e);
-        }
     }
 
     /**
@@ -435,8 +383,66 @@ public class SmbClient {
      * @return void
      */
     public void setCredentials(String domain, String username, String password) {
-        NtlmPasswordAuthentication c = new NtlmPasswordAuthentication(domain, username, password);
-        this.credentials = c;
+    		if (username.length() > 0 && password.length() > 0) {
+    			NtlmPasswordAuthentication c = new NtlmPasswordAuthentication(domain, username, password);
+    	        this.credentials = c;
+    		}
+    		else 
+    			this.credentials = null;
+        
     }
-
+    
+    /**
+     * Helper method to create a connection
+     * 
+     * @return SmbFile
+     */
+    private SmbFile getConnection() throws SmbConnectionException {
+    		try {
+    			SmbFile f;
+	    		if (this.getConfig().getHost() != null && this.getConfig().getPath() != null) {
+			    	if (this.getCredentials() != null) {
+			    		f = new SmbFile(this.getConfig().getHost() + this.getConfig().getPath(), this.getCredentials());
+			    	} else 
+			    		f = new SmbFile(this.getConfig().getHost() + this.getConfig().getPath());
+			    	
+			    f.setConnectTimeout(this.getConfig().getTimeout());
+		    
+			    return f;
+	    		} else {
+	    			return null;
+	    		}
+    		} catch (MalformedURLException e) {
+                throw new SmbConnectionException(ConnectionExceptionCode.UNKNOWN, null, e.getMessage(), e);
+    		}
+    }
+    
+    /**
+     * Helper method to create a connection for a file or directory
+     * 
+     * @param String filename
+     * 		filename or directory to obtain
+     * @return SmbFile
+     */
+    private SmbFile getConnection(String filenameordirectory) throws SmbConnectionException {
+    		try {    		
+			SmbFile f;
+	    		if (this.getConfig().getHost() != null && this.getConfig().getPath() != null) {
+			    	if (this.getCredentials() != null) {
+			    		f = new SmbFile(this.getConfig().getHost() + this.getConfig().getPath() + filenameordirectory, this.getCredentials());
+			    	} else 
+			    		f = new SmbFile(this.getConfig().getHost() + this.getConfig().getPath() + filenameordirectory);
+			    	
+			    f.setConnectTimeout(this.getConfig().getTimeout());
+		    
+			    return f;
+	    		} else {
+	    			return null;
+	    		}
+		} catch (MalformedURLException e) {
+            throw new SmbConnectionException(ConnectionExceptionCode.UNKNOWN, null, e.getMessage(), e);
+		}
+    }
 }
+    
+    
