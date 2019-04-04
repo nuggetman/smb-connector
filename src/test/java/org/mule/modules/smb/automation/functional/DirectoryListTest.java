@@ -12,7 +12,8 @@ import org.mule.tools.devkit.ctf.junit.AbstractTestCase;
 public class DirectoryListTest extends AbstractTestCase<SmbConnector> {
 
     private String dirName = new String("testlistfolder");
-    private String wildcard = new String("*");
+    private String wildcard = new String("*.*");
+    private int age = 500;
 
     public DirectoryListTest() {
         super(SmbConnector.class);
@@ -22,7 +23,7 @@ public class DirectoryListTest extends AbstractTestCase<SmbConnector> {
     public void setup() {
         try {
             getConnector().directoryCreate(dirName);
-        } catch (ConnectionException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
@@ -31,7 +32,7 @@ public class DirectoryListTest extends AbstractTestCase<SmbConnector> {
     public void tearDown() {
         try {
             getConnector().directoryDelete(dirName);
-        } catch (ConnectionException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
@@ -39,8 +40,8 @@ public class DirectoryListTest extends AbstractTestCase<SmbConnector> {
     @Test
     public void verifyDirListWithWildCard() {
         try {
-            assertNotNull(getConnector().directoryList(dirName, wildcard));
-        } catch (ConnectionException e) {
+        		assertFalse(getConnector().directoryList(dirName, wildcard, age).isEmpty());
+        } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
@@ -48,8 +49,8 @@ public class DirectoryListTest extends AbstractTestCase<SmbConnector> {
     @Test
     public void verifyDirListWithNoWildCard() {
         try {
-            assertNotNull(getConnector().directoryList(dirName, null));
-        } catch (ConnectionException e) {
+        		assertFalse(getConnector().directoryList(dirName, null, age).isEmpty());
+        } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
