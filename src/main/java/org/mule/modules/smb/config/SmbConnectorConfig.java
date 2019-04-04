@@ -32,6 +32,8 @@ public class SmbConnectorConfig {
     private String path;
 
     private int connectionTimeout = 30000;
+    
+    private int fileAge = 500;
 
     /**
      * Set the host for the config
@@ -154,6 +156,28 @@ public class SmbConnectorConfig {
      */
     public String getPassword() {
         return this.password;
+    }
+    
+    /**
+     * Set the file age limit (ms) for the config
+     *
+     * @return void
+     */
+    public void setFileage(Integer a) {
+    		if (a.length() == 0) {
+    			this.fileAge = 500;
+    		}
+    		else
+    			this.fileAge = a;
+    }
+
+    /**
+     * Get the file age limit from the config
+     *
+     * @return An int of the file age limit
+     */
+    public int getFileage() {
+        return this.fileAge;
     }
 
     /**

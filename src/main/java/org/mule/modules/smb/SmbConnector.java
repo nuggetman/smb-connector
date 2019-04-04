@@ -35,16 +35,14 @@ public class SmbConnector {
      *
      * @param fileName
      *            File name to read in
-     * @param fileAge
-     *            Required file age before read can occur (ms)
      * @param autoDelete
      *            Should the file be deleted after reading
      * @return The file contents as a byte[]
      */
     @Processor
-    public byte[] fileRead(@ConnectionKey @FriendlyName("File Name") String fileName, @Default("500") @FriendlyName("File age (ms)") Integer fileAge,
+    public byte[] fileRead(@ConnectionKey @FriendlyName("File Name") String fileName,
             @Default("false") @FriendlyName("Delete after reading") boolean autoDelete) throws ConnectionException {
-        return this.getConfig().getSmbClient().readFile(fileName, fileAge, autoDelete);
+        return this.getConfig().getSmbClient().readFile(fileName, autoDelete);
     }
 
     /**
@@ -85,18 +83,16 @@ public class SmbConnector {
      *            Folder name to be used for the list operation.
      * @param wildcard
      *            DOS style wildcard filter
-     * @param fileAge
-     *            Required file age before read can occur (ms)
      * @return A list of Maps, each Map containing attributes for each file
      */
     @Processor
     public List<Map<String, Object>> directoryList(@ConnectionKey @FriendlyName("Folder Name") @Optional String dirName, @Default("*") @FriendlyName("Wildcard") String wildcard, 
-    			@Default("500") @FriendlyName("File age (ms)") Integer fileAge) throws ConnectionException {
+    			throws ConnectionException {
         String w = wildcard;
         if (!Utilities.isNotBlankOrEmptyOrNull(w)) {
             w = "*";
         }
-        return this.getConfig().getSmbClient().listDirectory(dirName, w, fileAge);
+        return this.getConfig().getSmbClient().listDirectory(dirName, w);
     }
 
     /**

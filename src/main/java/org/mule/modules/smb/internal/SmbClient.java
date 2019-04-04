@@ -137,20 +137,17 @@ public class SmbClient {
      * 
      * @param fileName
      *            String containing the filename of the file to read in
-     * @param fileAge
-     *            Integer of the minimum file age before file is read in
-     * 
      * @param autoDelete
      *            boolean to indicate whether file should be deleted after reading
      * @return byte[] of file content
      */
-    public byte[] readFile(String fileName, Integer fileAge, boolean autoDelete) throws SmbConnectionException {
+    public byte[] readFile(String fileName, boolean autoDelete) throws SmbConnectionException {
         byte[] data = null;
         SmbFileInputStream smbFileInputStream = null;
         try {
             SmbFile smbFile = this.getConnection(Utilities.normalizeFile(fileName));
             if (smbFile != null) {
-                if (checkIsFileOldEnough(smbFile, fileAge)) {
+                if (checkIsFileOldEnough(smbFile, this.getConfig().getFileage())) {
                     smbFileInputStream = new SmbFileInputStream(smbFile);
                     data = new byte[(int) smbFile.length()];
                     smbFileInputStream.read(data);
@@ -266,10 +263,14 @@ public class SmbClient {
         SmbFile smbFile = this.getConnection(Utilities.normalizeFile(fileName));
         if (smbFile != null) {
             try {
-                logger.info("deleting file: " + fileName);
+                
                 if (smbFile.isFile()) {
-                    this.deleteSmbFile(smbFile);
-                    logger.info("deleted file: " + fileName);
+                		if (checkIsFileOldEnough(file, this.getConfig().getFileage())) {
+                			this.deleteSmbFile(smbFile);
+                			logger.debug("deleted file: " + fileName);
+                		} else {
+                			logger.debug("file:" + fileName + " not old enough for deletion");
+                		}
                 } else {
                     logger.debug("not a file: " + fileName);
                 }
@@ -325,12 +326,10 @@ public class SmbClient {
      *            String of the directory name
      * @param wildcard
      *            String of the DOS wildcard filter
-     * @param fileAge
-     *            Integer of the minimum file age before file is read in
      * @return A List<Map<String,Object>> where each item in the list is a file or directory and the Map structure contains the attributes for the item
      * 
      */
-    public List<Map<String, Object>> listDirectory(String dirName, String wildcard, Integer fileAge) throws SmbConnectionException {
+    public List<Map<String, Object>> listDirectory(String dirName, String wildcard) throws SmbConnectionException {
         List<Map<String, Object>> results = null;
         SmbFile smbDir;
         try {
@@ -340,13 +339,12 @@ public class SmbClient {
                 smbDir = this.getConnection();
             }
             
-            // TODO: SmbFileFilter or SmbFilenameFilter
             if (smbDir != null) {
                 SmbFile[] smbFiles;
-                smbFiles = smbDir.listFiles(wildcard);
+                smbFiles = smbDir.listFiles(wildcard); // TODO: SmbFileFilter or SmbFilenameFilter
                 results = new ArrayList<Map<String, Object>>();
                 for (SmbFile file : smbFiles) {
-                		if (checkIsFileOldEnough(file, fileAge)) {
+                		if (checkIsFileOldEnough(file, this.getConfig().getFileage())) {
 	                    HashMap<String, Object> metaData = new HashMap<String, Object>();
 	                    metaData.put("name", file.getName());
 	                    metaData.put("last modified", file.getLastModified());
