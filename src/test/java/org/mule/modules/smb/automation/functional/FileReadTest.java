@@ -13,7 +13,6 @@ public class FileReadTest extends AbstractTestCase<SmbConnector> {
 
     private String fileName = new String("testreadfile.txt");
     private String fileContent = new String("somecontent");
-    private Integer fileAge = new Integer(500);
 
     public FileReadTest() {
         super(SmbConnector.class);
@@ -41,7 +40,7 @@ public class FileReadTest extends AbstractTestCase<SmbConnector> {
     @Test
     public void verifyFileReadNoDelete() {
         try {
-            assertEquals(fileContent, new String(getConnector().fileRead(fileName, fileAge, false)));
+            assertEquals(fileContent, new String(getConnector().fileRead(fileName, false)));
         } catch (ConnectionException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -50,7 +49,7 @@ public class FileReadTest extends AbstractTestCase<SmbConnector> {
     @Test
     public void verifyFileReadWithDelete() {
         try {
-            assertEquals(fileContent, new String(getConnector().fileRead(fileName, fileAge, true)));
+            assertEquals(fileContent, new String(getConnector().fileRead(fileName, true)));
         } catch (ConnectionException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

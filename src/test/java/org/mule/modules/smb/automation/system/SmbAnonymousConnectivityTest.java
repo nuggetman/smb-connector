@@ -14,7 +14,7 @@ import org.mule.tools.devkit.ctf.configuration.util.ConfigurationUtils;
 
 import jcifs.smb.NtlmPasswordAuthentication;
 
-public class SmbConnectivityTest {
+public class SmbAnonymousConnectivityTest {
 
     private Properties validCredentials;
     private String domain;
@@ -31,7 +31,7 @@ public class SmbConnectivityTest {
         path = validCredentials.getProperty("config.path");
         timeout = validCredentials.getProperty("config.timeout");
         config = new SmbConnectorConfig();
-        config.connect(domain, host, path, username, password, timeout);
+        config.connect(domain, host, path, null, null, timeout);
     }
 
     @Test

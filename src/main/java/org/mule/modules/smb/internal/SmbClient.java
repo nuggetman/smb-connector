@@ -25,6 +25,7 @@ import org.mule.modules.smb.utils.Utilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jcifs.smb.DosFileFilter;
 import jcifs.smb.NtlmPasswordAuthentication;
 import jcifs.smb.SmbAuthException;
 import jcifs.smb.SmbException;
@@ -263,9 +264,8 @@ public class SmbClient {
         SmbFile smbFile = this.getConnection(Utilities.normalizeFile(fileName));
         if (smbFile != null) {
             try {
-                
                 if (smbFile.isFile()) {
-                		if (checkIsFileOldEnough(file, this.getConfig().getFileage())) {
+                		if (checkIsFileOldEnough(smbFile, this.getConfig().getFileage())) {
                 			this.deleteSmbFile(smbFile);
                 			logger.debug("deleted file: " + fileName);
                 		} else {
@@ -341,7 +341,7 @@ public class SmbClient {
             
             if (smbDir != null) {
                 SmbFile[] smbFiles;
-                DosFileFilter filter = new DosFileFilter(wildcard, null);
+                DosFileFilter filter = new DosFileFilter(wildcard, SmbFile.ATTR_DIRECTORY);
                 smbFiles = smbDir.listFiles(filter);
                 results = new ArrayList<Map<String, Object>>();
                 for (SmbFile file : smbFiles) {
@@ -397,23 +397,7 @@ public class SmbClient {
      * @return SmbFile
      */
     private SmbFile getConnection() throws SmbConnectionException {
-    		try {
-    			SmbFile f;
-	    		if (this.getConfig().getHost() != null && this.getConfig().getPath() != null) {
-			    	if (this.getCredentials() != null) {
-			    		f = new SmbFile(this.getConfig().getHost() + this.getConfig().getPath(), this.getCredentials());
-			    	} else 
-			    		f = new SmbFile(this.getConfig().getHost() + this.getConfig().getPath());
-			    	
-			    f.setConnectTimeout(this.getConfig().getTimeout());
-		    
-			    return f;
-	    		} else {
-	    			return null;
-	    		}
-    		} catch (MalformedURLException e) {
-                throw new SmbConnectionException(ConnectionExceptionCode.UNKNOWN, null, e.getMessage(), e);
-    		}
+    		return this.getConnection("");
     }
     
     /**

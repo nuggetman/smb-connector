@@ -1,6 +1,7 @@
 package org.mule.modules.smb.automation.functional;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertFalse;
 
 import org.junit.After;
 import org.junit.Before;
@@ -13,7 +14,6 @@ public class DirectoryListTest extends AbstractTestCase<SmbConnector> {
 
     private String dirName = new String("testlistfolder");
     private String wildcard = new String("*.*");
-    private int age = 500;
 
     public DirectoryListTest() {
         super(SmbConnector.class);
@@ -40,7 +40,7 @@ public class DirectoryListTest extends AbstractTestCase<SmbConnector> {
     @Test
     public void verifyDirListWithWildCard() {
         try {
-        		assertFalse(getConnector().directoryList(dirName, wildcard, age).isEmpty());
+        		assertFalse(getConnector().directoryList(dirName, wildcard).isEmpty());
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -49,7 +49,7 @@ public class DirectoryListTest extends AbstractTestCase<SmbConnector> {
     @Test
     public void verifyDirListWithNoWildCard() {
         try {
-        		assertFalse(getConnector().directoryList(dirName, null, age).isEmpty());
+        		assertFalse(getConnector().directoryList(dirName, null).isEmpty());
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }

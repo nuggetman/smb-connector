@@ -163,12 +163,8 @@ public class SmbConnectorConfig {
      *
      * @return void
      */
-    public void setFileage(Integer a) {
-    		if (a.length() == 0) {
-    			this.fileAge = 500;
-    		}
-    		else
-    			this.fileAge = a;
+    public void setFileage(int a) {
+   		this.fileAge = a;
     }
 
     /**
