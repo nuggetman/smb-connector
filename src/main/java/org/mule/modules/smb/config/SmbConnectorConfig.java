@@ -12,9 +12,13 @@ import org.mule.api.annotations.display.FriendlyName;
 import org.mule.api.annotations.display.Password;
 import org.mule.api.annotations.param.ConnectionKey;
 import org.mule.api.annotations.param.Optional;
+import org.mule.modules.smb.exception.SmbConnectionException;
 import org.mule.modules.smb.internal.SmbClient;
 import org.mule.modules.smb.utils.Utilities;
 import org.mule.util.NumberUtils;
+
+import jcifs.smb.SmbAuthException;
+import jcifs.smb.SmbException;
 
 @ConnectionManagement(friendlyName = "Configuration")
 public class SmbConnectorConfig {
@@ -120,10 +124,6 @@ public class SmbConnectorConfig {
      * @return void
      */
     public void setUsername(String u) {
-    		if (u.length() == 0) {
-    			this.username = null;
-    		}
-    		else
     			this.username = u;
     }
 
@@ -142,10 +142,6 @@ public class SmbConnectorConfig {
      * @return void
      */
     public void setPassword(String p) {
-    		if (p.length() == 0) {
-			this.password = null;
-		}
-		else
 			this.password = p;
     }
 
@@ -200,12 +196,13 @@ public class SmbConnectorConfig {
      */
     @Connect
     @TestConnectivity
-    public void connect(@ConnectionKey @FriendlyName("Domain") String domain, 
-    		@ConnectionKey @FriendlyName("Host") String host,
-        @ConnectionKey @Optional @FriendlyName("Path") String path, 
+    public void connect(@ConnectionKey @FriendlyName("Host") String host,
+        @ConnectionKey @Optional @FriendlyName("Path") String path,
+        @ConnectionKey @Optional @FriendlyName("Domain") String domain,
         @Optional @FriendlyName("Username") String username,
         @Optional @Password @FriendlyName("Password") String password, 
-        @Optional @FriendlyName("Connection timeout") String timeout) throws ConnectionException {
+        @Optional @FriendlyName("Connection timeout") String timeout,
+        @Optional @FriendlyName("File age (ms)") String fileAge) throws ConnectionException {
 
         try {
             this.setDomain(domain);
@@ -214,9 +211,11 @@ public class SmbConnectorConfig {
             this.setHost(host);
             this.setPath(Utilities.normalizePath(path));
             if (NumberUtils.isNumber(timeout)) {
-                this.connectionTimeout = Integer.parseInt(timeout);
+                this.setTimeout(Integer.parseInt(timeout));
             }
-
+            if (NumberUtils.isNumber(fileAge)) {
+                this.setFileage(Integer.parseInt(fileAge));
+            }
             this.getSmbClient().connect();
         } catch (Exception e) {
             throw new org.mule.api.ConnectionException(ConnectionExceptionCode.UNKNOWN, null, e.getMessage(), e);

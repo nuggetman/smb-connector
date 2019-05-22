@@ -84,16 +84,16 @@ public class SmbClient {
      *            long value in ms of minimum file age
      * @return
      */
-    public boolean checkIsFileOldEnough(SmbFile file, long minimumAge) {
-        if (minimumAge > 0) {
+    private boolean checkIsFileOldEnough(SmbFile file) {
+    		if (this.getConfig().getFileage() > 0) {
             long lastMod = file.getLastModified();
             long now = System.currentTimeMillis();
             long currentAge = now - lastMod;
             if (currentAge < 0) {
                 logger.warn("The system clocks appear to be out of sync, either time or timezone");
             }
-            logger.debug("fileAge = " + currentAge + ", expected = " + minimumAge + ", now = " + now + ", lastMod = " + lastMod);
-            if (currentAge < minimumAge) {
+            logger.debug("fileAge = " + currentAge + ", expected = " + this.getConfig().getFileage() + ", now = " + now + ", lastMod = " + lastMod);
+            if (currentAge < this.getConfig().getFileage()) {
                 logger.info("The file has not aged enough yet, will return nothing for: " + file.getName());
                 return false;
             }
@@ -148,7 +148,7 @@ public class SmbClient {
         try {
             SmbFile smbFile = this.getConnection(Utilities.normalizeFile(fileName));
             if (smbFile != null) {
-                if (checkIsFileOldEnough(smbFile, this.getConfig().getFileage())) {
+                if (checkIsFileOldEnough(smbFile)) {
                     smbFileInputStream = new SmbFileInputStream(smbFile);
                     data = new byte[(int) smbFile.length()];
                     smbFileInputStream.read(data);
@@ -265,7 +265,7 @@ public class SmbClient {
         if (smbFile != null) {
             try {
                 if (smbFile.isFile()) {
-                		if (checkIsFileOldEnough(smbFile, this.getConfig().getFileage())) {
+                		if (checkIsFileOldEnough(smbFile)) {
                 			this.deleteSmbFile(smbFile);
                 			logger.debug("deleted file: " + fileName);
                 		} else {
@@ -345,7 +345,7 @@ public class SmbClient {
                 smbFiles = smbDir.listFiles(filter);
                 results = new ArrayList<Map<String, Object>>();
                 for (SmbFile file : smbFiles) {
-                		if (checkIsFileOldEnough(file, this.getConfig().getFileage())) {
+                		if (checkIsFileOldEnough(file)) {
 	                    HashMap<String, Object> metaData = new HashMap<String, Object>();
 	                    metaData.put("name", file.getName());
 	                    metaData.put("last modified", file.getLastModified());
@@ -382,7 +382,7 @@ public class SmbClient {
      * @return void
      */
     public void setCredentials(String domain, String username, String password) {
-    		if (username.length() > 0 && password.length() > 0) {
+    		if (username != null && password != null && domain != null) {
     			NtlmPasswordAuthentication c = new NtlmPasswordAuthentication(domain, username, password);
     	        this.credentials = c;
     		}

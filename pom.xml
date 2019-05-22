@@ -18,7 +18,7 @@
         <category>Community</category>
         <licensePath>LICENSE.md</licensePath>
         <devkit.studio.package.skip>false</devkit.studio.package.skip>
-	    <skipTests>true</skipTests>
+	    <skipTests>false</skipTests>
     </properties>
     <repositories>
         <repository>
@@ -34,7 +34,7 @@
 		    <groupId>jcifs</groupId>
 		    <artifactId>jcifs</artifactId>
 		    <version>1.3.17</version>
-		    <scope>provided</scope>
+		    <!--scope>provided</scope-->
 		</dependency>
     </dependencies>
     

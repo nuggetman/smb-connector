@@ -1,12 +1,10 @@
 package org.mule.modules.smb.automation.functional;
 
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertFalse;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mule.api.ConnectionException;
 import org.mule.modules.smb.SmbConnector;
 import org.mule.tools.devkit.ctf.junit.AbstractTestCase;
 
