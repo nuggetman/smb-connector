@@ -12,13 +12,10 @@ import org.mule.api.annotations.display.FriendlyName;
 import org.mule.api.annotations.display.Password;
 import org.mule.api.annotations.param.ConnectionKey;
 import org.mule.api.annotations.param.Optional;
-import org.mule.modules.smb.exception.SmbConnectionException;
 import org.mule.modules.smb.internal.SmbClient;
 import org.mule.modules.smb.utils.Utilities;
 import org.mule.util.NumberUtils;
 
-import jcifs.smb.SmbAuthException;
-import jcifs.smb.SmbException;
 
 @ConnectionManagement(friendlyName = "Configuration")
 public class SmbConnectorConfig {
@@ -49,6 +46,9 @@ public class SmbConnectorConfig {
     public void setHost(String host) {
     		if (!host.startsWith("smb://")) {
     			host = "smb://" + host;
+    		}
+    		if (!host.endsWith("/")) {
+    			host = host + "/";
     		}
         this.host = host;
     }
@@ -209,7 +209,7 @@ public class SmbConnectorConfig {
             this.setUsername(username);
             this.setPassword(password);
             this.setHost(host);
-            this.setPath(Utilities.normalizePath(path));
+            this.setPath(Utilities.normalizeDir(path));
             if (NumberUtils.isNumber(timeout)) {
                 this.setTimeout(Integer.parseInt(timeout));
             }

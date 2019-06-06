@@ -13,16 +13,19 @@ public class Utilities {
      * @return String of normalized path
      */
 
-    public static String normalizePath(String path) {
-
-        StringBuilder sb = new StringBuilder(path.replaceAll("(//)", "/"));
-        if (!path.startsWith("/")) {
-            sb.insert(0, "/");
-        }
-        if (!path.endsWith("/")) {
-            sb.append("/");
-        }
-        return sb.toString();
+    public static String normalizeDir(String path) {
+    		if (path != null) {
+    			StringBuilder sb = new StringBuilder(path.replaceAll("(/)+", "/"));
+    			if (path.startsWith("/")) {
+    				sb.replace(0, 1, "");
+    			}
+    			if (!path.endsWith("/")) {
+    				sb.append("/");
+    			}
+    			return sb.toString();
+    		} else {
+    			return "";
+    		}
     }
 
     /**
@@ -35,13 +38,7 @@ public class Utilities {
      */
     public static String normalizeFile(String file) {
 
-        StringBuilder sb = new StringBuilder(file.replaceAll("//", "/"));
-        if (!file.startsWith("/")) {
-            sb.insert(0, "/");
-        }
-        if (file.endsWith("/")) {
-            sb.replace(sb.length() - 1, sb.length(), "");
-        }
+        StringBuilder sb = new StringBuilder(file.replaceAll("/", ""));
         return sb.toString();
     }
 

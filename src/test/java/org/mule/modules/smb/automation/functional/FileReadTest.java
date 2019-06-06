@@ -21,8 +21,8 @@ public class FileReadTest extends AbstractTestCase<SmbConnector> {
     @Before
     public void setup() {
         try {
-            getConnector().fileWrite(fileName, false, fileContent.getBytes(), "UTF-8");
-        } catch (ConnectionException e) {
+            getConnector().fileWrite(fileName, null, false, fileContent.getBytes(), "UTF-8");
+        } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
@@ -30,7 +30,7 @@ public class FileReadTest extends AbstractTestCase<SmbConnector> {
     @After
     public void tearDown() {
         try {
-            getConnector().fileDelete(fileName);
+            getConnector().fileDelete(fileName, null);
         } catch (ConnectionException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -40,16 +40,16 @@ public class FileReadTest extends AbstractTestCase<SmbConnector> {
     @Test
     public void verifyFileReadNoDelete() {
         try {
-            assertEquals(fileContent, new String(getConnector().fileRead(fileName, false)));
+            assertEquals(fileContent, new String(getConnector().fileRead(fileName, null, false)));
         } catch (ConnectionException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
-
+    
     @Test
     public void verifyFileReadWithDelete() {
         try {
-            assertEquals(fileContent, new String(getConnector().fileRead(fileName, true)));
+            assertEquals(fileContent, new String(getConnector().fileRead(fileName, null, true)));
         } catch (ConnectionException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

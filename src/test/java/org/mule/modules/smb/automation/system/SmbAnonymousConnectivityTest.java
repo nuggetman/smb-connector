@@ -4,7 +4,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Properties;
 
-import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mule.api.ConnectionException;
@@ -34,12 +33,6 @@ public class SmbAnonymousConnectivityTest {
     @Test
     public void validAnonymousConnectivityTest() throws ConnectionException {
         assertTrue(config.getSmbClient().isConnected());
-    }
-    
-    @After
-    public void sleepForDisconnect() throws InterruptedException {
-    		System.out.println("Sleeping to allow client to anonymous client to disconnect");
-        Thread.sleep(20000L);
     }
 
 }

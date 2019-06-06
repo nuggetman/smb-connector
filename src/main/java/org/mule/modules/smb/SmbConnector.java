@@ -41,8 +41,9 @@ public class SmbConnector {
      */
     @Processor
     public byte[] fileRead(@ConnectionKey @FriendlyName("File Name") String fileName,
-            @Default("false") @FriendlyName("Delete after reading") boolean autoDelete) throws ConnectionException {
-        return this.getConfig().getSmbClient().readFile(fileName, autoDelete);
+    			@Default("") @FriendlyName("Directory Name") String dirName,
+    			@Default("false") @FriendlyName("Delete after reading") boolean autoDelete) throws ConnectionException {
+        return this.getConfig().getSmbClient().readFile(fileName, dirName, autoDelete);
     }
 
     /**
@@ -59,9 +60,11 @@ public class SmbConnector {
      * @return void
      */
     @Processor
-    public void fileWrite(@ConnectionKey @FriendlyName("File Name") @Required String fileName, @Default("false") @FriendlyName("Append to file") boolean append,
-            @RefOnly @Default("#[payload]") Object fileContent, @Required @Default("UTF-8") String encoding) throws ConnectionException {
-        this.getConfig().getSmbClient().writeFile(fileName, append, fileContent, encoding);
+    public void fileWrite(@ConnectionKey @FriendlyName("File Name") @Required String fileName, 
+    			@Default("") @FriendlyName("Directory Name") String dirName,
+    			@Default("false") @FriendlyName("Append to file") boolean append,
+    			@RefOnly @Default("#[payload]") Object fileContent, @Required @Default("UTF-8") String encoding) throws ConnectionException, Exception {
+        this.getConfig().getSmbClient().writeFile(fileName, dirName, append, fileContent, encoding);
     }
 
     /**
@@ -72,8 +75,9 @@ public class SmbConnector {
      * @return void
      */
     @Processor
-    public void fileDelete(@ConnectionKey @FriendlyName("File Name") String fileName) throws ConnectionException {
-        this.getConfig().getSmbClient().deleteFile(fileName);
+    public void fileDelete(@ConnectionKey @FriendlyName("File Name") String fileName,
+    			@Default("") @FriendlyName("Directory Name") String dirName) throws ConnectionException {
+        this.getConfig().getSmbClient().deleteFile(fileName, dirName);
     }
 
     /**
@@ -87,7 +91,7 @@ public class SmbConnector {
      */
     @Processor
     public List<Map<String, Object>> directoryList(@ConnectionKey @FriendlyName("Folder Name") @Optional String dirName, @Default("*.*") @FriendlyName("Wildcard") String wildcard) 
-    			throws ConnectionException {
+    			throws ConnectionException, Exception {
         String w = wildcard;
         if (!Utilities.isNotBlankOrEmptyOrNull(w)) {
             w = "*.*";

@@ -21,6 +21,7 @@ import org.apache.commons.io.IOUtils;
 import org.mule.api.ConnectionExceptionCode;
 import org.mule.modules.smb.config.SmbConnectorConfig;
 import org.mule.modules.smb.exception.SmbConnectionException;
+import org.mule.modules.smb.exception.SmbConnectorException;
 import org.mule.modules.smb.utils.Utilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +33,7 @@ import jcifs.smb.SmbException;
 import jcifs.smb.SmbFile;
 import jcifs.smb.SmbFileInputStream;
 import jcifs.smb.SmbFileOutputStream;
+
 
 public class SmbClient {
 
@@ -142,20 +144,20 @@ public class SmbClient {
      *            boolean to indicate whether file should be deleted after reading
      * @return byte[] of file content
      */
-    public byte[] readFile(String fileName, boolean autoDelete) throws SmbConnectionException {
+    public byte[] readFile(String fileName, String dirName, boolean autoDelete) throws SmbConnectionException {
         byte[] data = null;
         SmbFileInputStream smbFileInputStream = null;
         try {
-            SmbFile smbFile = this.getConnection(Utilities.normalizeFile(fileName));
+            SmbFile smbFile = this.getConnection(Utilities.normalizeDir(dirName) + Utilities.normalizeFile(fileName));
             if (smbFile != null) {
                 if (checkIsFileOldEnough(smbFile)) {
                     smbFileInputStream = new SmbFileInputStream(smbFile);
                     data = new byte[(int) smbFile.length()];
                     smbFileInputStream.read(data);
                     smbFileInputStream.close();
-                }
-                if (autoDelete) {
-                    deleteSmbFile(smbFile);
+                    if (autoDelete) {
+                    		smbFile.delete();
+                    }
                 }
                 logger.debug("Done reading file", smbFile.getUncPath());
 
@@ -188,10 +190,10 @@ public class SmbClient {
      * @param encoding
      * 			  Character encoding of contents to write
      */
-    public void writeFile(String fileName, boolean append, Object data, String encoding) throws SmbConnectionException {
+    public void writeFile(String fileName, String dirName, boolean append, Object data, String encoding) throws SmbConnectionException {
         SmbFileOutputStream out = null;
         try {
-            SmbFile smbFile = this.getConnection(Utilities.normalizeFile(fileName));
+            SmbFile smbFile = this.getConnection(Utilities.normalizeDir(dirName) + Utilities.normalizeFile(fileName));
             out = new SmbFileOutputStream(smbFile, append);
             if (data instanceof InputStream) {
                 InputStream is = (InputStream) data;
@@ -204,7 +206,7 @@ public class SmbClient {
                 byte[] dataBytes = ((String) data).getBytes(encoding);
                 IOUtils.write(dataBytes, out);
             } else {
-                logger.error("unsupported object type");
+                logger.error("unsupported object type for file write: " + data.getClass() + ", supported types are InputStream, String or byte[]");
             }
         } catch (SmbAuthException e) {
             throw new SmbConnectionException(ConnectionExceptionCode.INCORRECT_CREDENTIALS, "WRITE_ERROR", e.getMessage(), e);
@@ -229,6 +231,34 @@ public class SmbClient {
         }
     }
 
+    /**
+     * Delete the specified file
+     * 
+     * @param fileName
+     *            String value of the file name to delete
+     */
+    public void deleteFile(String fileName, String dirName) throws SmbConnectionException {
+        SmbFile smbFile = this.getConnection(Utilities.normalizeDir(dirName) + Utilities.normalizeFile(fileName));
+        if (smbFile != null) {
+            try {
+                if (smbFile.isFile()) {
+                		if (checkIsFileOldEnough(smbFile)) {
+            				smbFile.delete();
+                			logger.debug("deleted file: " + fileName);
+                		} else {
+                			logger.debug("file:" + fileName + " not old enough for deletion");
+                		}
+                } else {
+                    logger.debug("not a file: " + fileName);
+                }
+            } catch (SmbAuthException e) {
+                throw new SmbConnectionException(ConnectionExceptionCode.INCORRECT_CREDENTIALS, null, e.getMessage(), e);
+            } catch (SmbException e) {
+                throw new SmbConnectionException(ConnectionExceptionCode.CANNOT_REACH, null, e.getMessage(), e);
+            }
+        }
+    }
+    
     /**
      * Create a new directory
      * 
@@ -255,63 +285,19 @@ public class SmbClient {
     }
 
     /**
-     * Delete the specified file
-     * 
-     * @param fileName
-     *            String value of the file name to delete
-     */
-    public void deleteFile(String fileName) throws SmbConnectionException {
-        SmbFile smbFile = this.getConnection(Utilities.normalizeFile(fileName));
-        if (smbFile != null) {
-            try {
-                if (smbFile.isFile()) {
-                		if (checkIsFileOldEnough(smbFile)) {
-                			this.deleteSmbFile(smbFile);
-                			logger.debug("deleted file: " + fileName);
-                		} else {
-                			logger.debug("file:" + fileName + " not old enough for deletion");
-                		}
-                } else {
-                    logger.debug("not a file: " + fileName);
-                }
-            } catch (SmbAuthException e) {
-                throw new SmbConnectionException(ConnectionExceptionCode.INCORRECT_CREDENTIALS, null, e.getMessage(), e);
-            } catch (SmbException e) {
-                throw new SmbConnectionException(ConnectionExceptionCode.CANNOT_REACH, null, e.getMessage(), e);
-            }
-        }
-    }
-
-    /**
      * Delete the specified directory
      * 
      * @param dirName
      *            String value of the directory to delete
      */
     public void deleteDir(String dirName) throws SmbConnectionException {
-        SmbFile smbFile = this.getConnection(Utilities.normalizePath(dirName));
+        SmbFile smbFile = this.getConnection(Utilities.normalizeDir(dirName));
         try {
             if (smbFile.isDirectory()) {
-                this.deleteSmbFile(smbFile);
+            		smbFile.delete();
             } else {
                 logger.debug("not a directory: " + dirName);
             }
-        } catch (SmbAuthException e) {
-            throw new SmbConnectionException(ConnectionExceptionCode.INCORRECT_CREDENTIALS, null, e.getMessage(), e);
-        } catch (SmbException e) {
-            throw new SmbConnectionException(ConnectionExceptionCode.CANNOT_REACH, null, e.getMessage(), e);
-        }
-    }
-
-    /**
-     * Delete an SmbFile
-     * 
-     * @param smbFile
-     *            SmbFile to delete
-     */
-    private void deleteSmbFile(SmbFile smbFile) throws SmbConnectionException {
-        try {
-            smbFile.delete();
         } catch (SmbAuthException e) {
             throw new SmbConnectionException(ConnectionExceptionCode.INCORRECT_CREDENTIALS, null, e.getMessage(), e);
         } catch (SmbException e) {
@@ -327,42 +313,50 @@ public class SmbClient {
      * @param wildcard
      *            String of the DOS wildcard filter
      * @return A List<Map<String,Object>> where each item in the list is a file or directory and the Map structure contains the attributes for the item
+     * @throws SmbConnectionException, SmbConnectorException 
      * 
      */
-    public List<Map<String, Object>> listDirectory(String dirName, String wildcard) throws SmbConnectionException {
-        List<Map<String, Object>> results = null;
+    public List<Map<String, Object>> listDirectory(String dirName, String wildcard) throws SmbConnectionException, SmbConnectorException {
+        List<Map<String, Object>> results = new ArrayList<Map<String, Object>>();
         SmbFile smbDir;
         try {
             if (dirName != null) {
-                smbDir = this.getConnection(Utilities.normalizePath(dirName));
+                smbDir = this.getConnection(Utilities.normalizeDir(dirName));
             } else {
                 smbDir = this.getConnection();
             }
-            
             if (smbDir != null) {
                 SmbFile[] smbFiles;
-                DosFileFilter filter = new DosFileFilter(wildcard, SmbFile.ATTR_DIRECTORY);
-                smbFiles = smbDir.listFiles(filter);
-                results = new ArrayList<Map<String, Object>>();
-                for (SmbFile file : smbFiles) {
-                		if (checkIsFileOldEnough(file)) {
-	                    HashMap<String, Object> metaData = new HashMap<String, Object>();
-	                    metaData.put("name", file.getName());
-	                    metaData.put("last modified", file.getLastModified());
-	                    metaData.put("created on", file.createTime());
-	                    metaData.put("size", file.length());
-	                    metaData.put("is file", file.isFile());
-	                    metaData.put("is directory", file.isDirectory());
-	                    metaData.put("read-only", !file.canWrite());
-	                    metaData.put("hidden", file.isHidden());
-	                    results.add(metaData);
-                		}
-                }
+				DosFileFilter filter = new DosFileFilter(wildcard, 32);
+				try {
+					smbFiles = smbDir.listFiles(filter);
+	                for (SmbFile file : smbFiles) {
+	                		if (checkIsFileOldEnough(file)) {
+		                    HashMap<String, Object> metaData = new HashMap<String, Object>();
+		                    metaData.put("name", file.getName());
+		                    metaData.put("last modified", file.getLastModified());
+		                    metaData.put("created on", file.createTime());
+		                    metaData.put("size", file.length());
+		                    metaData.put("is file", file.isFile());
+		                    metaData.put("is directory", file.isDirectory());
+		                    metaData.put("read-only", !file.canWrite());
+		                    metaData.put("hidden", file.isHidden());
+		                    results.add(metaData);
+	                		}
+	                }
+				} catch (SmbException e) {
+					if (e.getNtStatus() == SmbException.NT_STATUS_NO_SUCH_FILE) {
+						// do nothing - no files found
+					}
+					else {
+						throw e;
+					}
+				}
             }
         } catch (SmbAuthException e) {
             throw new SmbConnectionException(ConnectionExceptionCode.INCORRECT_CREDENTIALS, null, e.getMessage(), e);
         } catch (SmbException e) {
-            throw new SmbConnectionException(ConnectionExceptionCode.CANNOT_REACH, null, e.getMessage(), e);
+            throw new SmbConnectorException(e.getMessage(), e);
         }
         return results;
     }

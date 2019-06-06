@@ -34,7 +34,7 @@
 		    <groupId>jcifs</groupId>
 		    <artifactId>jcifs</artifactId>
 		    <version>1.3.17</version>
-		    <!--scope>provided</scope-->
+		    <scope>provided</scope>
 		</dependency>
     </dependencies>
     

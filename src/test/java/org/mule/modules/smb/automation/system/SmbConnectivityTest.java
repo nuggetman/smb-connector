@@ -37,20 +37,16 @@ public class SmbConnectivityTest {
         timeout = validCredentials.getProperty("config.timeout");
         fileage = validCredentials.getProperty("config.fileage");
         config = new SmbConnectorConfig();
-        System.out.println("connecting with: " + host+","+path+","+domain+","+username+","+password+","+timeout+","+fileage);
         config.connect(host, path, domain, username, password, timeout, fileage);
-        System.out.println("connected");
     }
 
     @Test
     public void validConnectivityTest() throws ConnectionException {
-    		System.out.println("validConnectivityTest");
         assertTrue(config.getSmbClient().isConnected());
     }
 
     @Test(expected = ConnectionException.class)
     public void invalidCredentialsConnectivityTest() throws ConnectionException {
-    	System.out.println("invalidCredentialsConnectivityTest");
         String invalidField = "invalid-field";
         SmbConnectorConfig c = new SmbConnectorConfig();
         c.connect(invalidField, invalidField, invalidField, invalidField, invalidField, invalidField, invalidField);
@@ -59,7 +55,6 @@ public class SmbConnectivityTest {
 
     @Test
     public void validCredentialsConnectivityTest() throws ConnectionException {
-    	System.out.println("validCredentialsConnectivityTest");
         assertTrue(assertCredentials(config.getSmbClient().getCredentials()));
         assertTrue(config.getSmbClient().isConnected());
     }
@@ -70,13 +65,11 @@ public class SmbConnectivityTest {
 
     @Test
     public void connectionIdTest() {
-    	System.out.println("connectionIdTest");
         assertEquals("001", config.connectionId());
     }
 
     @Test
     public void timeoutTest() {
-    	System.out.println("timeoutTest");
         config.setTimeout(Integer.parseInt(timeout));
         assertTrue(Integer.parseInt(timeout) == config.getTimeout());
     }

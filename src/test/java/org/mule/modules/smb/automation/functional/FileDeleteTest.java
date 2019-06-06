@@ -2,7 +2,6 @@ package org.mule.modules.smb.automation.functional;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mule.api.ConnectionException;
 import org.mule.modules.smb.SmbConnector;
 import org.mule.tools.devkit.ctf.junit.AbstractTestCase;
 
@@ -18,8 +17,8 @@ public class FileDeleteTest extends AbstractTestCase<SmbConnector> {
     @Before
     public void setup() {
         try {
-            getConnector().fileWrite(fileName, false, fileContent.getBytes(), "UTF-8");
-        } catch (ConnectionException e) {
+            getConnector().fileWrite(fileName, null, false, fileContent.getBytes(), "UTF-8");
+        } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
@@ -27,8 +26,8 @@ public class FileDeleteTest extends AbstractTestCase<SmbConnector> {
     @Test
     public void verify() {
         try {
-            getConnector().fileDelete(fileName);
-        } catch (ConnectionException e) {
+            getConnector().fileDelete(fileName, null);
+        } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
