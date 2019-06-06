@@ -26,11 +26,11 @@ import org.mule.tools.devkit.ctf.mockup.ConnectorTestContext;
     DirectoryDeleteTest.class
 })
 
-public class FunctionalTestSuite {
+public class FunctionalTestSuiteAnonymous {
 
     @BeforeClass
     public static void initialiseSuite() {
-    		System.setProperty("automation-credential.properties", "automation-credentials.properties");
+    		System.setProperty("automation-credential.properties", "automation-credentials-anonymous.properties");
         ConnectorTestContext.initialize(SmbConnector.class);
     }
 

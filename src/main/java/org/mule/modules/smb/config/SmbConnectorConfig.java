@@ -17,7 +17,7 @@ import org.mule.modules.smb.utils.Utilities;
 import org.mule.util.NumberUtils;
 
 
-@ConnectionManagement(friendlyName = "Configuration")
+@ConnectionManagement(friendlyName = "Configuration", configElementName = "config")
 public class SmbConnectorConfig {
 
     private SmbClient smbClient = new SmbClient(this);
@@ -34,7 +34,7 @@ public class SmbConnectorConfig {
 
     private int connectionTimeout = 30000;
     
-    private int fileAge = 500;
+    private Integer fileAge;
 
     /**
      * Set the host for the config
@@ -196,9 +196,9 @@ public class SmbConnectorConfig {
      */
     @Connect
     @TestConnectivity
-    public void connect(@ConnectionKey @FriendlyName("Host") String host,
+    public void connect(@ConnectionKey @Optional @FriendlyName("Domain") String domain,
+    		@ConnectionKey @FriendlyName("Host") String host,
         @ConnectionKey @Optional @FriendlyName("Path") String path,
-        @ConnectionKey @Optional @FriendlyName("Domain") String domain,
         @Optional @FriendlyName("Username") String username,
         @Optional @Password @FriendlyName("Password") String password, 
         @Optional @FriendlyName("Connection timeout") String timeout,
@@ -211,10 +211,12 @@ public class SmbConnectorConfig {
             this.setHost(host);
             this.setPath(Utilities.normalizeDir(path));
             if (NumberUtils.isNumber(timeout)) {
-                this.setTimeout(Integer.parseInt(timeout));
+            		this.setTimeout(Integer.parseInt(timeout));
             }
             if (NumberUtils.isNumber(fileAge)) {
-                this.setFileage(Integer.parseInt(fileAge));
+            		this.setFileage(Integer.parseInt(fileAge));
+            } else {
+            		//this.setFileage(500);
             }
             this.getSmbClient().connect();
         } catch (Exception e) {

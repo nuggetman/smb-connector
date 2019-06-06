@@ -96,7 +96,6 @@ public class SmbClient {
             }
             logger.debug("fileAge = " + currentAge + ", expected = " + this.getConfig().getFileage() + ", now = " + now + ", lastMod = " + lastMod);
             if (currentAge < this.getConfig().getFileage()) {
-                logger.info("The file has not aged enough yet, will return nothing for: " + file.getName());
                 return false;
             }
         }

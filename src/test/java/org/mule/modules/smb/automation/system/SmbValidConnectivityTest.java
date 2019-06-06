@@ -1,12 +1,11 @@
 package org.mule.modules.smb.automation.system;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Properties;
 
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 import org.mule.api.ConnectionException;
 import org.mule.modules.smb.config.SmbConnectorConfig;
@@ -14,30 +13,31 @@ import org.mule.tools.devkit.ctf.configuration.util.ConfigurationUtils;
 
 import jcifs.smb.NtlmPasswordAuthentication;
 
-public class SmbConnectivityTest {
+public class SmbValidConnectivityTest {
 
-    private static Properties validCredentials;
-    private static String domain;
-    private static String host;
-    private static String path;
-    private static String username;
-    private static String password;
-    private static String timeout;
-    private static String fileage;
-    private static SmbConnectorConfig config;
+    private Properties validCredentials;
+    private String domain;
+    private String host;
+    private String path;
+    private String username;
+    private String password;
+    private String connectionTimeout;
+    private String fileAge;
+    private SmbConnectorConfig config;
 
-    @BeforeClass
-    public static void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
+    		System.setProperty("automation-credential.properties", "automation-credentials.properties");
         validCredentials = ConfigurationUtils.getAutomationCredentialsProperties();
+        domain = validCredentials.getProperty("config.domain");
         host = validCredentials.getProperty("config.host");
         path = validCredentials.getProperty("config.path");
-        domain = validCredentials.getProperty("config.domain");
         username = validCredentials.getProperty("config.username");
         password = validCredentials.getProperty("config.password");
-        timeout = validCredentials.getProperty("config.timeout");
-        fileage = validCredentials.getProperty("config.fileage");
+        connectionTimeout = validCredentials.getProperty("config.connectionTimeout");
+        fileAge = validCredentials.getProperty("config.fileAge");
         config = new SmbConnectorConfig();
-        config.connect(host, path, domain, username, password, timeout, fileage);
+        config.connect(domain, host, path, username, password, connectionTimeout, fileAge);
     }
 
     @Test
@@ -45,18 +45,9 @@ public class SmbConnectivityTest {
         assertTrue(config.getSmbClient().isConnected());
     }
 
-    @Test(expected = ConnectionException.class)
-    public void invalidCredentialsConnectivityTest() throws ConnectionException {
-        String invalidField = "invalid-field";
-        SmbConnectorConfig c = new SmbConnectorConfig();
-        c.connect(invalidField, invalidField, invalidField, invalidField, invalidField, invalidField, invalidField);
-        assertFalse(c.getSmbClient().isConnected());
-    }
-
     @Test
     public void validCredentialsConnectivityTest() throws ConnectionException {
         assertTrue(assertCredentials(config.getSmbClient().getCredentials()));
-        assertTrue(config.getSmbClient().isConnected());
     }
 
     private boolean assertCredentials(NtlmPasswordAuthentication n) {
@@ -70,8 +61,14 @@ public class SmbConnectivityTest {
 
     @Test
     public void timeoutTest() {
-        config.setTimeout(Integer.parseInt(timeout));
-        assertTrue(Integer.parseInt(timeout) == config.getTimeout());
+        config.setTimeout(Integer.parseInt(connectionTimeout));
+        assertTrue(Integer.parseInt(connectionTimeout) == config.getTimeout());
+    }
+    
+    @Test
+    public void fileageTest() {
+        config.setFileage(Integer.parseInt(fileAge));
+        assertTrue(Integer.parseInt(fileAge) == config.getFileage());
     }
 
 }
