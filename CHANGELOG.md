@@ -1,7 +1,20 @@
 # SMB Connector Release Notes
 # --------------------------------------------------------------------
+#Version: 1.1.0
+Date: June-2019
+Supported driver: 
+JCIFS v1.3.19
+# Supported Mule Runtime Versions: 
+${project.devkitVersion}
+# New Features and Functionality
+* Issue 6 - Resolved wildcard behaviour 
+* Issue 9 - Delete on read behaviour fixed
+* Issue 10 - Directory list now returns only files older than the fileage 
+# Known Issues in this release
+
+# --------------------------------------------------------------------
+# Version: 1.0
 Date: Mar-2018
-Version: 1.0
 Supported driver: 
 JCIFS v1.3.19
 # Supported Mule Runtime Versions: 
