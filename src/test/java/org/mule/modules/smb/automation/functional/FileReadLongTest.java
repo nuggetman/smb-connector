@@ -1,9 +1,9 @@
 package org.mule.modules.smb.automation.functional;
 
+import static org.junit.Assert.assertNull;
 
-import static org.junit.Assert.assertEquals;
-
-import static org.mule.modules.smb.automation.functional.TestDataBuilder.FILENAME;
+import static org.mule.modules.smb.automation.functional.TestDataBuilder.CANT_DELETE_FILENAME;
+import static org.mule.modules.smb.automation.functional.TestDataBuilder.CANT_DELETE_DIRNAME;
 import static org.mule.modules.smb.automation.functional.TestDataBuilder.FILE_CONTENT;
 
 import org.junit.After;
@@ -13,16 +13,17 @@ import org.mule.api.ConnectionException;
 import org.mule.modules.smb.SmbConnector;
 import org.mule.tools.devkit.ctf.junit.AbstractTestCase;
 
-public class FileReadTest extends AbstractTestCase<SmbConnector> {
-
-    public FileReadTest() {
+public class FileReadLongTest extends AbstractTestCase<SmbConnector> {
+	
+	public FileReadLongTest() {
         super(SmbConnector.class);
     }
 
     @Before
     public void setup() {
         try {
-            getConnector().fileWrite(FILENAME, null, false, FILE_CONTENT.getBytes(), "UTF-8");
+        		getConnector().directoryCreate(CANT_DELETE_DIRNAME);
+            getConnector().fileWrite(CANT_DELETE_FILENAME, CANT_DELETE_DIRNAME, false, FILE_CONTENT.getBytes(), "UTF-8");
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -31,7 +32,7 @@ public class FileReadTest extends AbstractTestCase<SmbConnector> {
     @After
     public void tearDown() {
         try {
-            getConnector().fileDelete(FILENAME, null);
+        		getConnector().directoryDelete(CANT_DELETE_DIRNAME);
         } catch (ConnectionException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -41,7 +42,7 @@ public class FileReadTest extends AbstractTestCase<SmbConnector> {
     @Test
     public void verifyFileReadNoDelete() {
         try {
-            assertEquals(FILE_CONTENT, new String(getConnector().fileRead(FILENAME, null, false)));
+            assertNull(getConnector().fileRead(CANT_DELETE_FILENAME, CANT_DELETE_DIRNAME, false));
         } catch (ConnectionException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -50,7 +51,7 @@ public class FileReadTest extends AbstractTestCase<SmbConnector> {
     @Test
     public void verifyFileReadWithDelete() {
         try {
-            assertEquals(FILE_CONTENT, new String(getConnector().fileRead(FILENAME, null, true)));
+        		assertNull(getConnector().fileRead(CANT_DELETE_FILENAME, CANT_DELETE_DIRNAME, true));
         } catch (ConnectionException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

@@ -30,7 +30,7 @@ public class FunctionalTestSuiteAnonymous {
 
     @BeforeClass
     public static void initialiseSuite() {
-    		System.setProperty("automation-credential.properties", "automation-credentials-anonymous.properties");
+    		System.setProperty("automation-credentials.properties", "automation-credentials-anonymous.properties");
         ConnectorTestContext.initialize(SmbConnector.class);
     }
 

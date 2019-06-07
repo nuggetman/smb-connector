@@ -72,12 +72,13 @@ public class SmbConnector {
      *
      * @param fileName
      *            File name to be used for the delete operation.
-     * @return void
+     * @return boolean
+     * 			  Indicates success or failure of operation
      */
     @Processor
-    public void fileDelete(@ConnectionKey @FriendlyName("File Name") String fileName,
+    public boolean fileDelete(@ConnectionKey @FriendlyName("File Name") String fileName,
     			@Default("") @FriendlyName("Directory Name") String dirName) throws ConnectionException {
-        this.getConfig().getSmbClient().deleteFile(fileName, dirName);
+    		return this.getConfig().getSmbClient().deleteFile(fileName, dirName);
     }
 
     /**
@@ -116,11 +117,12 @@ public class SmbConnector {
      *
      * @param dirName
      *            Directory name to be used for the delete operation.
-     * @return void
+     * @return boolean
+     * 			  Indicates success or failure of operation 
      */
     @Processor
-    public void directoryDelete(@ConnectionKey @FriendlyName("Directory Name") String dirName) throws ConnectionException {
-        this.getConfig().getSmbClient().deleteDir(dirName);
+    public boolean directoryDelete(@ConnectionKey @FriendlyName("Directory Name") String dirName) throws ConnectionException {
+        return this.getConfig().getSmbClient().deleteDir(dirName);
     }
 
     /**

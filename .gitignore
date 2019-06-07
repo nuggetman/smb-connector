@@ -19,4 +19,4 @@ bin/
 .metadata
 .idea/
 
-**/automation-credentials.properties
+**/automation-credentials*

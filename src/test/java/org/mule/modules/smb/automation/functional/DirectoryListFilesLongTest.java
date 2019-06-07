@@ -1,10 +1,9 @@
 package org.mule.modules.smb.automation.functional;
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import static org.mule.modules.smb.automation.functional.TestDataBuilder.CANT_DELETE_FILENAME;
 import static org.mule.modules.smb.automation.functional.TestDataBuilder.DIR_NAME;
-import static org.mule.modules.smb.automation.functional.TestDataBuilder.FILENAME;
 import static org.mule.modules.smb.automation.functional.TestDataBuilder.FILE_CONTENT;
 import static org.mule.modules.smb.automation.functional.TestDataBuilder.WILDCARD;
 import static org.mule.modules.smb.automation.functional.TestDataBuilder.TXTWILDCARD;
@@ -16,9 +15,9 @@ import org.junit.Test;
 import org.mule.modules.smb.SmbConnector;
 import org.mule.tools.devkit.ctf.junit.AbstractTestCase;
 
-public class DirectoryListFilesTest extends AbstractTestCase<SmbConnector> {
-    
-    public DirectoryListFilesTest() {
+public class DirectoryListFilesLongTest extends AbstractTestCase<SmbConnector> {
+
+    public DirectoryListFilesLongTest() {
         super(SmbConnector.class);
     }
 
@@ -26,7 +25,7 @@ public class DirectoryListFilesTest extends AbstractTestCase<SmbConnector> {
     public void setup() {
         try {
             getConnector().directoryCreate(DIR_NAME);
-            getConnector().fileWrite(FILENAME, DIR_NAME, false, FILE_CONTENT, "UTF-8");
+            getConnector().fileWrite(CANT_DELETE_FILENAME, DIR_NAME, false, FILE_CONTENT, "UTF-8");
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -44,7 +43,7 @@ public class DirectoryListFilesTest extends AbstractTestCase<SmbConnector> {
     @Test
     public void verifyDirListWithWildCard() {
         try {
-        		assertFalse(getConnector().directoryList(DIR_NAME, WILDCARD).isEmpty());
+        		assertTrue(getConnector().directoryList(DIR_NAME, WILDCARD).isEmpty());
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -53,7 +52,7 @@ public class DirectoryListFilesTest extends AbstractTestCase<SmbConnector> {
     @Test
     public void verifyDirListWithTxtWildCard() {
         try {
-        		assertFalse(getConnector().directoryList(DIR_NAME, TXTWILDCARD).isEmpty());
+        		assertTrue(getConnector().directoryList(DIR_NAME, TXTWILDCARD).isEmpty());
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -71,7 +70,7 @@ public class DirectoryListFilesTest extends AbstractTestCase<SmbConnector> {
     @Test
     public void verifyDirListWithNoWildCard() {
         try {
-        		assertFalse(getConnector().directoryList(DIR_NAME, null).isEmpty());
+        		assertTrue(getConnector().directoryList(DIR_NAME, null).isEmpty());
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }

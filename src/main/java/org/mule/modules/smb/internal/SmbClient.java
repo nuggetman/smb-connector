@@ -94,8 +94,8 @@ public class SmbClient {
             if (currentAge < 0) {
                 logger.warn("The system clocks appear to be out of sync, either time or timezone");
             }
-            logger.debug("fileAge = " + currentAge + ", expected = " + this.getConfig().getFileage() + ", now = " + now + ", lastMod = " + lastMod);
             if (currentAge < this.getConfig().getFileage()) {
+                logger.debug("The file has not aged enough yet, will return nothing for: " + file.getName());
                 return false;
             }
         }
@@ -118,7 +118,7 @@ public class SmbClient {
     public boolean connect() throws SmbConnectionException {
         try {
             logger.debug("connecting to: smb://" + this.getConfig().getHost() + this.getConfig().getPath());
-
+            
             this.setCredentials(this.getConfig().getDomain(), this.getConfig().getUsername(), this.getConfig().getPassword());
             SmbFile smbFile = this.getConnection();
             
@@ -236,25 +236,30 @@ public class SmbClient {
      * @param fileName
      *            String value of the file name to delete
      */
-    public void deleteFile(String fileName, String dirName) throws SmbConnectionException {
+    public boolean deleteFile(String fileName, String dirName) throws SmbConnectionException {
         SmbFile smbFile = this.getConnection(Utilities.normalizeDir(dirName) + Utilities.normalizeFile(fileName));
         if (smbFile != null) {
             try {
                 if (smbFile.isFile()) {
                 		if (checkIsFileOldEnough(smbFile)) {
-            				smbFile.delete();
+                			smbFile.delete();
                 			logger.debug("deleted file: " + fileName);
+                			return true;
                 		} else {
                 			logger.debug("file:" + fileName + " not old enough for deletion");
+                			return false;
                 		}
                 } else {
                     logger.debug("not a file: " + fileName);
+                    return false;
                 }
             } catch (SmbAuthException e) {
                 throw new SmbConnectionException(ConnectionExceptionCode.INCORRECT_CREDENTIALS, null, e.getMessage(), e);
             } catch (SmbException e) {
                 throw new SmbConnectionException(ConnectionExceptionCode.CANNOT_REACH, null, e.getMessage(), e);
             }
+        } else {
+        		return false;
         }
     }
     
@@ -289,13 +294,15 @@ public class SmbClient {
      * @param dirName
      *            String value of the directory to delete
      */
-    public void deleteDir(String dirName) throws SmbConnectionException {
+    public boolean deleteDir(String dirName) throws SmbConnectionException {
         SmbFile smbFile = this.getConnection(Utilities.normalizeDir(dirName));
         try {
             if (smbFile.isDirectory()) {
             		smbFile.delete();
+            		return true;
             } else {
                 logger.debug("not a directory: " + dirName);
+                return false;
             }
         } catch (SmbAuthException e) {
             throw new SmbConnectionException(ConnectionExceptionCode.INCORRECT_CREDENTIALS, null, e.getMessage(), e);
@@ -376,12 +383,18 @@ public class SmbClient {
      */
     public void setCredentials(String domain, String username, String password) {
     		if (username != null && password != null && domain != null) {
-    			NtlmPasswordAuthentication c = new NtlmPasswordAuthentication(domain, username, password);
-    	        this.credentials = c;
+    			if (username.length() != 0 && password.length() != 0) {
+	    			NtlmPasswordAuthentication c = new NtlmPasswordAuthentication(domain, username, password);
+	    	        this.credentials = c;
+    			} else {
+    				this.credentials = NtlmPasswordAuthentication.ANONYMOUS;
+	    	        logger.warn("Warning - anonymous connectivity used");
+    			}
     		}
-    		else 
-    			this.credentials = null;
-        
+    		else {
+    			this.credentials = NtlmPasswordAuthentication.ANONYMOUS;
+    			logger.warn("Warning - anonymous connectivity used");
+    		}
     }
     
     /**

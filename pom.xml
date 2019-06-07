@@ -46,6 +46,9 @@
         <version>2.12.4</version>
         <configuration>
           <skipTests>${skipTests}</skipTests>
+          <includes>
+            <include>**/FullTestSuite.java</include>
+          </includes>
         </configuration>
       </plugin>
        <plugin>

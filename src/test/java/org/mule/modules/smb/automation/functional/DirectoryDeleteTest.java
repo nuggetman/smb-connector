@@ -1,5 +1,7 @@
 package org.mule.modules.smb.automation.functional;
 
+import static org.mule.modules.smb.automation.functional.TestDataBuilder.DIR_NAME;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mule.api.ConnectionException;
@@ -8,8 +10,6 @@ import org.mule.tools.devkit.ctf.junit.AbstractTestCase;
 
 public class DirectoryDeleteTest extends AbstractTestCase<SmbConnector> {
 
-    private String dirName = new String("testdeletefolder");
-
     public DirectoryDeleteTest() {
         super(SmbConnector.class);
     }
@@ -17,7 +17,7 @@ public class DirectoryDeleteTest extends AbstractTestCase<SmbConnector> {
     @Before
     public void setup() {
         try {
-            getConnector().directoryCreate(dirName);
+            getConnector().directoryCreate(DIR_NAME);
         } catch (ConnectionException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -26,7 +26,7 @@ public class DirectoryDeleteTest extends AbstractTestCase<SmbConnector> {
     @Test
     public void verify() {
         try {
-            getConnector().directoryDelete(dirName);
+            getConnector().directoryDelete(DIR_NAME);
         } catch (ConnectionException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

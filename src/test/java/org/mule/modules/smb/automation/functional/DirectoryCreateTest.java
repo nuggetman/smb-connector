@@ -1,5 +1,7 @@
 package org.mule.modules.smb.automation.functional;
 
+import static org.mule.modules.smb.automation.functional.TestDataBuilder.DIR_NAME;
+
 import org.junit.After;
 import org.junit.Test;
 import org.mule.api.ConnectionException;
@@ -8,8 +10,6 @@ import org.mule.tools.devkit.ctf.junit.AbstractTestCase;
 
 public class DirectoryCreateTest extends AbstractTestCase<SmbConnector> {
 
-    private String dirName = new String("testcreatefolder");
-
     public DirectoryCreateTest() {
         super(SmbConnector.class);
     }
@@ -17,7 +17,7 @@ public class DirectoryCreateTest extends AbstractTestCase<SmbConnector> {
     @After
     public void tearDown() {
         try {
-            getConnector().directoryDelete(dirName);
+            getConnector().directoryDelete(DIR_NAME);
         } catch (ConnectionException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -26,7 +26,7 @@ public class DirectoryCreateTest extends AbstractTestCase<SmbConnector> {
     @Test
     public void verifyCreateDirectory() {
         try {
-            getConnector().directoryCreate(dirName);
+            getConnector().directoryCreate(DIR_NAME);
         } catch (ConnectionException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -35,8 +35,8 @@ public class DirectoryCreateTest extends AbstractTestCase<SmbConnector> {
     @Test
     public void verifyCreateDirectoryTwice() {
         try {
-            getConnector().directoryCreate(dirName);
-            getConnector().directoryCreate(dirName);
+            getConnector().directoryCreate(DIR_NAME);
+            getConnector().directoryCreate(DIR_NAME);
         } catch (ConnectionException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

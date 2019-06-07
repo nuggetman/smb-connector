@@ -3,16 +3,13 @@ package org.mule.modules.smb.automation.runner;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
+import org.mule.modules.smb.automation.unit.UtilitiesUnitTest;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-	UnitTestSuite.class,
-	SystemTestSuite.class,
-	FunctionalTestSuite.class,
-	FunctionalTestSuiteLongFileAge.class
-	
+    UtilitiesUnitTest.class
 })
 
-public class FullTestSuite {
+public class UnitTestSuite {
 
 }

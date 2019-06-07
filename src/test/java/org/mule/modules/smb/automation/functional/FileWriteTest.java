@@ -1,5 +1,8 @@
 package org.mule.modules.smb.automation.functional;
 
+import static org.mule.modules.smb.automation.functional.TestDataBuilder.FILENAME;
+import static org.mule.modules.smb.automation.functional.TestDataBuilder.FILE_CONTENT;
+
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Test;
@@ -8,10 +11,6 @@ import org.mule.tools.devkit.ctf.junit.AbstractTestCase;
 
 public class FileWriteTest extends AbstractTestCase<SmbConnector> {
 
-    private String fileName = new String("testwritefile.txt");
-    private String fileContent = new String("somecontent");
-    private Integer integerContent = 999999999;
-
     public FileWriteTest() {
         super(SmbConnector.class);
     }
@@ -19,7 +18,7 @@ public class FileWriteTest extends AbstractTestCase<SmbConnector> {
     @After
     public void tearDown() {
         try {
-            getConnector().fileDelete(fileName, null);
+            getConnector().fileDelete(FILENAME, null);
         } catch ( Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -28,7 +27,7 @@ public class FileWriteTest extends AbstractTestCase<SmbConnector> {
     @Test
     public void verifyWriteNoAppend() {
         try {
-            getConnector().fileWrite(fileName, null, false, fileContent, "UTF-8");
+            getConnector().fileWrite(FILENAME, null, false, FILE_CONTENT, "UTF-8");
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -37,7 +36,7 @@ public class FileWriteTest extends AbstractTestCase<SmbConnector> {
     @Test
     public void verifyWriteAppendString() {
         try {
-            getConnector().fileWrite(fileName, null, true, fileContent, "UTF-8");
+            getConnector().fileWrite(FILENAME, null, true, FILE_CONTENT, "UTF-8");
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -46,7 +45,7 @@ public class FileWriteTest extends AbstractTestCase<SmbConnector> {
     @Test
     public void verifyWriteAppendInputStream() {
         try {
-            getConnector().fileWrite(fileName, null, true, IOUtils.toInputStream(fileContent), "UTF-8");
+            getConnector().fileWrite(FILENAME, null, true, IOUtils.toInputStream(FILE_CONTENT), "UTF-8");
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -55,16 +54,7 @@ public class FileWriteTest extends AbstractTestCase<SmbConnector> {
     @Test
     public void verifyWriteAppendByteArray() {
         try {
-            getConnector().fileWrite(fileName, null, true, fileContent.getBytes(), "UTF-8");
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
-    }
-
-    @Test
-    public void verifyWriteAppendInteger() {
-        try {
-        		getConnector().fileWrite(fileName, null, true, integerContent, "UTF-8");
+            getConnector().fileWrite(FILENAME, null, true, FILE_CONTENT.getBytes(), "UTF-8");
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
