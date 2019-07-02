@@ -38,9 +38,9 @@ public class SmbConnectorConfig {
     
     private Integer fileAge;
     
-    private Properties props;
-    
     private boolean guest = false;
+    
+    private boolean anonymous = false;
 
     /**
      * Set the host for the config
@@ -196,6 +196,23 @@ public class SmbConnectorConfig {
         return this.guest;
     }
 
+    /**
+     * Set anonymous credentials
+     *
+     * @return void
+     */
+    public void setAnonymous(boolean a) {
+   		this.anonymous = a;
+    }
+
+    /**
+     * Get the anonymous credential status
+     *
+     * @return boolean, true if anonymous enabled
+     */
+    public boolean getAnonymous() {
+        return this.anonymous;
+    }
 
     /**
      * Get the client that does the work
@@ -204,15 +221,6 @@ public class SmbConnectorConfig {
      */
     public SmbClient getSmbClient() {
         return smbClient;
-    }
-    
-    /**
-     * Get the props
-     *
-     * @return Properties props
-     */
-    public Properties getProperties() {
-        return props;
     }
 
     /**
@@ -261,16 +269,6 @@ public class SmbConnectorConfig {
             		this.setFileage(Integer.parseInt(fileage));
             }
             this.setGuest(guest);
-            
-            props = new Properties();
-            props.put("jcifs.smb.client.connTimeout", timeout);
-            if (!guest) {
-            		props.put("jcifs.smb.client.domain", domain);
-                props.put("jcifs.smb.client.username", username);
-                props.put("jcifs.smb.client.password", password);
-                props.put("jcifs.smb.client.logonShare", this.getHost() + this.getPath());
-            }
-            
             this.getSmbClient().connect();
         } catch (Exception e) {
             throw new org.mule.api.ConnectionException(ConnectionExceptionCode.UNKNOWN, null, e.getMessage(), e);

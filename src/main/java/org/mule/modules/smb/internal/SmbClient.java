@@ -8,15 +8,21 @@
 
 package org.mule.modules.smb.internal;
 
+import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.IOUtils;
 import org.mule.api.ConnectionExceptionCode;
@@ -27,31 +33,35 @@ import org.mule.modules.smb.utils.Utilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jcifs.CIFSContext;
-import jcifs.CIFSException;
-import jcifs.SmbResource;
-import jcifs.config.BaseConfiguration;
-import jcifs.config.PropertyConfiguration;
-import jcifs.context.BaseContext;
-import jcifs.smb.DosFileFilter;
-import jcifs.smb.NtlmPasswordAuthenticator;
-import jcifs.smb.SmbAuthException;
-import jcifs.smb.SmbException;
-import jcifs.smb.SmbFile;
-import jcifs.smb.SmbFileInputStream;
-import jcifs.smb.SmbFileOutputStream;
-
+import com.hierynomus.msdtyp.AccessMask;
+import com.hierynomus.msdtyp.FileTime;
+import com.hierynomus.mssmb2.SMB2ShareAccess;
+import com.hierynomus.smbj.SMBClient;
+import com.hierynomus.smbj.SmbConfig;
+import com.hierynomus.smbj.auth.AuthenticationContext;
+import com.hierynomus.smbj.connection.Connection;
+import com.hierynomus.smbj.session.Session;
+import com.hierynomus.smbj.share.DiskShare;
+import com.hierynomus.smbj.share.File;
 
 public class SmbClient {
 
     private static final Logger logger = LoggerFactory.getLogger(SmbClient.class);
 
-    private SmbConnectorConfig config;
+    private SmbConnectorConfig connectorConfig;
 
-    private CIFSContext cifsContext;
+    private AuthenticationContext ac = null;
+    
+    private SmbConfig smbConfig = null;
+    
+    private SMBClient sc = null;
+    
+    private Session smbSession = null;
+    
+    private DiskShare diskShare = null;
 
     public SmbClient(SmbConnectorConfig config) {
-        this.config = config;
+        this.connectorConfig = config;
     }
 
     /**
@@ -66,11 +76,7 @@ public class SmbClient {
      */
     public boolean isConnected() {
         try {
-            if (this.getConnection() != null) {
-                return this.getConnection().canRead();
-            } else {
-                return false;
-            }
+         	return this.getShare().isConnected();
         } catch (Exception e) {
             logger.error("Error checking connection status", e);
             return false;
@@ -93,16 +99,15 @@ public class SmbClient {
      *            long value in ms of minimum file age
      * @return
      */
-    private boolean checkIsFileOldEnough(SmbFile file) {
+    private boolean checkIsFileOldEnough(File file) {
     		if (this.getConfig().getFileage() > 0) {
-            long lastMod = file.getLastModified();
-            long now = System.currentTimeMillis();
-            long currentAge = now - lastMod;
+            long lastMod = file.getFileInformation().getBasicInformation().getChangeTime().toEpochMillis();
+            long currentAge = FileTime.now().toEpochMillis() - lastMod;
             if (currentAge < 0) {
                 logger.warn("The system clocks appear to be out of sync, either time or timezone");
             }
             if (currentAge < this.getConfig().getFileage()) {
-                logger.debug("The file has not aged enough yet, will return nothing for: " + file.getName());
+                logger.debug("The file has not aged enough yet, will return nothing for: " + file.getFileName());
                 return false;
             }
         }
@@ -114,7 +119,7 @@ public class SmbClient {
      * @return SmbConnectorConfig containing configuration parameters for this client
      */
     public SmbConnectorConfig getConfig() {
-        return this.config;
+        return this.connectorConfig;
     }
 
     /**
@@ -126,18 +131,38 @@ public class SmbClient {
         try {
             logger.debug("connecting to: smb://" + this.getConfig().getHost() + this.getConfig().getPath());
             
-            this.setContext();
-            SmbFile smbFile = this.getConnection();
-            
-            if (!smbFile.canRead()) {
-                throw new SmbConnectionException(ConnectionExceptionCode.CANNOT_REACH, null, "not connected", null);
+            if (this.ac == null) {
+            		this.setAuthContext();
+            		logger.info("setting auth context");
             }
-        } catch (SmbAuthException e) {
-            throw new SmbConnectionException(ConnectionExceptionCode.INCORRECT_CREDENTIALS, null, e.getMessage(), e);
-        } catch (SmbException e) {
+    			
+            if (this.smbConfig == null) {
+            		logger.info("setting smbConfig");
+            		this.smbConfig = SmbConfig.builder()
+                    .withTimeout(this.getConfig().getTimeout(), TimeUnit.MILLISECONDS) // Timeout sets Read, Write, and Transact timeouts (default is 60 seconds)
+                    .withSoTimeout(this.getConfig().getTimeout(), TimeUnit.MILLISECONDS) // Socket Timeout (default is 0 seconds, blocks forever)
+                    .build();
+            }
+            
+            if (this.sc == null) {
+        			logger.info("setting smbClient");
+        			sc = new SMBClient(this.smbConfig);
+            }
+
+            if (getSession() == null) {
+            		logger.info("setting smbSession");
+	             setSession(this.getConfig().getHost());
+            }
+            
+            if (getShare() == null) {
+	        		logger.info("setting smbShare");
+	        		setShare(this.getConfig().getHost(), this.getConfig().getPath());
+	        }
+
+        } catch (IOException e) {
             throw new SmbConnectionException(ConnectionExceptionCode.CANNOT_REACH, null, e.getMessage(), e);
-        } catch (CIFSException e) {
-        		throw new SmbConnectionException(ConnectionExceptionCode.INCORRECT_CREDENTIALS, null, e.getMessage(), e);
+        } catch (Exception e) {
+        		throw new SmbConnectionException(ConnectionExceptionCode.CANNOT_REACH, null, e.getMessage(), e);
 		}
         return isConnected();
     }
@@ -153,29 +178,32 @@ public class SmbClient {
      * @return byte[] of file content
      */
     public byte[] readFile(String fileName, String dirName, boolean autoDelete) throws SmbConnectionException {
-        byte[] data = null;
-        SmbFileInputStream smbFileInputStream = null;
+        InputStream is = null;
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
         try {
-            SmbFile smbFile = this.getConnection(Utilities.normalizeDir(dirName) + Utilities.normalizeFile(fileName));
+        		Set<SMB2ShareAccess> s = new HashSet<>();
+            s.add(SMB2ShareAccess.FILE_SHARE_DELETE);
+            s.add(SMB2ShareAccess.FILE_SHARE_READ);
+            File smbFile = this.getShare().openFile(Utilities.normalizeDir(dirName) + Utilities.normalizeFile(fileName), EnumSet.of(AccessMask.GENERIC_READ), null, s, null, null);
             if (smbFile != null) {
                 if (checkIsFileOldEnough(smbFile)) {
-                    smbFileInputStream = new SmbFileInputStream(smbFile);
-                    data = new byte[(int) smbFile.length()];
-                    smbFileInputStream.read(data);
-                    smbFileInputStream.close();
-                    if (autoDelete) {
-                    		smbFile.delete();
+	                	if (autoDelete) {
+	                		smbFile.deleteOnClose();
+	                }
+                		is = smbFile.getInputStream();
+                    byte[] buffer = new byte[1024];
+                    int length;
+                    while ((length = is.read(buffer)) > 0) {
+                        os.write(buffer, 0, length);
                     }
+                    is.close();
+                    smbFile.close();
                 }
-                logger.debug("Done reading file", smbFile.getUncPath());
+                logger.debug("Done reading file", smbFile.getFileName());
 
             } else {
                 logger.error("file not found", fileName);
             }
-        } catch (SmbAuthException e) {
-            throw new SmbConnectionException(ConnectionExceptionCode.INCORRECT_CREDENTIALS, "READ_ERROR", e.getMessage(), e);
-        } catch (SmbException e) {
-            throw new SmbConnectionException(ConnectionExceptionCode.CANNOT_REACH, "READ_ERROR", e.getMessage(), e);
         } catch (MalformedURLException e) {
             throw new SmbConnectionException(ConnectionExceptionCode.UNKNOWN, "READ_ERROR", e.getMessage(), e);
         } catch (UnknownHostException e) {
@@ -183,7 +211,7 @@ public class SmbClient {
         } catch (IOException e) {
             throw new SmbConnectionException(ConnectionExceptionCode.UNKNOWN, "READ_ERROR", e.getMessage(), e);
         }
-        return data;
+        return os.toByteArray();
     }
 
     /**
@@ -375,75 +403,71 @@ public class SmbClient {
         }
         return results;
     }
-
-    /**
-     * Get CIFSContext object containing credentials
-     * 
-     * @return CIFSContext object
-     */
-    public CIFSContext getCifsContext() {
-        return cifsContext;
-    }
     
     /**
      * Set the credentials to re-use for connections
      *
      * @return void
      */
-    private void setContext() throws CIFSException {
-    		try {
-    			
-    			PropertyConfiguration pc = new PropertyConfiguration(config.getProperties());
-    			if (config.getGuest()) {
-    				this.cifsContext = new BaseContext(pc).withGuestCrendentials();
-	    	        logger.debug("guest credentials used");
-    			}
-    			else {
-	    				this.cifsContext = new BaseContext(pc).withCredentials(new NtlmPasswordAuthenticator(config.getDomain(), config.getUsername(), config.getPassword()));
-	    		}
-		} catch (CIFSException e) {
-			logger.error(e.getMessage());
+    private void setAuthContext() throws Exception {
+		if (!connectorConfig.getGuest() && !connectorConfig.getAnonymous()) {
+			ac = new AuthenticationContext(this.getConfig().getUsername(), this.getConfig().getPassword().toCharArray(), this.getConfig().getDomain());
+		}
+		else if (connectorConfig.getGuest()) {
+			this.ac = AuthenticationContext.guest();
+	        logger.debug("guest credentials used");
+		} else if (connectorConfig.getAnonymous()) {
+			this.ac = AuthenticationContext.guest();
+	        logger.debug("anonymous credentials used");
 		}
     }
     
+    
     /**
-     * Helper method to create a connection
+     * get current diskshare
      * 
-     * @return SmbFile
+     * @return DiskShare
      */
-    private SmbFile getConnection() throws SmbConnectionException {
-    		return this.getConnection("");
+    private DiskShare getShare() throws SmbConnectionException {
+    		return this.diskShare;
     }
     
     /**
-     * Helper method to create a connection for a file or directory
+     * Helper method to create a connection for a server share
      * 
-     * @param String filename
-     * 		filename or directory to obtain
-     * @return SmbFile
+     * @param String hostname
+     * 		hostname to connect to
+     * @param String sharename
+     * 		sharename to connect to
+     * @return DiskShare object
      */
-    private SmbFile getConnection(String filenameordirectory) throws SmbConnectionException { 		
-		SmbFile f = null;
-    		if (this.getConfig().getHost() != null && this.getConfig().getPath() != null) {
-		    	if (this.getCifsContext() != null) {
-		    		try {
-					SmbResource r = this.getCifsContext().get(this.getConfig().getHost() + this.getConfig().getPath() + filenameordirectory);
-						if (r.isFile() || r.isDirectory()) {
-							f = (SmbFile) r;
-							f.setConnectTimeout(this.getConfig().getTimeout());
-						}
-						return f;
-				} catch (CIFSException e) {
-					throw new SmbConnectionException(ConnectionExceptionCode.UNKNOWN, null, e.getMessage(), e);
-				}
-		    	} else { 
-		    		logger.error("Missing credentials required for connectivity, declare them first");
-		    		return null;
-    			}
-    		} else {
-    			return null;
-    		}
+    private DiskShare setShare(String hostname, String sharename) throws IOException {
+    		Session s = setSession(hostname);
+		this.diskShare = (DiskShare) s.connectShare(sharename);
+    		return this.diskShare;
+    }
+    
+    /**
+     * get current session
+     * 
+     * @return Session authenticated object
+     */
+    private Session getSession() {
+    		return this.smbSession;
+    }
+    
+    /**
+     * Helper method to create a connection session for a server
+     * 
+     * @param String hostname
+     * 		hostname to connect to
+     * @return Session authenticated object
+     */
+    private Session setSession(String hostname) throws IOException { 		
+    		if (getSession() == null) {
+	    		Connection c = this.sc.connect(hostname);
+	    		this.smbSession = c.authenticate(ac);
+		}
+		return this.smbSession;
     }
 }
-    
-    
