@@ -11,7 +11,7 @@ import org.mule.api.ConnectionException;
 import org.mule.modules.smb.config.SmbConnectorConfig;
 import org.mule.tools.devkit.ctf.configuration.util.ConfigurationUtils;
 
-import jcifs.smb.NtlmPasswordAuthentication;
+import jcifs.CIFSContext;
 
 public class SmbValidConnectivityTest {
 
@@ -37,7 +37,7 @@ public class SmbValidConnectivityTest {
         connectionTimeout = validCredentials.getProperty("config.connectionTimeout");
         fileAge = validCredentials.getProperty("config.fileAge");
         config = new SmbConnectorConfig();
-        config.connect(domain, host, path, username, password, connectionTimeout, fileAge);
+        config.connect(domain, host, path, username, password, connectionTimeout, fileAge, false);
     }
 
     @Test
@@ -47,11 +47,11 @@ public class SmbValidConnectivityTest {
 
     @Test
     public void validCredentialsConnectivityTest() throws ConnectionException {
-        assertTrue(assertCredentials(config.getSmbClient().getCredentials()));
+        assertTrue(assertCredentials(config.getSmbClient().getCifsContext()));
     }
 
-    private boolean assertCredentials(NtlmPasswordAuthentication n) {
-        return n.getDomain().equals(domain) && n.getUsername().equals(username) && n.getPassword().equals(password);
+    private boolean assertCredentials(CIFSContext c) {
+        return c.getCredentials().getUserDomain().equals(domain) && !c.getCredentials().isAnonymous() && !c.getCredentials().isGuest();
     }
 
     @Test

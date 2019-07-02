@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import org.apache.commons.io.IOUtils;
 import org.mule.api.ConnectionExceptionCode;
@@ -26,8 +27,14 @@ import org.mule.modules.smb.utils.Utilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jcifs.CIFSContext;
+import jcifs.CIFSException;
+import jcifs.SmbResource;
+import jcifs.config.BaseConfiguration;
+import jcifs.config.PropertyConfiguration;
+import jcifs.context.BaseContext;
 import jcifs.smb.DosFileFilter;
-import jcifs.smb.NtlmPasswordAuthentication;
+import jcifs.smb.NtlmPasswordAuthenticator;
 import jcifs.smb.SmbAuthException;
 import jcifs.smb.SmbException;
 import jcifs.smb.SmbFile;
@@ -41,7 +48,7 @@ public class SmbClient {
 
     private SmbConnectorConfig config;
 
-    private NtlmPasswordAuthentication credentials;
+    private CIFSContext cifsContext;
 
     public SmbClient(SmbConnectorConfig config) {
         this.config = config;
@@ -51,7 +58,7 @@ public class SmbClient {
      * Disconnect client
      */
     public void disconnect() {
-        // currently no way to close connections via jcifs - connections automatically disconnect after the timeout (15000ms default)
+        // currently no way to close connections via jcifs - connections automatically disconnect after the timeout
     }
 
     /**
@@ -119,7 +126,7 @@ public class SmbClient {
         try {
             logger.debug("connecting to: smb://" + this.getConfig().getHost() + this.getConfig().getPath());
             
-            this.setCredentials(this.getConfig().getDomain(), this.getConfig().getUsername(), this.getConfig().getPassword());
+            this.setContext();
             SmbFile smbFile = this.getConnection();
             
             if (!smbFile.canRead()) {
@@ -129,7 +136,9 @@ public class SmbClient {
             throw new SmbConnectionException(ConnectionExceptionCode.INCORRECT_CREDENTIALS, null, e.getMessage(), e);
         } catch (SmbException e) {
             throw new SmbConnectionException(ConnectionExceptionCode.CANNOT_REACH, null, e.getMessage(), e);
-        }
+        } catch (CIFSException e) {
+        		throw new SmbConnectionException(ConnectionExceptionCode.INCORRECT_CREDENTIALS, null, e.getMessage(), e);
+		}
         return isConnected();
     }
 
@@ -368,33 +377,33 @@ public class SmbClient {
     }
 
     /**
-     * Get NtlmPasswordAuthentication object required for connecting to SmbFile objects
+     * Get CIFSContext object containing credentials
      * 
-     * @return NtlmPasswordAuthentication object
+     * @return CIFSContext object
      */
-    public NtlmPasswordAuthentication getCredentials() {
-        return credentials;
+    public CIFSContext getCifsContext() {
+        return cifsContext;
     }
-
+    
     /**
      * Set the credentials to re-use for connections
      *
      * @return void
      */
-    public void setCredentials(String domain, String username, String password) {
-    		if (username != null && password != null && domain != null) {
-    			if (username.length() != 0 && password.length() != 0) {
-	    			NtlmPasswordAuthentication c = new NtlmPasswordAuthentication(domain, username, password);
-	    	        this.credentials = c;
-    			} else {
-    				this.credentials = NtlmPasswordAuthentication.ANONYMOUS;
-	    	        logger.warn("Warning - anonymous connectivity used");
+    private void setContext() throws CIFSException {
+    		try {
+    			
+    			PropertyConfiguration pc = new PropertyConfiguration(config.getProperties());
+    			if (config.getGuest()) {
+    				this.cifsContext = new BaseContext(pc).withGuestCrendentials();
+	    	        logger.debug("guest credentials used");
     			}
-    		}
-    		else {
-    			this.credentials = NtlmPasswordAuthentication.ANONYMOUS;
-    			logger.warn("Warning - anonymous connectivity used");
-    		}
+    			else {
+	    				this.cifsContext = new BaseContext(pc).withCredentials(new NtlmPasswordAuthenticator(config.getDomain(), config.getUsername(), config.getPassword()));
+	    		}
+		} catch (CIFSException e) {
+			logger.error(e.getMessage());
+		}
     }
     
     /**
@@ -413,24 +422,27 @@ public class SmbClient {
      * 		filename or directory to obtain
      * @return SmbFile
      */
-    private SmbFile getConnection(String filenameordirectory) throws SmbConnectionException {
-    		try {    		
-			SmbFile f;
-	    		if (this.getConfig().getHost() != null && this.getConfig().getPath() != null) {
-			    	if (this.getCredentials() != null) {
-			    		f = new SmbFile(this.getConfig().getHost() + this.getConfig().getPath() + filenameordirectory, this.getCredentials());
-			    	} else 
-			    		f = new SmbFile(this.getConfig().getHost() + this.getConfig().getPath() + filenameordirectory);
-			    	
-			    f.setConnectTimeout(this.getConfig().getTimeout());
-		    
-			    return f;
-	    		} else {
-	    			return null;
-	    		}
-		} catch (MalformedURLException e) {
-            throw new SmbConnectionException(ConnectionExceptionCode.UNKNOWN, null, e.getMessage(), e);
-		}
+    private SmbFile getConnection(String filenameordirectory) throws SmbConnectionException { 		
+		SmbFile f = null;
+    		if (this.getConfig().getHost() != null && this.getConfig().getPath() != null) {
+		    	if (this.getCifsContext() != null) {
+		    		try {
+					SmbResource r = this.getCifsContext().get(this.getConfig().getHost() + this.getConfig().getPath() + filenameordirectory);
+						if (r.isFile() || r.isDirectory()) {
+							f = (SmbFile) r;
+							f.setConnectTimeout(this.getConfig().getTimeout());
+						}
+						return f;
+				} catch (CIFSException e) {
+					throw new SmbConnectionException(ConnectionExceptionCode.UNKNOWN, null, e.getMessage(), e);
+				}
+		    	} else { 
+		    		logger.error("Missing credentials required for connectivity, declare them first");
+		    		return null;
+    			}
+    		} else {
+    			return null;
+    		}
     }
 }
     

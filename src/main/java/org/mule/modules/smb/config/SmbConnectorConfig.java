@@ -1,5 +1,7 @@
 package org.mule.modules.smb.config;
 
+import java.util.Properties;
+
 import org.mule.api.ConnectionException;
 import org.mule.api.ConnectionExceptionCode;
 import org.mule.api.annotations.Connect;
@@ -35,6 +37,10 @@ public class SmbConnectorConfig {
     private int connectionTimeout = 30000;
     
     private Integer fileAge;
+    
+    private Properties props;
+    
+    private boolean guest = false;
 
     /**
      * Set the host for the config
@@ -171,6 +177,25 @@ public class SmbConnectorConfig {
     public int getFileage() {
         return this.fileAge;
     }
+    
+    /**
+     * Set guest credentials
+     *
+     * @return void
+     */
+    public void setGuest(boolean g) {
+   		this.guest = g;
+    }
+
+    /**
+     * Get the guest credential status
+     *
+     * @return boolean, true if guest enabled
+     */
+    public boolean getGuest() {
+        return this.guest;
+    }
+
 
     /**
      * Get the client that does the work
@@ -180,18 +205,35 @@ public class SmbConnectorConfig {
     public SmbClient getSmbClient() {
         return smbClient;
     }
+    
+    /**
+     * Get the props
+     *
+     * @return Properties props
+     */
+    public Properties getProperties() {
+        return props;
+    }
 
     /**
      * Connect
      *
      * @param domain
      *            domain
+	 * @param host
+     *            host name to connect
+     * @param path
+     *            shared path
      * @param username
      *            username
      * @param password
      *            password
-     * @param path
-     *            shared path
+     * @param timeout
+     *            connection timeout
+     * @param fileage
+     *            file age for actions
+     * @param guest
+     *            connect with guest
      * @throws ConnectionException
      */
     @Connect
@@ -202,9 +244,11 @@ public class SmbConnectorConfig {
         @Optional @FriendlyName("Username") String username,
         @Optional @Password @FriendlyName("Password") String password, 
         @Optional @FriendlyName("Connection timeout") String timeout,
-        @Optional @FriendlyName("File age (ms)") String fileAge) throws ConnectionException {
+        @Optional @FriendlyName("File age (ms)") String fileage,
+        @Optional @FriendlyName("Connect as guest")  boolean guest ) throws ConnectionException {
 
         try {
+        	
             this.setDomain(domain);
             this.setUsername(username);
             this.setPassword(password);
@@ -213,11 +257,20 @@ public class SmbConnectorConfig {
             if (NumberUtils.isNumber(timeout)) {
             		this.setTimeout(Integer.parseInt(timeout));
             }
-            if (NumberUtils.isNumber(fileAge)) {
-            		this.setFileage(Integer.parseInt(fileAge));
-            } else {
-            		//this.setFileage(500);
+            if (NumberUtils.isNumber(fileage)) {
+            		this.setFileage(Integer.parseInt(fileage));
             }
+            this.setGuest(guest);
+            
+            props = new Properties();
+            props.put("jcifs.smb.client.connTimeout", timeout);
+            if (!guest) {
+            		props.put("jcifs.smb.client.domain", domain);
+                props.put("jcifs.smb.client.username", username);
+                props.put("jcifs.smb.client.password", password);
+                props.put("jcifs.smb.client.logonShare", this.getHost() + this.getPath());
+            }
+            
             this.getSmbClient().connect();
         } catch (Exception e) {
             throw new org.mule.api.ConnectionException(ConnectionExceptionCode.UNKNOWN, null, e.getMessage(), e);
