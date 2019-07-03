@@ -47,7 +47,7 @@
         <configuration>
           <skipTests>${skipTests}</skipTests>
           <includes>
-            <include>**/FullTestSuite.java</include>
+            <include>**/*TestSuite.java</include>
           </includes>
         </configuration>
       </plugin>
