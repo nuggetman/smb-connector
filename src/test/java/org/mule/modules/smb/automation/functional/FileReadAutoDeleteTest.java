@@ -3,7 +3,7 @@ package org.mule.modules.smb.automation.functional;
 
 import static org.junit.Assert.assertEquals;
 
-import static org.mule.modules.smb.automation.functional.TestDataBuilder.FILENAME;
+import static org.mule.modules.smb.automation.functional.TestDataBuilder.FILE_READ_AUTODELETE_TEST_FILENAME;
 import static org.mule.modules.smb.automation.functional.TestDataBuilder.FILE_CONTENT;
 
 import org.junit.After;
@@ -22,7 +22,7 @@ public class FileReadAutoDeleteTest extends AbstractTestCase<SmbConnector> {
     @Before
     public void setup() {
         try {
-            getConnector().fileWrite(FILENAME, null, false, FILE_CONTENT.getBytes(), "UTF-8");
+            getConnector().fileWrite(FILE_READ_AUTODELETE_TEST_FILENAME, null, false, FILE_CONTENT.getBytes(), "UTF-8");
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -35,7 +35,7 @@ public class FileReadAutoDeleteTest extends AbstractTestCase<SmbConnector> {
     @Test
     public void verifyFileReadWithDelete() {
         try {
-            assertEquals(FILE_CONTENT, new String(getConnector().fileRead(FILENAME, null, true)));
+            assertEquals(FILE_CONTENT, new String(getConnector().fileRead(FILE_READ_AUTODELETE_TEST_FILENAME, null, true)));
         } catch (ConnectionException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

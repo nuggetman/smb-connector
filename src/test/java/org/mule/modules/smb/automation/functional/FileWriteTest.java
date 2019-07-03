@@ -1,6 +1,6 @@
 package org.mule.modules.smb.automation.functional;
 
-import static org.mule.modules.smb.automation.functional.TestDataBuilder.FILENAME;
+import static org.mule.modules.smb.automation.functional.TestDataBuilder.FILE_WRITE_TEST_FILENAME;
 import static org.mule.modules.smb.automation.functional.TestDataBuilder.FILE_CONTENT;
 
 import org.junit.After;
@@ -17,7 +17,7 @@ public class FileWriteTest extends AbstractTestCase<SmbConnector> {
     @After
     public void tearDown() {
         try {
-            getConnector().fileDelete(FILENAME, null);
+            getConnector().fileDelete(FILE_WRITE_TEST_FILENAME, null);
         } catch ( Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -26,7 +26,7 @@ public class FileWriteTest extends AbstractTestCase<SmbConnector> {
     @Test
     public void verifyWriteNoAppend() {
         try {
-            getConnector().fileWrite(FILENAME, null, false, FILE_CONTENT, "UTF-8");
+            getConnector().fileWrite(FILE_WRITE_TEST_FILENAME, null, false, FILE_CONTENT, "UTF-8");
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
