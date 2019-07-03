@@ -34,6 +34,7 @@
 	    <groupId>com.hierynomus</groupId>
 		<artifactId>smbj</artifactId>
         <version>0.9.1</version>
+        <scope>provided</scope>
       </dependency>
     </dependencies>
     

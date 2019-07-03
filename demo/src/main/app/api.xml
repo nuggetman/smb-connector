@@ -7,7 +7,7 @@ http://www.mulesoft.org/schema/mule/smb http://www.mulesoft.org/schema/mule/smb/
 http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd">
     <http:listener-config name="api-httpListenerConfig" host="0.0.0.0" port="8081" doc:name="HTTP Listener Configuration" />
     <apikit:config name="api-config" raml="api.raml" consoleEnabled="false" doc:name="Router" />
-    <smb:config name="SMB_Connector__Configuration" domain="${domain}" host="${host}" path="${path}" username="${username}" password="${password}" timeout="${timeout}" doc:name="SMB Connector: Configuration" />
+    <smb:config name="SMB_Connector__Configuration" host="${host}" doc:name="SMB Connector: Configuration" domain="${domain}" fileage="${fileage}" password="${pass}" share="${share}" timeout="${timeout}" username="${user}"/>
     <flow name="api-main">
         <http:listener config-ref="api-httpListenerConfig" path="/api/*" doc:name="HTTP" />
         <apikit:router config-ref="api-config" doc:name="APIkit Router" />

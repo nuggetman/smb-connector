@@ -122,7 +122,7 @@ public class SmbConnector {
      */
     @Processor
     public boolean directoryDelete(@ConnectionKey @FriendlyName("Directory Name") String dirName,
-    		@ConnectionKey @FriendlyName("Recursive delete") boolean recursive) throws ConnectionException {
+    		@Default("false") @FriendlyName("Recursive delete") boolean recursive) throws ConnectionException {
         return this.getConfig().getSmbClient().deleteDir(dirName, recursive);
     }
 

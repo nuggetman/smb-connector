@@ -67,7 +67,7 @@ public class SmbClient {
      * Disconnect client
      */
     public void disconnect() {
-        // currently no way to close connections via jcifs - connections automatically disconnect after the timeout
+        // currently no way to close connections via smb - connections automatically disconnect after the timeout
     }
 
     /**

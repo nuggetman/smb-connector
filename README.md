@@ -3,8 +3,8 @@
 The SMB connector allows Mule to connect to a Samba share to read and write file based data.
 
 ## Mule supported versions
-Examples:
 Mule 3.8.x
+Mule 3.9.x
 
 ## Supported SMB Hosts
 Windows 2008 / R2

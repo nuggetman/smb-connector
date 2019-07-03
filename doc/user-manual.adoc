@@ -67,6 +67,11 @@ For Maven dependency management, include this XML snippet in your `pom.xml` file
     <artifactId>mule-module-smb</artifactId>
     <version>1.2.0</version>
 </dependency>
+<dependency>
+    <groupId>com.hierynomus</groupId>
+    <artifactId>smbj</artifactId>
+    <version>0.9.1</version>
+</dependency>
 ----
 
 Inside the `<version>` tags, put the desired version number, the word `RELEASE` for the latest release, or `SNAPSHOT` for the latest available version.
