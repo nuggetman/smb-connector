@@ -108,8 +108,8 @@ public class SmbConnector {
      * @return void
      */
     @Processor
-    public void directoryCreate(@ConnectionKey @Required @FriendlyName("Folder Name") String dirName) throws ConnectionException {
-        this.getConfig().getSmbClient().createDirectory(dirName);
+    public boolean directoryCreate(@ConnectionKey @Required @FriendlyName("Folder Name") String dirName) throws ConnectionException {
+        return this.getConfig().getSmbClient().createDirectory(dirName);
     }
 
     /**

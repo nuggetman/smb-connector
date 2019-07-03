@@ -81,17 +81,17 @@ public class UtilitiesUnitTest {
     
     @Test
     public void buildPathTestPath1() {
-        assertEquals("path", Utilities.buildPath("path",null));
+        assertEquals("path1", Utilities.buildPath("path1",null));
     }
     
     @Test
     public void buildPathTestPath2() {
-        assertEquals("file", Utilities.buildPath(null,"file"));
+        assertEquals("path2", Utilities.buildPath(null,"path2"));
     }
     
     @Test
     public void buildPathTestPath12() {
-        assertEquals("path/file", Utilities.buildPath("path","file"));
+        assertEquals("path1/path2", Utilities.buildPath("path1","path2"));
     }
 
     @Test

@@ -1,5 +1,6 @@
 package org.mule.modules.smb.automation.functional;
 
+import static org.junit.Assert.assertTrue;
 import static org.mule.modules.smb.automation.functional.TestDataBuilder.FILENAME;
 import static org.mule.modules.smb.automation.functional.TestDataBuilder.FILE_CONTENT;
 
@@ -26,7 +27,7 @@ public class FileDeleteTest extends AbstractTestCase<SmbConnector> {
     @Test
     public void verify() {
         try {
-            getConnector().fileDelete(FILENAME, null);
+            assertTrue(getConnector().fileDelete(FILENAME, null));
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }

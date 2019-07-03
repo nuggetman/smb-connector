@@ -1,5 +1,7 @@
 package org.mule.modules.smb.automation.functional;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mule.modules.smb.automation.functional.TestDataBuilder.DIR_NAME;
 
 import org.junit.After;
@@ -26,7 +28,7 @@ public class DirectoryCreateTest extends AbstractTestCase<SmbConnector> {
     @Test
     public void verifyCreateDirectory() {
         try {
-            getConnector().directoryCreate(DIR_NAME);
+            assertTrue(getConnector().directoryCreate(DIR_NAME));
         } catch (ConnectionException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -35,8 +37,8 @@ public class DirectoryCreateTest extends AbstractTestCase<SmbConnector> {
     @Test
     public void verifyCreateDirectoryTwice() {
         try {
-            getConnector().directoryCreate(DIR_NAME);
-            getConnector().directoryCreate(DIR_NAME);
+        	    assertTrue(getConnector().directoryCreate(DIR_NAME));
+        	    assertFalse(getConnector().directoryCreate(DIR_NAME));
         } catch (ConnectionException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

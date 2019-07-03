@@ -132,29 +132,29 @@ public class SmbClient {
             logger.debug("connecting to: smb://" + this.getConfig().getHost() + this.getConfig().getShare());
             
             if (this.ac == null) {
+                logger.debug("setting auth context");
                 this.setAuthContext();
-                logger.info("setting auth context");
             }
     			
             if (this.smbConfig == null) {
-                logger.info("setting smbConfig");
+                logger.debug("setting smbConfig");
                 this.smbConfig = SmbConfig.builder()
                 .withTimeout(this.getConfig().getTimeout(), TimeUnit.MILLISECONDS)
                 .build();
             }
             
             if (this.sc == null) {
-                logger.info("setting smbClient");
+                logger.debug("setting smbClient");
                 sc = new SMBClient(this.smbConfig);
             }
 
             if (getSession() == null) {
-                logger.info("setting smbSession");
+                logger.debug("setting smbSession");
                 setSession(this.getConfig().getHost());
             }
             
             if (getShare() == null) {
-                logger.info("setting smbShare");
+                logger.debug("setting smbShare");
                 setShare(this.getConfig().getHost(), this.getConfig().getShare());
 	        }
 
@@ -317,19 +317,23 @@ public class SmbClient {
      * @param dirName
      *            String value of the directory name
      */
-    public void createDirectory(String dirName) throws SmbConnectionException {
+    public boolean createDirectory(String dirName) throws SmbConnectionException {
         if (dirName != null) {
             try {
                 if (!this.getShare().folderExists(Utilities.cleanPath(dirName))) {
                     this.getShare().mkdir(Utilities.cleanPath(dirName));
                     logger.debug("done creating directory:" + Utilities.cleanPath(dirName));
+                    return true;
     				} else {
                     logger.debug("directory already exists: " + Utilities.cleanPath(dirName));
+                    return false;
     	            }
     			} catch (Exception e) {
                 throw new SmbConnectionException(ConnectionExceptionCode.UNKNOWN, null, e.getMessage(), e);
             }
-    		}
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -396,7 +400,7 @@ public class SmbClient {
 			this.ac = AuthenticationContext.guest();
 	        logger.debug("guest credentials used");
 		} else if (connectorConfig.getAnonymous()) {
-			this.ac = AuthenticationContext.guest();
+			this.ac = AuthenticationContext.anonymous();
 	        logger.debug("anonymous credentials used");
 		}
     }
