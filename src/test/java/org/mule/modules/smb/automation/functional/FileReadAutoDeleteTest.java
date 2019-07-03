@@ -13,9 +13,9 @@ import org.mule.api.ConnectionException;
 import org.mule.modules.smb.SmbConnector;
 import org.mule.tools.devkit.ctf.junit.AbstractTestCase;
 
-public class FileReadTest extends AbstractTestCase<SmbConnector> {
+public class FileReadAutoDeleteTest extends AbstractTestCase<SmbConnector> {
 
-    public FileReadTest() {
+    public FileReadAutoDeleteTest() {
         super(SmbConnector.class);
     }
 
@@ -30,21 +30,14 @@ public class FileReadTest extends AbstractTestCase<SmbConnector> {
 
     @After
     public void tearDown() {
-        try {
-            getConnector().fileDelete(FILENAME, null);
-        } catch (ConnectionException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
-
     }
-
+    
     @Test
-    public void verifyFileReadNoDelete() {
+    public void verifyFileReadWithDelete() {
         try {
-            assertEquals(FILE_CONTENT, new String(getConnector().fileRead(FILENAME, null, false)));
+            assertEquals(FILE_CONTENT, new String(getConnector().fileRead(FILENAME, null, true)));
         } catch (ConnectionException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
-
 }

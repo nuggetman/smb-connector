@@ -11,18 +11,18 @@ import org.mule.api.ConnectionException;
 import org.mule.modules.smb.config.SmbConnectorConfig;
 import org.mule.tools.devkit.ctf.configuration.util.ConfigurationUtils;
 
-import jcifs.CIFSContext;
-
 public class SmbValidConnectivityTest {
 
     private Properties validCredentials;
     private String domain;
     private String host;
-    private String path;
+    private String share;
     private String username;
     private String password;
     private String connectionTimeout;
-    private String fileAge;
+    private String fileage;
+    private Boolean guest;
+    private Boolean anonymous;
     private SmbConnectorConfig config;
 
     @Before
@@ -31,27 +31,20 @@ public class SmbValidConnectivityTest {
         validCredentials = ConfigurationUtils.getAutomationCredentialsProperties();
         domain = validCredentials.getProperty("config.domain");
         host = validCredentials.getProperty("config.host");
-        path = validCredentials.getProperty("config.path");
+        share = validCredentials.getProperty("config.share");
         username = validCredentials.getProperty("config.username");
         password = validCredentials.getProperty("config.password");
         connectionTimeout = validCredentials.getProperty("config.connectionTimeout");
-        fileAge = validCredentials.getProperty("config.fileAge");
+        fileage = validCredentials.getProperty("config.fileage");	
+        guest = Boolean.parseBoolean(validCredentials.getProperty("config.guest"));
+        anonymous = Boolean.parseBoolean(validCredentials.getProperty("config.anonymous"));
         config = new SmbConnectorConfig();
-        config.connect(domain, host, path, username, password, connectionTimeout, fileAge, false);
+        config.connect(domain, host, share, username, password, connectionTimeout, fileage, guest, anonymous);
     }
 
     @Test
     public void validConnectivityTest() throws ConnectionException {
         assertTrue(config.getSmbClient().isConnected());
-    }
-
-    @Test
-    public void validCredentialsConnectivityTest() throws ConnectionException {
-        assertTrue(assertCredentials(config.getSmbClient().getCifsContext()));
-    }
-
-    private boolean assertCredentials(CIFSContext c) {
-        return c.getCredentials().getUserDomain().equals(domain) && !c.getCredentials().isAnonymous() && !c.getCredentials().isGuest();
     }
 
     @Test
@@ -67,8 +60,8 @@ public class SmbValidConnectivityTest {
     
     @Test
     public void fileageTest() {
-        config.setFileage(Integer.parseInt(fileAge));
-        assertTrue(Integer.parseInt(fileAge) == config.getFileage());
+        config.setFileage(Integer.parseInt(fileage));
+        assertTrue(Integer.parseInt(fileage) == config.getFileage());
     }
 
 }

@@ -26,7 +26,7 @@ public class DirectoryDeleteTest extends AbstractTestCase<SmbConnector> {
     @Test
     public void verify() {
         try {
-            getConnector().directoryDelete(DIR_NAME);
+            getConnector().directoryDelete(DIR_NAME, true);
         } catch (ConnectionException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

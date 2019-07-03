@@ -29,7 +29,7 @@ public class DirectoryListEmptyTest extends AbstractTestCase<SmbConnector> {
     @After
     public void tearDown() {
         try {
-            getConnector().directoryDelete(DIR_NAME);
+            getConnector().directoryDelete(DIR_NAME, true);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }

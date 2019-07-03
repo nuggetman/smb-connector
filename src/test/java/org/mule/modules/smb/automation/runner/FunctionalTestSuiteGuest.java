@@ -9,32 +9,26 @@ import org.mule.modules.smb.SmbConnector;
 import org.mule.modules.smb.automation.functional.DirectoryCreateTest;
 import org.mule.modules.smb.automation.functional.DirectoryDeleteTest;
 import org.mule.modules.smb.automation.functional.DirectoryListEmptyTest;
-import org.mule.modules.smb.automation.functional.DirectoryListFilesTest;
 import org.mule.modules.smb.automation.functional.FileDeleteTest;
-import org.mule.modules.smb.automation.functional.FileReadAutoDeleteTest;
 import org.mule.modules.smb.automation.functional.FileReadTest;
-import org.mule.modules.smb.automation.functional.FileWriteAppendTest;
 import org.mule.modules.smb.automation.functional.FileWriteTest;
 import org.mule.tools.devkit.ctf.mockup.ConnectorTestContext;
 
 @RunWith(Suite.class)
 @SuiteClasses({
     FileReadTest.class,
-    FileReadAutoDeleteTest.class,
     FileWriteTest.class,
-    FileWriteAppendTest.class,
     FileDeleteTest.class,
     DirectoryCreateTest.class,
     DirectoryListEmptyTest.class,
-    DirectoryListFilesTest.class,
     DirectoryDeleteTest.class
 })
 
-public class FunctionalTestSuite {
+public class FunctionalTestSuiteGuest {
 
     @BeforeClass
     public static void initialiseSuite() {
-    		System.setProperty("automation-credentials.properties", "automation-credentials.properties");
+    		System.setProperty("automation-credentials.properties", "automation-credentials-guest.properties");
         ConnectorTestContext.initialize(SmbConnector.class);
     }
 

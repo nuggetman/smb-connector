@@ -9,7 +9,6 @@
 package org.mule.modules.smb;
 
 import java.util.List;
-import java.util.Map;
 
 import org.apache.logging.log4j.core.config.plugins.validation.constraints.Required;
 import org.mule.api.ConnectionException;
@@ -91,7 +90,8 @@ public class SmbConnector {
      * @return A list of Maps, each Map containing attributes for each file
      */
     @Processor
-    public List<Map<String, Object>> directoryList(@ConnectionKey @FriendlyName("Folder Name") @Optional String dirName, @Default("*.*") @FriendlyName("Wildcard") String wildcard) 
+    public List<String> directoryList(@ConnectionKey @FriendlyName("Folder Name") @Optional String dirName,
+    			@Default("*.*") @FriendlyName("Wildcard") String wildcard) 
     			throws ConnectionException, Exception {
         String w = wildcard;
         if (!Utilities.isNotBlankOrEmptyOrNull(w)) {
@@ -121,8 +121,9 @@ public class SmbConnector {
      * 			  Indicates success or failure of operation 
      */
     @Processor
-    public boolean directoryDelete(@ConnectionKey @FriendlyName("Directory Name") String dirName) throws ConnectionException {
-        return this.getConfig().getSmbClient().deleteDir(dirName);
+    public boolean directoryDelete(@ConnectionKey @FriendlyName("Directory Name") String dirName,
+    		@ConnectionKey @FriendlyName("Recursive delete") boolean recursive) throws ConnectionException {
+        return this.getConfig().getSmbClient().deleteDir(dirName, recursive);
     }
 
     /**

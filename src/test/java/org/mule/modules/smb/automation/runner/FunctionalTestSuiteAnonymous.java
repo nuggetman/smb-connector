@@ -9,7 +9,6 @@ import org.mule.modules.smb.SmbConnector;
 import org.mule.modules.smb.automation.functional.DirectoryCreateTest;
 import org.mule.modules.smb.automation.functional.DirectoryDeleteTest;
 import org.mule.modules.smb.automation.functional.DirectoryListEmptyTest;
-import org.mule.modules.smb.automation.functional.DirectoryListFilesTest;
 import org.mule.modules.smb.automation.functional.FileDeleteTest;
 import org.mule.modules.smb.automation.functional.FileReadTest;
 import org.mule.modules.smb.automation.functional.FileWriteTest;
@@ -22,7 +21,6 @@ import org.mule.tools.devkit.ctf.mockup.ConnectorTestContext;
     FileDeleteTest.class,
     DirectoryCreateTest.class,
     DirectoryListEmptyTest.class,
-    DirectoryListFilesTest.class,
     DirectoryDeleteTest.class
 })
 
