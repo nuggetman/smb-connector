@@ -24,7 +24,7 @@ import org.mule.tools.devkit.ctf.mockup.ConnectorTestContext;
     DirectoryDeleteTest.class
 })
 
-public class FunctionalTestSuiteAnonymous {
+public class FunctionalAnonymousTestSuite {
 
     @BeforeClass
     public static void initialiseSuite() {

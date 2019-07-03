@@ -122,7 +122,7 @@ public class SmbConnectorConfig {
      * @return void
      */
     public void setUsername(String u) {
-    			this.username = u;
+        this.username = u;
     }
 
     /**
@@ -140,7 +140,7 @@ public class SmbConnectorConfig {
      * @return void
      */
     public void setPassword(String p) {
-			this.password = p;
+        this.password = p;
     }
 
     /**
@@ -158,7 +158,7 @@ public class SmbConnectorConfig {
      * @return void
      */
     public void setFileage(int a) {
-   		this.fileage = a;
+        this.fileage = a;
     }
 
     /**
@@ -176,7 +176,7 @@ public class SmbConnectorConfig {
      * @return void
      */
     public void setGuest(boolean g) {
-   		this.guest = g;
+        this.guest = g;
     }
 
     /**
@@ -194,7 +194,7 @@ public class SmbConnectorConfig {
      * @return void
      */
     public void setAnonymous(boolean a) {
-   		this.anonymous = a;
+        this.anonymous = a;
     }
 
     /**
@@ -256,10 +256,10 @@ public class SmbConnectorConfig {
             this.setHost(host);
             this.setShare(Utilities.cleanPath(share));
             if (NumberUtils.isNumber(timeout)) {
-            		this.setTimeout(Integer.parseInt(timeout));
+                this.setTimeout(Integer.parseInt(timeout));
             }
             if (NumberUtils.isNumber(fileage)) {
-            		this.setFileage(Integer.parseInt(fileage));
+                this.setFileage(Integer.parseInt(fileage));
             }
             this.setGuest(guest);
             this.setAnonymous(anonymous);

@@ -68,6 +68,31 @@ public class UtilitiesUnitTest {
     public void normalizeFileTest4() {
         assertEquals("file1.txt", Utilities.cleanPath("file1.txt"));
     }
+    
+    @Test
+    public void normalizeFileTestNull() {
+        assertEquals("", Utilities.cleanPath(null));
+    }
+    
+    @Test
+    public void buildPathTestNull() {
+        assertEquals(null, Utilities.buildPath(null,null));
+    }
+    
+    @Test
+    public void buildPathTestPath1() {
+        assertEquals("path", Utilities.buildPath("path",null));
+    }
+    
+    @Test
+    public void buildPathTestPath2() {
+        assertEquals("file", Utilities.buildPath(null,"file"));
+    }
+    
+    @Test
+    public void buildPathTestPath12() {
+        assertEquals("path/file", Utilities.buildPath("path","file"));
+    }
 
     @Test
     public void isNotBlankOrEmptyOrNullTest() {

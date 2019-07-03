@@ -13,7 +13,7 @@ public class Utilities {
      * @return String of normalized file
      */
     public static String cleanPath(String path) {
-    		if (path != null) {
+        if (path != null) {
 			StringBuilder sb = new StringBuilder(path.replaceAll("(/)+", "/"));
 			if (path.startsWith("/")) {
 				sb.replace(0, 1, "");
@@ -38,11 +38,11 @@ public class Utilities {
      * @return String of normalized file
      */
     public static String buildPath(String path1, String path2) {
-     	if (path1 != null && path2 != null) {
-		    	path1 = cleanPath(path1);
-		    	path2 = cleanPath(path2);
-			StringBuilder sb = new StringBuilder(path1 + "/" + path2);
-			return sb.toString();
+        if (path1 != null && path2 != null) {
+            path1 = cleanPath(path1);
+            path2 = cleanPath(path2);
+            StringBuilder sb = new StringBuilder(path1 + "/" + path2);
+            return sb.toString();
 		} else if (path1 == null && path2 != null) {
 			return path2;
 		} else if (path1 != null && path2 == null) {

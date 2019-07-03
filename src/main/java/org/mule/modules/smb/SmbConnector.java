@@ -62,7 +62,7 @@ public class SmbConnector {
     public void fileWrite(@ConnectionKey @FriendlyName("File Name") @Required String fileName, 
     			@Default("") @FriendlyName("Directory Name") String dirName,
     			@Default("false") @FriendlyName("Append to file") boolean append,
-    			@RefOnly @Default("#[payload]") Object fileContent, @Required @Default("UTF-8") String encoding) throws ConnectionException, Exception {
+    			@RefOnly @Default("#[payload]") Object fileContent, @Required @Default("UTF-8") String encoding) throws ConnectionException {
         this.getConfig().getSmbClient().writeFile(fileName, dirName, append, fileContent, encoding);
     }
 
@@ -77,7 +77,7 @@ public class SmbConnector {
     @Processor
     public boolean fileDelete(@ConnectionKey @FriendlyName("File Name") String fileName,
     			@Default("") @FriendlyName("Directory Name") String dirName) throws ConnectionException {
-    		return this.getConfig().getSmbClient().deleteFile(fileName, dirName);
+        return this.getConfig().getSmbClient().deleteFile(fileName, dirName);
     }
 
     /**
@@ -92,7 +92,7 @@ public class SmbConnector {
     @Processor
     public List<String> directoryList(@ConnectionKey @FriendlyName("Folder Name") @Optional String dirName,
     			@Default("*.*") @FriendlyName("Wildcard") String wildcard) 
-    			throws ConnectionException, Exception {
+    			throws ConnectionException {
         String w = wildcard;
         if (!Utilities.isNotBlankOrEmptyOrNull(w)) {
             w = "*.*";

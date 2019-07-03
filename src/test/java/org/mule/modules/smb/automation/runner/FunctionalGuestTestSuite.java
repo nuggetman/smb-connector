@@ -24,7 +24,7 @@ import org.mule.tools.devkit.ctf.mockup.ConnectorTestContext;
     DirectoryDeleteTest.class
 })
 
-public class FunctionalTestSuiteGuest {
+public class FunctionalGuestTestSuite {
 
     @BeforeClass
     public static void initialiseSuite() {
