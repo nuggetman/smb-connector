@@ -65,7 +65,7 @@ For Maven dependency management, include this XML snippet in your `pom.xml` file
 <dependency>
     <groupId>org.mule.modules</groupId>
     <artifactId>mule-module-smb</artifactId>
-    <version>1.0.0</version>
+    <version>1.2.0</version>
 </dependency>
 ----
 
@@ -87,6 +87,8 @@ To use the SMB connector in your Mule application, you must configure a global S
 |Host |Hostname of server hosting SMB share.
 |Path |Named path of the SMB share.
 |Connection timeout |Timeout for connection, in milliseconds.
+|Connect as guest |Checkbox to indicate guest account access.
+|Connect as anonymous |Checkbox to indicate anonymous account access.
 |===
 
 [[operations]]

@@ -21,5 +21,5 @@ Known issues
 ~~~~~~~~~~~~
 
 . Streaming is currently not supported in DevKit 3.9 (current edition)
-. The underlying JCIFS library cannot be distributed with the connector, the .jar driver can be downloaded from https://jcifs.samba.org/
-. JCifs provides no way to “disconnect” from a resource, but it naturally times out after 15 secs of no activity
+. The underlying library cannot be distributed with the connector, the .jar driver can be downloaded from https://mvnrepository.com/artifact/com.hierynomus/smbj/0.9.1
+. Samba provides no way to “disconnect” from a resource, but it naturally times out after 15 secs of no activity
