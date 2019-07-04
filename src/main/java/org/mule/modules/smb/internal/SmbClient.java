@@ -102,16 +102,21 @@ public class SmbClient {
      * @return
      */
     private boolean checkIsFileOldEnough(long age) {
-        if (this.getConfig().getFileage() > 0) {
+    	    boolean ready = false;
+        if (this.getConfig().getFileage() == 0) {
+        		logger.debug("File time check skipped");
+        	    ready = true;
+        } else if (this.getConfig().getFileage() > 0) {
             long currentAge = FileTime.now().toEpochMillis() - age;
             if (currentAge < 0) {
                 logger.warn("The system clocks appear to be out of sync, either time or timezone");
-            }
-            if (currentAge < this.getConfig().getFileage()) {
-                return false;
+            } else if (currentAge > 0 && currentAge < this.getConfig().getFileage()) {
+            	    logger.debug("File is not ready yet");
+            } else if (currentAge > 0 && currentAge > this.getConfig().getFileage()) {
+            	    ready = true;
             }
         }
-        return true;
+        return ready;
     }
 
     /**

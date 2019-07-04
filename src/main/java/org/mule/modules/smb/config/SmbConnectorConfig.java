@@ -257,9 +257,13 @@ public class SmbConnectorConfig {
             this.setShare(Utilities.cleanPath(share));
             if (NumberUtils.isNumber(timeout)) {
                 this.setTimeout(Integer.parseInt(timeout));
+            } else {
+            		this.setTimeout(30000);
             }
             if (NumberUtils.isNumber(fileage)) {
                 this.setFileage(Integer.parseInt(fileage));
+            } else {
+            		this.setFileage(500);
             }
             this.setGuest(guest);
             this.setAnonymous(anonymous);
