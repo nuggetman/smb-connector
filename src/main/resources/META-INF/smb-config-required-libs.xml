@@ -1,6 +1,0 @@
-<namespace xmlns="http://www.mulesoft.org/schema/mule/tooling.attributes" xmlns:mule="http://www.mulesoft.org/schema/mule/core">
-    <require>
-       <jar name="smbj (smbj-0.9.1.jar)" fileName="smbj(.*)\.jar" targetFolder="/lib/smb" 
-       targetRuntimeFolder="/plugins" className="com.hierynomus.smbj.SMBClient"/>
-    </require>
-</namespace>

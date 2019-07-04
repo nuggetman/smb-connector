@@ -66,11 +66,6 @@ For Maven dependency management, include this XML snippet in your `pom.xml` file
     <artifactId>mule-module-smb</artifactId>
     <version>1.2.0</version>
 </dependency>
-<dependency>
-    <groupId>com.hierynomus</groupId>
-    <artifactId>smbj</artifactId>
-    <version>0.9.1</version>
-</dependency>
 ----
 
 Inside the `<version>` tags, put the desired version number, the word `RELEASE` for the latest release, or `SNAPSHOT` for the latest available version.
@@ -86,13 +81,11 @@ To use the SMB connector in your Mule application, you must configure a global S
 |===
 |Field |Description
 |Domain |Enter a Windows domain for the user to log in with.
-|Username |Enter the username to log in with.
+|Username |Enter the username to log in with. Users "guest" and "anonymous" are reserved to indicate to use this access type.
 |Password |Enter the corresponding password.
 |Host |Hostname of server hosting SMB share.
 |Path |Named path of the SMB share.
 |Connection timeout |Timeout for connection, in milliseconds.
-|Connect as guest |Checkbox to indicate guest account access.
-|Connect as anonymous |Checkbox to indicate anonymous account access.
 |===
 
 [[operations]]

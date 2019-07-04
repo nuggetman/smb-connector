@@ -20,6 +20,5 @@ This connector supports the following operations:
 Known issues
 ~~~~~~~~~~~~
 
-. Streaming is currently not supported in DevKit 3.9 (current edition)
-. The underlying library cannot be distributed with the connector, the driver should be added to the project pom.xml as per the user guide
+. Streaming is currently not supported
 . Samba provides no way to “disconnect” from a resource, but it naturally times out after 15 secs of no activity
