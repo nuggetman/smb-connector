@@ -34,7 +34,7 @@ public class SmbConnectorConfig {
 
     private int connectionTimeout = 30000;
     
-    private Integer fileage;
+    private int fileage = 500;
     
     private boolean guest = false;
     
@@ -232,8 +232,6 @@ public class SmbConnectorConfig {
      *            connection timeout
      * @param fileage
      *            file age for actions
-     * @param guest
-     *            connect with guest
      * @throws ConnectionException
      */
     @Connect
@@ -244,29 +242,27 @@ public class SmbConnectorConfig {
         @Optional @FriendlyName("Username") String username,
         @Optional @Password @FriendlyName("Password") String password, 
         @Optional @FriendlyName("Connection timeout") String timeout,
-        @Optional @FriendlyName("File age (ms)") String fileage,
-        @Optional @FriendlyName("Connect as guest")  boolean guest,
-        @Optional @FriendlyName("Connect as anonymous")  boolean anonymous) throws ConnectionException {
+        @Optional @FriendlyName("File age (ms)") String fileage) throws ConnectionException {
 
         try {
         	
             this.setDomain(domain);
-            this.setUsername(username);
-            this.setPassword(password);
+            if (username.equalsIgnoreCase("guest")) {
+                this.setGuest(true);
+            } else if (username.equalsIgnoreCase("anonymous")) {
+                this.setAnonymous(true);
+            } else {
+                this.setUsername(username);
+                this.setPassword(password);
+            }
             this.setHost(host);
             this.setShare(Utilities.cleanPath(share));
             if (NumberUtils.isNumber(timeout)) {
                 this.setTimeout(Integer.parseInt(timeout));
-            } else {
-            		this.setTimeout(30000);
             }
             if (NumberUtils.isNumber(fileage)) {
                 this.setFileage(Integer.parseInt(fileage));
-            } else {
-            		this.setFileage(500);
             }
-            this.setGuest(guest);
-            this.setAnonymous(anonymous);
             this.getSmbClient().connect();
         } catch (Exception e) {
             throw new org.mule.api.ConnectionException(ConnectionExceptionCode.UNKNOWN, null, e.getMessage(), e);

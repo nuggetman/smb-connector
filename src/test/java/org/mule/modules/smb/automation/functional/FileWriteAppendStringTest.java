@@ -18,7 +18,7 @@ public class FileWriteAppendStringTest extends AbstractTestCase<SmbConnector> {
     @Before
     public void setup() {
         try {
-            getConnector().fileWrite(FILE_WRITE_APPEND_STRING_TEST_FILENAME, null, false, FILE_CONTENT.getBytes(), "UTF-8");
+            getConnector().fileWrite(FILE_WRITE_APPEND_STRING_TEST_FILENAME, null, false, FILE_CONTENT.toString(), "UTF-8");
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -36,7 +36,7 @@ public class FileWriteAppendStringTest extends AbstractTestCase<SmbConnector> {
     @Test
     public void verifyWriteAppendString() {
         try {
-            getConnector().fileWrite(FILE_WRITE_APPEND_STRING_TEST_FILENAME, null, true, FILE_CONTENT, "UTF-8");
+            getConnector().fileWrite(FILE_WRITE_APPEND_STRING_TEST_FILENAME, null, true, FILE_CONTENT.toString(), "UTF-8");
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }

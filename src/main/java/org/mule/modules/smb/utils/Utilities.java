@@ -1,8 +1,14 @@
 package org.mule.modules.smb.utils;
 
 import org.mule.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.hierynomus.msdtyp.FileTime;
 
 public class Utilities {
+	
+	private static final Logger logger = LoggerFactory.getLogger(Utilities.class);
 
     /**
      * 
@@ -67,6 +73,35 @@ public class Utilities {
         } else {
             return false;
         }
+    }
+    
+    /**
+     * 
+     * @param target
+     *            int value to target in ms
+     * @param age
+     *            epoch long value of file in ms
+     * 
+     * @param minimumAge
+     *            long value in ms of minimum file age
+     * @return
+     */
+    public static boolean timeCompare(int target, long age) {
+        boolean ready = false;
+        if (target == 0) {
+            logger.debug("Time check skipped");
+            ready = true;
+        } else if (target > 0) {
+            long currentAge = FileTime.now().toEpochMillis() - age;
+            if (currentAge < 0) {
+                logger.warn("The system clocks appear to be out of sync, either time or timezone");
+            } else if (currentAge > 0 && currentAge < target) {
+                logger.debug("Target is not ready yet");
+            } else if (currentAge > 0 && currentAge > target) {
+                ready = true;
+            }
+        }
+        return ready;
     }
 
     /**

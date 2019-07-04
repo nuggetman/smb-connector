@@ -29,7 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hierynomus.msdtyp.AccessMask;
-import com.hierynomus.msdtyp.FileTime;
 import com.hierynomus.msfscc.FileAttributes;
 import com.hierynomus.msfscc.fileinformation.FileIdBothDirectoryInformation;
 import com.hierynomus.mssmb2.SMB2CreateDisposition;
@@ -102,24 +101,10 @@ public class SmbClient {
      * @return
      */
     private boolean checkIsFileOldEnough(long age) {
-    	    boolean ready = false;
-        if (this.getConfig().getFileage() == 0) {
-        		logger.debug("File time check skipped");
-        	    ready = true;
-        } else if (this.getConfig().getFileage() > 0) {
-            long currentAge = FileTime.now().toEpochMillis() - age;
-            if (currentAge < 0) {
-                logger.warn("The system clocks appear to be out of sync, either time or timezone");
-            } else if (currentAge > 0 && currentAge < this.getConfig().getFileage()) {
-            	    logger.debug("File is not ready yet");
-            } else if (currentAge > 0 && currentAge > this.getConfig().getFileage()) {
-            	    ready = true;
-            }
-        }
-        return ready;
+        return Utilities.timeCompare(this.getConfig().getFileage(), age);
     }
 
-    /**
+	/**
      * 
      * @return SmbConnectorConfig containing configuration parameters for this client
      */

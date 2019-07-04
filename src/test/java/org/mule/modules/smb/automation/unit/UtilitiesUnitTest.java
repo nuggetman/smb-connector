@@ -7,6 +7,8 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 import org.mule.modules.smb.utils.Utilities;
 
+import com.hierynomus.msdtyp.FileTime;
+
 public class UtilitiesUnitTest {
 
     @Test
@@ -100,5 +102,14 @@ public class UtilitiesUnitTest {
         assertFalse(Utilities.isNotBlankOrEmptyOrNull(""));
         assertFalse(Utilities.isNotBlankOrEmptyOrNull(null));
     }
+
+    @Test
+    public void timeComparisons() {
+    		assertTrue(Utilities.timeCompare(0, 1000));
+    		assertFalse(Utilities.timeCompare(-1, 1000));
+    		assertTrue(Utilities.timeCompare(500, 1000));
+    		assertFalse(Utilities.timeCompare(500, FileTime.now().toEpochMillis()+100000));
+    }
+    
 
 }

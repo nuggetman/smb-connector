@@ -11,7 +11,7 @@ import org.mule.api.ConnectionException;
 import org.mule.modules.smb.config.SmbConnectorConfig;
 import org.mule.tools.devkit.ctf.configuration.util.ConfigurationUtils;
 
-public class SmbValidConnectivityTest {
+public class InvalidValuesConnectivityTest {
 
     private Properties validCredentials;
     private String domain;
@@ -21,8 +21,6 @@ public class SmbValidConnectivityTest {
     private String password;
     private String connectionTimeout;
     private String fileage;
-    private Boolean guest;
-    private Boolean anonymous;
     private SmbConnectorConfig config;
 
     @Before
@@ -34,12 +32,10 @@ public class SmbValidConnectivityTest {
         share = validCredentials.getProperty("config.share");
         username = validCredentials.getProperty("config.username");
         password = validCredentials.getProperty("config.password");
-        connectionTimeout = validCredentials.getProperty("config.connectionTimeout");
-        fileage = validCredentials.getProperty("config.fileage");	
-        guest = Boolean.parseBoolean(validCredentials.getProperty("config.guest"));
-        anonymous = Boolean.parseBoolean(validCredentials.getProperty("config.anonymous"));
+        connectionTimeout = "some string";
+        fileage = "some string";	
         config = new SmbConnectorConfig();
-        config.connect(domain, host, share, username, password, connectionTimeout, fileage, guest, anonymous);
+        config.connect(domain, host, share, username, password, connectionTimeout, fileage);
     }
 
     @Test
@@ -54,14 +50,12 @@ public class SmbValidConnectivityTest {
 
     @Test
     public void timeoutTest() {
-        config.setTimeout(Integer.parseInt(connectionTimeout));
-        assertTrue(Integer.parseInt(connectionTimeout) == config.getTimeout());
+        assertTrue(config.getTimeout() == 30000);
     }
     
     @Test
     public void fileageTest() {
-        config.setFileage(Integer.parseInt(fileage));
-        assertTrue(Integer.parseInt(fileage) == config.getFileage());
+        assertTrue(config.getFileage() == 500);
     }
 
 }
