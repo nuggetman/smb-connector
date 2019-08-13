@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ *
+ * The software in this package is published under the terms of the CPAL v1.0 license,
+ * a copy of which has been included with this distribution in the LICENSE.md file.
+ */
 package org.mule.modules.smb.utils;
 
 import org.mule.util.StringUtils;
@@ -77,14 +83,9 @@ public class Utilities {
     
     /**
      * 
-     * @param target
-     *            int value to target in ms
-     * @param age
-     *            epoch long value of file in ms
-     * 
-     * @param minimumAge
-     *            long value in ms of minimum file age
-     * @return
+     * @param target, int value to target in ms
+     * @param age, epoch long value of file in ms
+     * @return boolean age has been reached
      */
     public static boolean timeCompare(int target, long age) {
         boolean ready = false;

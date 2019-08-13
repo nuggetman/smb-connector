@@ -1,11 +1,9 @@
-/*
+/**
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
- * The software in this package is published under the terms of the CPAL v1.0
- * license, a copy of which has been included with this distribution in the
- * LICENSE.txt file.
+ * The software in this package is published under the terms of the CPAL v1.0 license,
+ * a copy of which has been included with this distribution in the LICENSE.md file.
  */
-
 package org.mule.modules.smb;
 
 import java.util.List;
@@ -21,6 +19,7 @@ import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.Optional;
 import org.mule.api.annotations.param.RefOnly;
 import org.mule.modules.smb.config.SmbConnectorConfig;
+import org.mule.modules.smb.exception.SmbConnectionException;
 import org.mule.modules.smb.utils.Utilities;
 
 @Connector(name = "smb", friendlyName = "SMB Connector")
@@ -32,11 +31,11 @@ public class SmbConnector {
     /**
      * Read file processor for reading in the contents of a file
      *
-     * @param fileName
-     *            File name to read in
-     * @param autoDelete
-     *            Should the file be deleted after reading
+     * @param fileName, name of file to read in
+     * @param dirName, directory where file is located
+     * @param autoDelete, Should the file be deleted after reading
      * @return The file contents as a byte[]
+     * @throws SmbConnectionException when a connection error occurs
      */
     @Processor
     public byte[] fileRead(@ConnectionKey @FriendlyName("File Name") String fileName,
@@ -48,15 +47,12 @@ public class SmbConnector {
     /**
      * Write file processor for writing out data to a file
      *
-     * @param fileName
-     *            File name to be used for the write operation.
-     * @param append
-     *            Append payload to file, if it exists already
-     * @param fileContent
-     *            A byte[], String or InputStream containing the contents of the file to write.
-     * @param encoding
-     * 			  Character encoding of contents to write
-     * @return void
+     * @param fileName, file name to be used for the write operation.
+     * @param dirName, directory where file is located
+     * @param append, when true append payload to file, if it exists already
+     * @param fileContent, a byte[], String or InputStream containing the contents of the file to write.
+     * @param encoding, character encoding of contents to write
+     * @throws SmbConnectionException when a connection error occurs
      */
     @Processor
     public void fileWrite(@ConnectionKey @FriendlyName("File Name") @Required String fileName, 
@@ -69,10 +65,10 @@ public class SmbConnector {
     /**
      * Delete file processor for deleting a file
      *
-     * @param fileName
-     *            File name to be used for the delete operation.
-     * @return boolean
-     * 			  Indicates success or failure of operation
+     * @param fileName, file name to be used for the delete operation.
+     * @param dirName, directory where file is located
+     * @return boolean, true indicates success for the operation
+     * @throws SmbConnectionException when a connection error occurs
      */
     @Processor
     public boolean fileDelete(@ConnectionKey @FriendlyName("File Name") String fileName,
@@ -83,11 +79,10 @@ public class SmbConnector {
     /**
      * List directory processor for retrieving the contents of a directory
      *
-     * @param dirName
-     *            Folder name to be used for the list operation.
-     * @param wildcard
-     *            DOS style wildcard filter
+     * @param dirName, directory name to be used for the list operation.
+     * @param wildcard, DOS style wildcard filter
      * @return A list of Maps, each Map containing attributes for each file
+     * @throws SmbConnectionException when a connection error occurs
      */
     @Processor
     public List<String> directoryList(@ConnectionKey @FriendlyName("Folder Name") @Optional String dirName,
@@ -103,9 +98,9 @@ public class SmbConnector {
     /**
      * Create directory processor for creating a directory
      *
-     * @param dirName
-     *            Folder name to be used for the write operation.
-     * @return void
+     * @param dirName, directory name to be used for the write operation.
+     * @return boolean, true indicates success for the operation
+     * @throws SmbConnectionException when a connection error occurs
      */
     @Processor
     public boolean directoryCreate(@ConnectionKey @Required @FriendlyName("Folder Name") String dirName) throws ConnectionException {
@@ -115,10 +110,10 @@ public class SmbConnector {
     /**
      * Delete directory processor for deleting a directory
      *
-     * @param dirName
-     *            Directory name to be used for the delete operation.
-     * @return boolean
-     * 			  Indicates success or failure of operation 
+     * @param dirName, directory name to be used for the delete operation.
+     * @param recursive, set to true for a recursive delete
+     * @return boolean, true indicates success for the operation 
+     * @throws SmbConnectionException when a connection error occurs
      */
     @Processor
     public boolean directoryDelete(@ConnectionKey @FriendlyName("Directory Name") String dirName,
@@ -129,9 +124,7 @@ public class SmbConnector {
     /**
      * Set the config
      *
-     * @param config
-     *            SMBConnectorConfig to be used
-     * @return void
+     * @param config, SMBConnectorConfig to be used
      */
     public void setConfig(SmbConnectorConfig config) {
         this.config = config;

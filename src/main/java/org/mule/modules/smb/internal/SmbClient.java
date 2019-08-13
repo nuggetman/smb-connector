@@ -1,11 +1,9 @@
-/*
+/**
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
- * The software in this package is published under the terms of the CPAL v1.0
- * license, a copy of which has been included with this distribution in the
- * LICENSE.txt file.
+ * The software in this package is published under the terms of the CPAL v1.0 license,
+ * a copy of which has been included with this distribution in the LICENSE.md file.
  */
-
 package org.mule.modules.smb.internal;
 
 import java.io.ByteArrayOutputStream;
@@ -71,6 +69,8 @@ public class SmbClient {
 
     /**
      * Check to see if we are connected
+     * 
+     * @return boolean, true if connected
      */
     public boolean isConnected() {
         boolean c = false;
@@ -86,6 +86,8 @@ public class SmbClient {
 
     /**
      * Return a default connection id
+     * 
+     * @return String, connection id
      */
     public String connectionId() {
         return "001";
@@ -114,8 +116,8 @@ public class SmbClient {
 
     /**
      * 
-     * @return boolean stating whether client connected correctly
-     * @throws Exception
+     * @return boolean, states whether client connected correctly
+     * @throws SmbConnectionException when unable to connect to share
      */
     public boolean connect() throws SmbConnectionException {
         try {
@@ -160,11 +162,11 @@ public class SmbClient {
      * 
      * Read in some file content from the specified file name
      * 
-     * @param fileName
-     *            String containing the filename of the file to read in
-     * @param autoDelete
-     *            boolean to indicate whether file should be deleted after reading
+     * @param fileName, filename of the file to read in
+     * @param dirName, directory where file is located
+     * @param autoDelete, indicate whether file should be deleted after reading
      * @return byte[] of file content
+     * @throws SmbConnectionException when a connection error occurs
      */
     public byte[] readFile(String fileName, String dirName, boolean autoDelete) throws SmbConnectionException {
         InputStream is = null;
@@ -203,14 +205,12 @@ public class SmbClient {
     /**
      * Write some content to the specified file name
      * 
-     * @param fileName
-     *            String containing the filename of the file to read in
-     * @param append
-     *            boolean indicating whether to append this new content to the file otherwise overwrite
-     * @param data
-     *            InputStream or byte[] of data to write into the file
-     * @param encoding
-     * 			  Character encoding of contents to write
+     * @param fileName, name of the file to write
+     * @param dirName, directory where file should be written
+     * @param append, boolean indicating whether to append this new content to the file otherwise overwrite
+     * @param data, InputStream, byte[] or String of data to write into the file
+     * @param encoding, Character encoding of contents to write
+     * @throws SmbConnectionException when a connection error occurs
      */
     public void writeFile(String fileName, String dirName, boolean append, Object data, String encoding) throws SmbConnectionException {
         OutputStream out = null;
@@ -277,8 +277,10 @@ public class SmbClient {
     /**
      * Delete the specified file
      * 
-     * @param fileName
-     *            String value of the file name to delete
+     * @param fileName, name of the file to delete
+     * @param dirName, directory where file is located
+     * @return boolean, successful if true
+     * @throws SmbConnectionException when a connection error occurs
      */
     public boolean deleteFile(String fileName, String dirName) throws SmbConnectionException {
         try {
@@ -304,8 +306,9 @@ public class SmbClient {
     /**
      * Create a new directory
      * 
-     * @param dirName
-     *            String value of the directory name
+     * @param dirName, name of the directory
+     * @return boolean, successful if true
+     * @throws SmbConnectionException when a connection error occurs
      */
     public boolean createDirectory(String dirName) throws SmbConnectionException {
         if (dirName != null) {
@@ -329,8 +332,10 @@ public class SmbClient {
     /**
      * Delete the specified directory
      * 
-     * @param dirName
-     *            String value of the directory to delete
+     * @param dirName, name of the directory to delete
+     * @param recursive, set to true for a recursive delete
+     * @return boolean, successful if true
+     * @throws SmbConnectionException when a connection error occurs
      */
     public boolean deleteDir(String dirName, boolean recursive) throws SmbConnectionException {
         if (dirName != null) {
@@ -354,13 +359,10 @@ public class SmbClient {
     /**
      * Retrieve the directory listing
      * 
-     * @param dirName
-     *            String of the directory name
-     * @param wildcard
-     *            String of the DOS wildcard filter
-     * @return A List<String> where each item in the list is a file or directory name
-     * @throws SmbConnectionException, SmbConnectorException 
-     * 
+     * @param dirName, directory name
+     * @param wildcard, DOS wildcard filter
+     * @return A List where each item in the list is a file or directory name
+     * @throws SmbConnectionException when a connection error occurs
      */
     public List<String> listDirectory(String dirName, String wildcard) throws SmbConnectionException {
         List<String> results = new ArrayList<String>();
@@ -379,8 +381,6 @@ public class SmbClient {
     
     /**
      * Set the credentials to re-use for connections
-     *
-     * @return void
      */
     private void setAuthContext() {
 		if (!connectorConfig.getGuest() && !connectorConfig.getAnonymous()) {
@@ -408,10 +408,8 @@ public class SmbClient {
     /**
      * Helper method to create a connection for a server share
      * 
-     * @param String hostname
-     * 		hostname to connect to
-     * @param String sharename
-     * 		sharename to connect to
+     * @param String hostname, hostname to connect to
+     * @param String sharename, sharename to connect to
      * @return DiskShare object
      */
     private DiskShare setShare(String hostname, String sharename) throws IOException {
@@ -432,8 +430,7 @@ public class SmbClient {
     /**
      * Helper method to create a connection session for a server
      * 
-     * @param String hostname
-     * 		hostname to connect to
+     * @param String hostname, hostname to connect to
      * @return Session authenticated object
      */
     private Session setSession(String hostname) throws IOException { 		
