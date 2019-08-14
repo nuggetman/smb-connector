@@ -14,6 +14,7 @@ import org.mule.api.annotations.Config;
 import org.mule.api.annotations.Connector;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.display.FriendlyName;
+import org.mule.api.annotations.licensing.RequiresEnterpriseLicense;
 import org.mule.api.annotations.param.ConnectionKey;
 import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.Optional;
@@ -23,6 +24,7 @@ import org.mule.modules.smb.exception.SmbConnectionException;
 import org.mule.modules.smb.utils.Utilities;
 
 @Connector(name = "smb", friendlyName = "SMB Connector")
+@RequiresEnterpriseLicense(allowEval = true)
 public class SmbConnector {
 
     @Config
