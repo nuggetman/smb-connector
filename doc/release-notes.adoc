@@ -35,6 +35,11 @@ This release of the Connector includes the following:
 
 * SMBJ 0.9.1 is packaged with the connector
 
+=== Version 1.2.0 - Known issues
+
+* Streaming is currently not supported
+* Samba provides no way to “disconnect” from a resource, but it naturally times out after 15 secs of no activity
+
 == Version 1.0.0 - 2019-05-01
 
 === Version 1.0.0 - Compatibility
@@ -63,6 +68,6 @@ This initial release of the Connector includes the following operations:
 
 === Version 1.0.0 - Known issues
 
-. Streaming is currently not supported in DevKit 3.9 (current edition)
-. The underlying JCIFS library cannot be distributed with the connector, the .jar driver can be downloaded from https://jcifs.samba.org/
-. JCifs provides no way to “disconnect” from a resource, but it naturally times out after 15 secs of no activity
+* Streaming is currently not supported in DevKit 3.9 (current edition)
+* The underlying JCIFS library cannot be distributed with the connector, the .jar driver can be downloaded from https://jcifs.samba.org/
+* Samba provides no way to “disconnect” from a resource, but it naturally times out after 15 secs of no activity
