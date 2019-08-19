@@ -1,18 +1,18 @@
 <!-- BEGIN_INCLUDE(smb:directory-create) -->
-    <smb:directory-create config-ref="SMB_Connector__Configuration" dirName="#[flowVars.folder]" doc:name="SMB Connector"/>
+    <smb:directory-create config-ref="SMB_Connector__Configuration" dirName="#[flowVars.directory]" doc:name="SMB Connector"/>
 <!-- END_INCLUDE(smb:directory-create) -->
 <!-- BEGIN_INCLUDE(smb:directory-delete) -->
-	<smb:directory-delete config-ref="SMB_Connector__Configuration" dirName="#[flowVars.folder]" doc:name="SMB Connector"/>
+	<smb:directory-delete config-ref="SMB_Connector__Configuration" dirName="#[flowVars.directory]" doc:name="SMB Connector" recursive="true"/>
 <!-- END_INCLUDE(smb:directory-delete) -->
 <!-- BEGIN_INCLUDE(smb:directorylist) -->
-	<smb:directory-list config-ref="SMB_Connector__Configuration" dirName="#[flowVars.folder]" doc:name="SMB Connector"/>
+	<smb:directory-list config-ref="SMB_Connector__Configuration" doc:name="SMB Connector" dirName="#[flowVars.directory]"/>
 <!-- END_INCLUDE(smb:directorylist) -->
 <!-- BEGIN_INCLUDE(smb:file-delete) -->
-	<smb:file-delete config-ref="SMB_Connector__Configuration" fileName="#[flowVars.fileName]" doc:name="SMB Connector"/>
+	<smb:file-delete config-ref="SMB_Connector__Configuration" fileName="#[flowVars.filename]" doc:name="SMB Connector" dirName="#[flowVars.directory]"/>
 <!-- END_INCLUDE(smb:file-delete) -->
 <!-- BEGIN_INCLUDE(smb:file-read) -->
-	<smb:file-read config-ref="SMB_Connector__Configuration" fileName="#[flowVars.fileName]" autoDelete="false" doc:name="SMB Connector"/>
+	<smb:file-read config-ref="SMB_Connector__Configuration" dirName="#[flowVars.directory]" fileName="#[flowVars.filename]" autoDelete="true" doc:name="SMB Connector"/>
 <!-- END_INCLUDE(smb:file-read) -->
 <!-- BEGIN_INCLUDE(smb:file-write) -->
-	<smb:file-write config-ref="SMB_Connector__Configuration" fileName="#[flowVars.fileName]" append="false" doc:name="SMB Connector"/>
+	<smb:file-write config-ref="SMB_Connector__Configuration" fileName="#[flowVars.filename]" doc:name="SMB Connector" append="true" dirName="#[flowVars.directory]"/>
 <!-- END_INCLUDE(smb:file-write) -->

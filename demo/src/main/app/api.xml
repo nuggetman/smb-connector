@@ -17,51 +17,51 @@ http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/jso
         <http:listener config-ref="api-httpListenerConfig" path="/console/*" doc:name="HTTP" />
         <apikit:console config-ref="api-config" doc:name="APIkit Console" />
     </flow>
-    <flow name="get:/directory/{directory_name}:api-config">
-        <smb:directory-list config-ref="SMB_Connector__Configuration" dirName="#[flowVars.directory_name]" doc:name="SMB Connector"/>
+    <flow name="get:/directory/{directory}:api-config">
+        <smb:directory-list config-ref="SMB_Connector__Configuration" doc:name="SMB Connector" dirName="#[flowVars.directory]"/>
         <catch-exception-strategy doc:name="Catch Exception Strategy">
             <set-property propertyName="http.status" value="400" doc:name="Property" />
             <set-payload value="{ &quot;successful&quot; : &quot;false&quot; }" doc:name="Set Payload" />
         </catch-exception-strategy>
     </flow>
-    <flow name="post:/directory/{directory_name}:api-config">
-        <smb:directory-create config-ref="SMB_Connector__Configuration" dirName="#[flowVars.directory_name]" doc:name="SMB Connector"/>
+    <flow name="post:/directory/{directory}:api-config">
+        <smb:directory-create config-ref="SMB_Connector__Configuration" dirName="#[flowVars.directory]" doc:name="SMB Connector"/>
         <catch-exception-strategy doc:name="Catch Exception Strategy">
             <set-property propertyName="http.status" value="400" doc:name="Property" />
             <set-payload value="{ &quot;successful&quot; : &quot;false&quot; }" doc:name="Set Payload" />
         </catch-exception-strategy>
     </flow>
-    <flow name="delete:/directory/{directory_name}:api-config">
-        <smb:directory-delete config-ref="SMB_Connector__Configuration" dirName="#[flowVars.directory_name]" doc:name="SMB Connector" />
+    <flow name="delete:/directory/{directory}:api-config">
+        <smb:directory-delete config-ref="SMB_Connector__Configuration" dirName="#[flowVars.directory]" doc:name="SMB Connector" recursive="true"/>
         <set-payload value="{ &quot;successful&quot; : &quot;true&quot; }" doc:name="Set Payload" />
         <catch-exception-strategy doc:name="Catch Exception Strategy">
             <set-property propertyName="http.status" value="400" doc:name="Property" />
             <set-payload value="{ &quot;successful&quot; : &quot;false&quot; }" doc:name="Set Payload" />
         </catch-exception-strategy>
     </flow>
-    <flow name="get:/file/{file_name}:api-config">
-        <smb:file-read config-ref="SMB_Connector__Configuration" fileName="#[flowVars.file_name]" doc:name="SMB Connector"/>
-    	<catch-exception-strategy doc:name="Catch Exception Strategy">
+    <flow name="get:/file/{directory}/{filename}:api-config">
+        <smb:file-read config-ref="SMB_Connector__Configuration" dirName="#[flowVars.directory]" fileName="#[flowVars.filename]" autoDelete="true" doc:name="SMB Connector"/>
+    	    <catch-exception-strategy doc:name="Catch Exception Strategy">
             <set-property propertyName="http.status" value="400" doc:name="Property"/>
             <set-payload value="{ &quot;successful&quot; : &quot;false&quot; }" doc:name="Set Payload"/>
         </catch-exception-strategy>
     </flow>
-    <flow name="put:/file/{file_name}:api-config">
+    <flow name="put:/file/{directory}/{filename}:api-config">
         <smb:file-write config-ref="SMB_Connector__Configuration" fileName="#[flowVars.file_name]" append="true" doc:name="SMB Connector"/>
         <catch-exception-strategy doc:name="Catch Exception Strategy">
             <set-property propertyName="http.status" value="400" doc:name="Property"/>
             <set-payload value="{ &quot;successful&quot; : &quot;false&quot; }" doc:name="Set Payload"/>
         </catch-exception-strategy>
     </flow>
-    <flow name="post:/file/{file_name}:api-config">
-        <smb:file-write config-ref="SMB_Connector__Configuration" fileName="#[flowVars.file_name]" doc:name="SMB Connector"/>
+    <flow name="post:/file/{directory}/{filename}:api-config">
+        <smb:file-write config-ref="SMB_Connector__Configuration" fileName="#[flowVars.filename]" doc:name="SMB Connector" append="true" dirName="#[flowVars.directory]"/>
         <catch-exception-strategy doc:name="Catch Exception Strategy">
             <set-property propertyName="http.status" value="400" doc:name="Property"/>
             <set-payload value="{ &quot;successful&quot; : &quot;false&quot; }" doc:name="Set Payload"/>
         </catch-exception-strategy>
     </flow>
-    <flow name="delete:/file/{file_name}:api-config">
-        <smb:file-delete config-ref="SMB_Connector__Configuration" fileName="#[flowVars.file_name]" doc:name="SMB Connector"/>
+    <flow name="delete:/file/{directory}/{filename}:api-config">
+        <smb:file-delete config-ref="SMB_Connector__Configuration" fileName="#[flowVars.filename]" doc:name="SMB Connector" dirName="#[flowVars.directory]"/>
         <set-payload value="{ &quot;successful&quot; : &quot;true&quot; }" doc:name="Set Payload"/>
         <catch-exception-strategy doc:name="Catch Exception Strategy">
             <set-property propertyName="http.status" value="400" doc:name="Property"/>
