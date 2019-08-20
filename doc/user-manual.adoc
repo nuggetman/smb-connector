@@ -1,5 +1,5 @@
 = SMB Connector
-
+:toc:
 toc::[]
 
 
@@ -104,11 +104,11 @@ To use the SMB connector in your Mule application, you must configure a global S
 |Directory delete |Delete a directory from the SMB share
 |===
 
-*File read*
+=== File read
 
 Reads the contents of a file from the SMB share, this can be wrapped in a poll scope at the start of a flow or used mid-flow to retrieve some data. Obeys minimum file age requirements.
 
-Parameters
+*Parameters*
 
 [%header,cols="20%,20%,20%,20%,20%"]
 |===
@@ -118,19 +118,19 @@ Parameters
 |Delete after reading |Boolean |Should the file be deleted after reading |No |
 |===
 
-Output
+*Output*
 
 byte[]
 
-For Configurations
+*For Configurations*
 
 smb-config
 
-*File write*
+=== File write
 
 Writes the specified file content to a file on an SMB share, this can be wrapped in a poll scope at the start of a flow or used mid-flow.
 
-Parameters
+*Parameters*
 
 [%header,cols="20%,20%,20%,20%,20%"]
 |===
@@ -142,19 +142,19 @@ Parameters
 |Append to file |Boolean |Should the content be appended to the file otherwise overwrite content |No |
 |===
 
-Output
+*Output*
 
 void
 
-For Configurations
+*For Configurations*
 
 smb-config
 
-*File delete*
+=== File delete
 
 Delete the specified file from the SMB share, this can be wrapped in a poll scope at the start of a flow or used mid-flow. Returns true if successful.  Obeys minimum file age requirements.
 
-Parameters
+*Parameters*
 
 [%header,cols="20%,20%,20%,20%,20%"]
 |===
@@ -163,19 +163,19 @@ Parameters
 |File Name |String |Name of file to delete | |X
 |===
 
-Output
+*Output*
 
 boolean
 
-For Configurations
+*For Configurations*
 
 smb-config
 
-*Directory create*
+=== Directory create
 
 Create the specified directory on the SMB share, this can be wrapped in a poll scope at the start of a flow or used mid-flow. Returns true if successful.
 
-Parameters
+*Parameters*
 
 [%header,cols="20%,20%,20%,20%,20%"]
 |===
@@ -183,19 +183,19 @@ Parameters
 |Directory Name |String |Name of directory to create | |X
 |===
 
-Output
+*Output*
 
 boolean
 
-For Configurations
+*For Configurations*
 
 smb-config
 
-*Directory list*
+=== Directory list
 
 List the contents of specified directory from the SMB share, this can be wrapped in a poll scope at the start of a flow or used mid-flow. Results include only items that are older than the minimum file age.
 
-Parameters
+*Parameters*
 
 [%header,cols="20%,20%,20%,20%,20%"]
 |===
@@ -204,19 +204,19 @@ Parameters
 |Wildcard |String |DOS style wildcard filter |*.* |
 |===
 
-Output
+*Output*
 
 List<String>
 
-For Configurations
+*For Configurations*
 
 smb-config
 
-*Directory delete*
+=== Directory delete
 
 Delete the specified directory from the SMB share, this can be wrapped in a poll scope at the start of a flow or used mid-flow. Returns true if successful.
 
-Parameters
+*Parameters*
 
 [%header,cols="20%,20%,20%,20%,20%"]
 |===
@@ -225,11 +225,11 @@ Parameters
 |Recursive delete |Boolean |Should the delete be executed recursively |No |
 |===
 
-Output
+*Output*
 
 boolean
 
-For Configurations
+*For Configurations*
 
 smb-config
 
