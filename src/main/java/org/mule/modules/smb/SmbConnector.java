@@ -23,7 +23,7 @@ import org.mule.modules.smb.config.SmbConnectorConfig;
 import org.mule.modules.smb.exception.SmbConnectionException;
 import org.mule.modules.smb.utils.Utilities;
 
-@Connector(name = "smb", friendlyName = "SMB Connector")
+@Connector(name = "smb", friendlyName = "SMB Connector", minMuleVersion = "3.8.0")
 @RequiresEnterpriseLicense(allowEval = true)
 public class SmbConnector {
 

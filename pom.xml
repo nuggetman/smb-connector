@@ -23,20 +23,16 @@
     </properties>
     <repositories>
         <repository>
-            <id>mulesoft-releases</id>
+            <id>mulesoft-ee-releases</id>
             <name>MuleSoft Releases Repository</name>
             <url>http://repository.mulesoft.org/releases/</url>
             <layout>default</layout>
         </repository>
         <repository>
-        	    <id>mulesoft-ee-releases</id>
-        	    <name>MuleSoft EE Releases Repository</name>
-        	    <url>https://repository-master.mulesoft.org/nexus/content/repositories/releases-ee/</url>
-        </repository>
-        <repository>
-            <id>mulesoft-ee-snapshots</id>
-        	    <name>MuleSoft EE Snapshots Repository</name>
-        	    <url>repository-master.mulesoft.org/nexus/content/repositories/ci-snapshots/</url>
+            <id>mulesoft-snapshots</id>
+            <name>MuleSoft Snapshots Repository</name>
+            <url>http://repository.mulesoft.org/snapshots/</url>
+            <layout>default</layout>
         </repository>
     </repositories>
     
