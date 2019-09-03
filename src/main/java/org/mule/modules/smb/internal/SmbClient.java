@@ -223,12 +223,12 @@ public class SmbClient {
             
             File f;
             if (append) {
-                f = this.getShare().openFile(Utilities.buildPath(dirName, fileName), EnumSet.of(AccessMask.GENERIC_ALL), fileAttributes, SMB2ShareAccess.ALL, SMB2CreateDisposition.FILE_OPEN, createOptions);
+                f = this.getShare().openFile(Utilities.buildPath(dirName, fileName), EnumSet.of(AccessMask.GENERIC_ALL), fileAttributes, SMB2ShareAccess.ALL, SMB2CreateDisposition.FILE_OPEN_IF, createOptions);
             } else {
-                f = this.getShare().openFile(Utilities.buildPath(dirName, fileName), EnumSet.of(AccessMask.GENERIC_ALL), fileAttributes, SMB2ShareAccess.ALL, SMB2CreateDisposition.FILE_CREATE, createOptions);
+                f = this.getShare().openFile(Utilities.buildPath(dirName, fileName), EnumSet.of(AccessMask.GENERIC_ALL), fileAttributes, SMB2ShareAccess.ALL, SMB2CreateDisposition.FILE_OVERWRITE_IF, createOptions);
             }
 
-            out = f.getOutputStream();
+            out = f.getOutputStream(append);
             
             if (data instanceof InputStream) {
                 InputStream in = (InputStream) data;

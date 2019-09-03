@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw" xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/apikit" xmlns:context="http://www.springframework.org/schema/context" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:smb="http://www.mulesoft.org/schema/mule/smb" xmlns:spring="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/apikit http://www.mulesoft.org/schema/mule/apikit/current/mule-apikit.xsd
+http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-current.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+http://www.mulesoft.org/schema/mule/smb http://www.mulesoft.org/schema/mule/smb/current/mule-smb.xsd
+http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd">
+    <http:listener-config name="httpListenerConfig" host="0.0.0.0" port="${http.port}" doc:name="HTTP Listener Configuration" />
+    <apikit:config name="apiConfig" raml="api.raml" consoleEnabled="false" doc:name="Router" />
+    <smb:config name="SMB_Connector__Configuration" host="${host}" doc:name="SMB Connector: Configuration" domain="${domain}" fileage="${fileage}" password="${password}" share="${share}" timeout="${timeout}" username="${username}" />
+    <flow name="api-main">
+        <http:listener config-ref="httpListenerConfig" path="/api/*" doc:name="HTTP" />
+        <apikit:router config-ref="apiConfig" doc:name="APIkit Router" />
+        <exception-strategy ref="apiKitGlobalExceptionMapping" doc:name="Reference Exception Strategy" />
+    </flow>
+    <flow name="api-console">
+        <http:listener config-ref="httpListenerConfig" path="/console/*" doc:name="HTTP" />
+        <apikit:console config-ref="apiConfig" doc:name="APIkit Console" />
+    </flow>
+    <flow name="get:/directory/{directory}:apiConfig">
+        <smb:directory-list config-ref="SMB_Connector__Configuration" doc:name="SMB Connector" dirName="#[flowVars.directory]" />
+        <catch-exception-strategy doc:name="Catch Exception Strategy">
+            <set-property propertyName="http.status" value="400" doc:name="Property" />
+            <set-payload value="{ &quot;successful&quot; : &quot;false&quot; }" doc:name="Set Payload" />
+        </catch-exception-strategy>
+    </flow>
+    <flow name="post:/directory/{directory}:apiConfig">
+        <smb:directory-create config-ref="SMB_Connector__Configuration" dirName="#[flowVars.directory]" doc:name="SMB Connector" />
+        <catch-exception-strategy doc:name="Catch Exception Strategy">
+            <set-property propertyName="http.status" value="400" doc:name="Property" />
+            <set-payload value="{ &quot;successful&quot; : &quot;false&quot; }" doc:name="Set Payload" />
+        </catch-exception-strategy>
+    </flow>
+    <flow name="delete:/directory/{directory}:apiConfig">
+        <smb:directory-delete config-ref="SMB_Connector__Configuration" dirName="#[flowVars.directory]" doc:name="SMB Connector" recursive="true" />
+        <set-payload value="{ &quot;successful&quot; : &quot;true&quot; }" doc:name="Set Payload" />
+        <catch-exception-strategy doc:name="Catch Exception Strategy">
+            <set-property propertyName="http.status" value="400" doc:name="Property" />
+            <set-payload value="{ &quot;successful&quot; : &quot;false&quot; }" doc:name="Set Payload" />
+        </catch-exception-strategy>
+    </flow>
+    <flow name="get:/file/{directory}/{filename}:apiConfig">
+        <smb:file-read config-ref="SMB_Connector__Configuration" dirName="#[flowVars.directory]" fileName="#[flowVars.filename]"  doc:name="SMB Connector" />
+        <dw:transform-message doc:name="Transform Message">
+            <dw:set-payload><![CDATA[%dw 1.0
+%output application/json
+---
+{
+	"content" :  "" ++ payload as :string ++ ""
+}]]></dw:set-payload>
+        </dw:transform-message>
+        <catch-exception-strategy doc:name="Catch Exception Strategy">
+            <set-property propertyName="http.status" value="400" doc:name="Property" />
+            <set-payload value="{ &quot;successful&quot; : &quot;false&quot; }" doc:name="Set Payload" />
+        </catch-exception-strategy>
+    </flow>
+    <flow name="put:/file/{directory}/{filename}:apiConfig">
+        <set-payload value="#[&quot;append content,&quot;]" doc:name="Set Payload"/>
+        <smb:file-write config-ref="SMB_Connector__Configuration" dirName="#[flowVars.directory]" fileName="#[flowVars.filename]" append="true" doc:name="SMB Connector" />
+        <catch-exception-strategy doc:name="Catch Exception Strategy">
+            <set-property propertyName="http.status" value="400" doc:name="Property" />
+            <set-payload value="{ &quot;successful&quot; : &quot;false&quot; }" doc:name="Set Payload" />
+        </catch-exception-strategy>
+    </flow>
+    <flow name="post:/file/{directory}/{filename}:apiConfig">
+        <set-payload value="#[&quot;new content,&quot;]" doc:name="Set Payload"/>
+        <smb:file-write config-ref="SMB_Connector__Configuration" fileName="#[flowVars.filename]" doc:name="SMB Connector"  dirName="#[flowVars.directory]" />
+        <catch-exception-strategy doc:name="Catch Exception Strategy">
+            <set-property propertyName="http.status" value="400" doc:name="Property" />
+            <set-payload value="{ &quot;successful&quot; : &quot;false&quot; }" doc:name="Set Payload" />
+        </catch-exception-strategy>
+    </flow>
+    <flow name="delete:/file/{directory}/{filename}:apiConfig">
+        <smb:file-delete config-ref="SMB_Connector__Configuration" fileName="#[flowVars.filename]" doc:name="SMB Connector" dirName="#[flowVars.directory]" />
+        <set-payload value="{ &quot;successful&quot; : &quot;true&quot; }" doc:name="Set Payload" />
+        <catch-exception-strategy doc:name="Catch Exception Strategy">
+            <set-property propertyName="http.status" value="400" doc:name="Property" />
+            <set-payload value="{ &quot;successful&quot; : &quot;false&quot; }" doc:name="Set Payload" />
+        </catch-exception-strategy>
+    </flow>
+    <apikit:mapping-exception-strategy name="apiKitGlobalExceptionMapping">
+        <apikit:mapping statusCode="404">
+            <apikit:exception value="org.mule.module.apikit.exception.NotFoundException" />
+            <set-property propertyName="Content-Type" value="application/json" doc:name="Property" />
+            <set-payload value="{ &quot;message&quot;: &quot;Resource not found&quot; }" doc:name="Set Payload" />
+        </apikit:mapping>
+        <apikit:mapping statusCode="405">
+            <apikit:exception value="org.mule.module.apikit.exception.MethodNotAllowedException" />
+            <set-property propertyName="Content-Type" value="application/json" doc:name="Property" />
+            <set-payload value="{ &quot;message&quot;: &quot;Method not allowed&quot; }" doc:name="Set Payload" />
+        </apikit:mapping>
+        <apikit:mapping statusCode="415">
+            <apikit:exception value="org.mule.module.apikit.exception.UnsupportedMediaTypeException" />
+            <set-property propertyName="Content-Type" value="application/json" doc:name="Property" />
+            <set-payload value="{ &quot;message&quot;: &quot;Unsupported media type&quot; }" doc:name="Set Payload" />
+        </apikit:mapping>
+        <apikit:mapping statusCode="406">
+            <apikit:exception value="org.mule.module.apikit.exception.NotAcceptableException" />
+            <set-property propertyName="Content-Type" value="application/json" doc:name="Property" />
+            <set-payload value="{ &quot;message&quot;: &quot;Not acceptable&quot; }" doc:name="Set Payload" />
+        </apikit:mapping>
+        <apikit:mapping statusCode="400">
+            <apikit:exception value="org.mule.module.apikit.exception.BadRequestException" />
+            <set-property propertyName="Content-Type" value="application/json" doc:name="Property" />
+            <set-payload value="{ &quot;message&quot;: &quot;Bad request&quot; }" doc:name="Set Payload" />
+        </apikit:mapping>
+    </apikit:mapping-exception-strategy>
+</mule>

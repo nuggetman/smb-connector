@@ -50,7 +50,10 @@ baseUri: http://localhost:8081/api
         description: get file contents
         responses: 
           200:
-            body: 
+            body:
+              application/json:
+                example: |
+                  { "content" : "some data" }
           400:
             body: 
               application/json:
