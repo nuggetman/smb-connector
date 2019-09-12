@@ -2,7 +2,8 @@
 :toc:
 toc::[]
 
-[[Technical Reference]]
+[[TechnicalReference]]
+== Technical Reference
 
 *smb-config*
 

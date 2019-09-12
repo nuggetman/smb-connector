@@ -1,6 +1,6 @@
 = SMB Connector Release Notes 
 
-August 2019
+September 2019
 
 _MuleSoft Certified_
 
