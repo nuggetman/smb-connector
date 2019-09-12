@@ -18,14 +18,14 @@ The SMB connector allows for connectivity to SMB v1 & v2 shares and can be used 
 |SMB|1 and 2
 |===
 
-=== Version 1.2.0 - Features
-This release of the Connector includes the following:
-
+=== Version 1.2.0 - New features
 * Connector is now MuleSoft certified
 * Migrated connector to use SMBJ as the previous used JCIFS library is no longer maintained
 * File age parameter is now a global connector setting
 * Added option for anonymous connectivity
 * Added option for guest connectivity
+
+=== Version 1.2.0 - Fixed in this release
 * Resolved issue #10 - file age parameter observed for directory list operation
 * Resolved issue #9 - file age parameter observed for file delete operation 
 * Resolved issue #8 - connectivity to public shares
@@ -33,12 +33,14 @@ This release of the Connector includes the following:
 
 === Version 1.2.0 - Required Libraries
 
-* SMBJ 0.9.1 is packaged with the connector
+* SMBJ 0.9.1 is pre-packaged with the connector
 
 === Version 1.2.0 - Known issues
 
 * Streaming is currently not supported
 * Samba provides no way to “disconnect” from a resource, but it naturally times out after 15 secs of no activity
+
+== Version 1.1.0 - Unreleased
 
 == Version 1.0.0 - 2019-05-01
 
@@ -52,7 +54,7 @@ This release of the Connector includes the following:
 |SMB|1 and 2
 |===
 
-=== Version 1.0.0 - Features
+=== Version 1.0.0
 This initial release of the Connector includes the following operations:
 
 * Read a file (Optional file delete upon read completion)

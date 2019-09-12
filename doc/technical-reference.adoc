@@ -1,0 +1,152 @@
+= SMB Connector
+:toc:
+toc::[]
+
+[[Technical Reference]]
+
+*smb-config*
+
+[%header%autowidth.spread]
+|===
+|Field |Description
+|Domain |Enter a Windows domain for the user to log in with.
+|Host |Hostname of server hosting SMB share.
+|Share |Named path of the SMB share.
+|Username |Enter the username to log in with. Setting the value to "guest" indicates that guest connectivity should be used and no password is required. Setting the value to "anonymous" indicates that anonymous connectivity should be used and no password is required. These values are reserved to indicate these access types.
+|Password |Enter the corresponding password.
+|Connection timeout |Timeout for connection, in milliseconds.
+|File age |Age of file required to perform operations on it, in milliseconds.
+|===
+
+
+[[operations]]
+== Operations
+
+[%header,cols="20%,80%"]
+|===
+|Name |Description
+|File read |Reads the contents of a file from the SMB share
+|File write |Writes data out to a file, optional property to append data to an existing file
+|File delete |Delete a file from the SMB share
+|Directory create |Create a new directory on the SMB share
+|Directory list |List the contents of a directory on the SMB share
+|Directory delete |Delete a directory from the SMB share
+|===
+
+=== File read
+
+*Parameters*
+
+[%header,cols="20%,20%,20%,20%,20%"]
+|===
+|Name |Type |Description |Default Value |Required
+|Directory Name |String |Directory where file is located | |X
+|File Name |String |Name of file to read in | |X
+|Delete after reading |Boolean |Should the file be deleted after reading |No |
+|===
+
+*Output*
+
+byte[]
+
+*For Configurations*
+
+smb-config
+
+=== File write
+
+*Parameters*
+
+[%header,cols="20%,20%,20%,20%,20%"]
+|===
+|Name |Type |Description |Default Value |Required
+|Directory Name |String |Directory where file is located | |X
+|File Name |String |Name of file to write to | |X
+|File content reference |String or InputStream or byte[] |Content to write to file |#[payload] |X
+|Encoding | |character encoding of contents to write |UTF-8 |X for String content
+|Append to file |Boolean |Should the content be appended to the file otherwise overwrite content |No |
+|===
+
+*Output*
+
+void
+
+*For Configurations*
+
+smb-config
+
+=== File delete
+
+*Parameters*
+
+[%header,cols="20%,20%,20%,20%,20%"]
+|===
+|Name |Type |Description |Default Value |Required
+|Directory Name |String |Directory where file is located | |X
+|File Name |String |Name of file to delete | |X
+|===
+
+*Output*
+
+boolean
+
+*For Configurations*
+
+smb-config
+
+=== Directory create
+
+*Parameters*
+
+[%header,cols="20%,20%,20%,20%,20%"]
+|===
+|Name |Type |Description |Default Value |Required
+|Directory Name |String |Name of directory to create | |X
+|===
+
+*Output*
+
+boolean
+
+*For Configurations*
+
+smb-config
+
+=== Directory list
+
+*Parameters*
+
+[%header,cols="20%,20%,20%,20%,20%"]
+|===
+|Name |Type |Description |Default Value |Required
+|Directory Name |String |Name of directory to search in | |X
+|Wildcard |String |DOS style wildcard filter |*.* |
+|===
+
+*Output*
+
+List<String>
+
+*For Configurations*
+
+smb-config
+
+=== Directory delete
+
+*Parameters*
+
+[%header,cols="20%,20%,20%,20%,20%"]
+|===
+|Name |Type |Description |Default Value |Required
+|Directory Name |String |Name of directory to delete | |X
+|Recursive delete |Boolean |Should the delete be executed recursively |No |
+|===
+
+*Output*
+
+boolean
+
+*For Configurations*
+
+smb-config
+

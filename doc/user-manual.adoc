@@ -6,14 +6,22 @@ toc::[]
 [[overview]]
 == Overview
 
-
 Anypoint Connector for SMB provides the capability to perform operations (such as create directory, list directory contents, delete a directory, read a file, write a file, delete a file) against a Windows SMB share.
 
 For details on this release see:
 
 * link:/doc/release-notes.adoc[Connector Release Notes]
 
+To configure a connector in Anypoint Studio follow this process:
+
+1. Install the SMB connector.
+
+2. Configure the SMB connector global element.
+
+3. Configure an operation.
+
 This document assumes that you are familiar with Mule, Anypoint Connectors, Anypoint Studio, Mule Concepts, and Global Elements.
+
 
 [[install]]
 == How to Install
@@ -22,6 +30,7 @@ You can install the connector in Anypoint Studio using the instructions in
 link:https://docs.mulesoft.com/mule-runtime/3.9/installing-connectors[Installing Connectors].
 
 If you are upgrading from a previous version of the connector, a small popup appears in the bottom right corner of Anypoint Studio with the "Updates Available" message. Click the popup and follow the prompts to install the latest version.
+
 
 [[ns-schema]]
 == Connector Namespace and Schema
@@ -52,6 +61,7 @@ If you are manually coding the Mule application in Studio's XML editor or anothe
 
 NOTE: Use `current` in the schema path. Studio interprets this to the current Mule version.
 
+
 [[maven]]
 == Maven Dependency Information
 
@@ -68,168 +78,124 @@ For Maven dependency management, include this XML snippet in your `pom.xml` file
 
 Inside the `<version>` tags, put the desired version number, the word `RELEASE` for the latest release, or `SNAPSHOT` for the latest available version.
 
+
 [[configure]]
-== How to Configure
+== How to configure
 
-Place the connector in your flow as applicable for your use case.
+1. Drag and drop the connector to the Studio canvas.
 
-To use the SMB connector in your Mule application, you must configure a global SMB element that can be used by the SMB connector, smb:config.
+2. Click the green plus sign to the right of Connector Configuration to configure a global element.
 
-*smb-config*
+3. Enter the following values:
 
-[%header%autowidth.spread]
-|===
-|Field |Description
-|Domain |Enter a Windows domain for the user to log in with.
-|Host |Hostname of server hosting SMB share.
-|Share |Named path of the SMB share.
-|Username |Enter the username to log in with. Setting the value to "guest" indicates that guest connectivity should be used and no password is required. Setting the value to "anonymous" indicates that anonymous connectivity should be used and no password is required. These values are reserved to indicate these access types.
-|Password |Enter the corresponding password.
-|Connection timeout |Timeout for connection, in milliseconds.
-|File age |Age of file required to perform operations on it, in milliseconds.
-|===
+*Domain*: Enter a Windows domain for the user to log in with.
+*Host*: Hostname of server hosting SMB share.
+*Share*: Named path of the SMB share.
+*Username*: Enter the username to log in with. Setting the value to "guest" indicates that guest connectivity should be used and no password is required. Setting the value to "anonymous" indicates that anonymous connectivity should be used and no password is required. These values are reserved to indicate these access types.
+*Password*: Enter the corresponding password.
+*Connection timeout*: Timeout for connection, in milliseconds.
+*File age*: Age of file required to perform operations on it, in milliseconds.
+
+If using property placeholders this is configured as follows:
+
+image::img/global_config.png[Global config]
+
+4. After setting the Global Element Properties, select *Ok* to save.
+
+5. Select an Operation and configure the operation properties as follows. 
 
 
-[[operations]]
+[[Operations]]
 == Operations
 
-[%header,cols="20%,80%"]
-|===
-|Name |Description
-|File read |Reads the contents of a file from the SMB share
-|File write |Writes data out to a file, optional property to append data to an existing file
-|File delete |Delete a file from the SMB share
-|Directory create |Create a new directory on the SMB share
-|Directory list |List the contents of a directory on the SMB share
-|Directory delete |Delete a directory from the SMB share
-|===
+The operations for this connector can be wrapped in a poll scope at the start of a flow or used mid-flow to perform their respective action.
+
 
 === File read
 
-Reads the contents of a file from the SMB share, this can be wrapped in a poll scope at the start of a flow or used mid-flow to retrieve some data. Obeys minimum file age requirements.
+Reads the contents of a file from the SMB share and returns a byte[] of the content, obeys minimum file age requirements.
 
-*Parameters*
+*Required parameters*
+Directory Name: Directory where file is located
+File Name: Name of file to read in
 
-[%header,cols="20%,20%,20%,20%,20%"]
-|===
-|Name |Type |Description |Default Value |Required
-|Directory Name |String |Directory where file is located | |X
-|File Name |String |Name of file to read in | |X
-|Delete after reading |Boolean |Should the file be deleted after reading |No |
-|===
+*Optional*
+Delete after reading: Checkbox to declare whether the file be deleted after reading
 
-*Output*
+This is configured as follows:
 
-byte[]
+image::img/file_read_config.png[File read config]
 
-*For Configurations*
-
-smb-config
 
 === File write
 
-Writes the specified file content to a file on an SMB share, this can be wrapped in a poll scope at the start of a flow or used mid-flow.
+Writes the specified file content to a file on an SMB share, content can be provided as an InputStream, byte[] or String.
 
-*Parameters*
+*Required parameters*
+Directory Name: String |Directory where file is located
+File Name: Name of file to write to
+File content reference: Content to write to file
+Encoding: Character encoding of contents to write
 
-[%header,cols="20%,20%,20%,20%,20%"]
-|===
-|Name |Type |Description |Default Value |Required
-|Directory Name |String |Directory where file is located | |X
-|File Name |String |Name of file to write to | |X
-|File content reference |String or InputStream or byte[] |Content to write to file |#[payload] |X
-|Encoding | |character encoding of contents to write |UTF-8 |X for String content
-|Append to file |Boolean |Should the content be appended to the file otherwise overwrite content |No |
-|===
+*Optional*
+Append to file: Should the content be appended to the file otherwise overwrite content
 
-*Output*
+This is configured as follows:
 
-void
+image::img/file_write_config.png[File write config]
 
-*For Configurations*
-
-smb-config
 
 === File delete
 
-Delete the specified file from the SMB share, this can be wrapped in a poll scope at the start of a flow or used mid-flow. Returns true if successful.  Obeys minimum file age requirements.
+Delete the specified file from the SMB share, returns true if successful and obeys minimum file age requirements.
 
-*Parameters*
+*Required parameters*
+Directory Name: String |Directory where file is located
+File Name: String |Name of file to delete
 
-[%header,cols="20%,20%,20%,20%,20%"]
-|===
-|Name |Type |Description |Default Value |Required
-|Directory Name |String |Directory where file is located | |X
-|File Name |String |Name of file to delete | |X
-|===
+This is configured as follows:
 
-*Output*
+image::img/file_delete_config.png[File delete config]
 
-boolean
-
-*For Configurations*
-
-smb-config
 
 === Directory create
 
-Create the specified directory on the SMB share, this can be wrapped in a poll scope at the start of a flow or used mid-flow. Returns true if successful.
+Create the specified directory on the SMB share, returns true if successful.
 
-*Parameters*
+*Required parameters*
+Directory Name: Name of directory to create
 
-[%header,cols="20%,20%,20%,20%,20%"]
-|===
-|Name |Type |Description |Default Value |Required
-|Directory Name |String |Name of directory to create | |X
-|===
+This is configured as follows:
 
-*Output*
+image::img/directory_create_config.png[Directory create config]
 
-boolean
-
-*For Configurations*
-
-smb-config
 
 === Directory list
 
-List the contents of specified directory from the SMB share, this can be wrapped in a poll scope at the start of a flow or used mid-flow. Results include only items that are older than the minimum file age.
+List the contents of specified directory from the SMB share, results include only items that are older than the minimum file age.
 
-*Parameters*
+*Required parameters*
+Directory Name: Name of directory to search in
 
-[%header,cols="20%,20%,20%,20%,20%"]
-|===
-|Name |Type |Description |Default Value |Required
-|Directory Name |String |Name of directory to search in | |X
-|Wildcard |String |DOS style wildcard filter |*.* |
-|===
+*Optional*
+Wildcard: DOS style wildcard filter
 
-*Output*
+This is configured as follows:
 
-List<String>
+image::img/directory_list_config.png[Directory list config]
 
-*For Configurations*
-
-smb-config
 
 === Directory delete
 
-Delete the specified directory from the SMB share, this can be wrapped in a poll scope at the start of a flow or used mid-flow. Returns true if successful.
+Delete the specified directory from the SMB share, returns true if successful.
 
-*Parameters*
+*Required parameters*
+Directory Name: Name of directory to delete
 
-[%header,cols="20%,20%,20%,20%,20%"]
-|===
-|Name |Type |Description |Default Value |Required
-|Directory Name |String |Name of directory to delete | |X
-|Recursive delete |Boolean |Should the delete be executed recursively |No |
-|===
+*Optional*
+Recursive delete: Checkbox to declare whether the delete be executed recursively
 
-*Output*
+This is configured as follows:
 
-boolean
-
-*For Configurations*
-
-smb-config
+image::img/directory_delete_config.png[Directory delete config]
 
