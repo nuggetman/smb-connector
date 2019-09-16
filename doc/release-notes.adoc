@@ -6,7 +6,7 @@ _MuleSoft Certified_
 
 The SMB connector allows for connectivity to SMB v1 & v2 shares and can be used in both on-premises and CloudHub environments.
 
-== Version 1.2.0 - 2019-08-12
+== Version 1.2.0 - 2019-09
 
 === Version 1.2.0 - Compatibility
 [%header%autowidth.spread]
@@ -42,7 +42,7 @@ The SMB connector allows for connectivity to SMB v1 & v2 shares and can be used 
 
 == Version 1.1.0 - Unreleased
 
-== Version 1.0.0 - 2019-05-01
+== Version 1.0.0 - 2018-05
 
 === Version 1.0.0 - Compatibility
 [%header%autowidth.spread]
