@@ -82,14 +82,14 @@
 
 	<distributionManagement>
         <repository>
-            <id>mulesoft-ee-releases</id>
-            <name>MuleSoft EE Repository</name>
+            <id>mule-ee-releases</id>
+            <name>MuleEE Releases Repository</name>
             <url>https://repository-master.mulesoft.org/nexus/content/repositories/releases-ee/</url>
         </repository>
         <snapshotRepository>
-            <id>mulesoft-ee-snapshots</id>
-            <name>MuleSoft EE Snapshot Repository</name>
-            <url>http://repository-master.mulesoft.org/nexus/content/repositories/ci-snapshots/</url>
+            <id>mule-ee-snapshots</id>
+            <name>MuleEE Snapshots Repository</name>
+            <url>https://repository-master.mulesoft.org/nexus/content/repositories/ci-snapshots/</url>
             <uniqueVersion>false</uniqueVersion>
         </snapshotRepository>
     </distributionManagement>
