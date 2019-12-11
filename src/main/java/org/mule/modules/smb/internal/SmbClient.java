@@ -434,10 +434,8 @@ public class SmbClient {
      * @return Session authenticated object
      */
     private Session setSession(String hostname) throws IOException { 		
-        if (getSession() == null) {
-            Connection c = this.sc.connect(hostname);
-            this.smbSession = c.authenticate(ac);
-        }
+        Connection c = this.sc.connect(hostname);
+        this.smbSession = c.authenticate(ac);
         return this.smbSession;
     }
 }
