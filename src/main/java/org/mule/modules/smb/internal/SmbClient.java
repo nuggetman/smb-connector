@@ -64,7 +64,12 @@ public class SmbClient {
      * Disconnect client
      */
     public void disconnect() {
-        // currently no way to close connections via smb - connections automatically disconnect after the timeout
+        try {
+    	        this.getSession().logoff();
+            this.getSession().getConnection().close();
+        } catch (IOException e) {
+        	    logger.error("disconnection error", e);
+        }
     }
 
     /**
@@ -75,12 +80,15 @@ public class SmbClient {
     public boolean isConnected() {
         boolean c = false;
         try {
-            if (this.getShare() != null) {
-                c = this.getShare().isConnected();
+            if (this.getShare() != null && this.getSession() != null) {
+                if (this.getShare().isConnected() && this.getSession().getConnection().isConnected()) {
+                    c = this.getShare().isConnected();
+                }
         		}
         } catch (Exception e) {
             logger.error("Error checking connection status", e);
         }
+        logger.debug("Connected status:" + c);
         return c;
     }
 
@@ -123,32 +131,23 @@ public class SmbClient {
         try {
             logger.debug("connecting to: smb://" + this.getConfig().getHost() + this.getConfig().getShare());
             
-            if (this.ac == null) {
-                logger.debug("setting auth context");
-                this.setAuthContext();
-            }
+            logger.debug("setting auth context");
+            this.setAuthContext();
     			
-            if (this.smbConfig == null) {
-                logger.debug("setting smbConfig");
-                this.smbConfig = SmbConfig.builder()
-                .withTimeout(this.getConfig().getTimeout(), TimeUnit.MILLISECONDS)
-                .build();
-            }
+            logger.debug("setting smbConfig");
+            this.smbConfig = SmbConfig.builder()
+            .withTimeout(this.getConfig().getTimeout(), TimeUnit.MILLISECONDS)
+            .withSoTimeout(30, TimeUnit.SECONDS)
+            .build();
             
-            if (this.sc == null) {
-                logger.debug("setting smbClient");
-                sc = new SMBClient(this.smbConfig);
-            }
+            logger.debug("setting smbClient");
+            sc = new SMBClient(this.smbConfig);
 
-            if (getSession() == null) {
-                logger.debug("setting smbSession");
-                setSession(this.getConfig().getHost());
-            }
+            logger.debug("setting smbSession");
+            setSession(this.getConfig().getHost());
             
-            if (getShare() == null) {
-                logger.debug("setting smbShare");
-                setShare(this.getConfig().getHost(), this.getConfig().getShare());
-	        }
+            logger.debug("setting smbShare");
+            setShare(this.getConfig().getHost(), this.getConfig().getShare());
 
         } catch (IOException e) {
             throw new SmbConnectionException(ConnectionExceptionCode.CANNOT_REACH, null, e.getMessage(), e);
@@ -199,6 +198,7 @@ public class SmbClient {
         } catch (IOException e) {
             throw new SmbConnectionException(ConnectionExceptionCode.UNKNOWN, "READ_ERROR", e.getMessage(), e);
         }
+        this.disconnect();
         return os.toByteArray();
     }
 
@@ -272,6 +272,7 @@ public class SmbClient {
                 }
             }
         }
+        this.disconnect();
     }
 
     /**
@@ -283,24 +284,25 @@ public class SmbClient {
      * @throws SmbConnectionException when a connection error occurs
      */
     public boolean deleteFile(String fileName, String dirName) throws SmbConnectionException {
+        boolean status = false;
         try {
             String absoluteFile = Utilities.buildPath(dirName, fileName);
             if (this.getShare().fileExists(absoluteFile)) {
                 if (checkIsFileOldEnough(this.getShare().getFileInformation(absoluteFile).getBasicInformation().getChangeTime().toEpochMillis())) {
                     this.getShare().rm(absoluteFile);
                     logger.debug("deleted file: " + absoluteFile);
-                    return true;
+                    status = true;
                 } else {
                     logger.debug("file:" + absoluteFile + " not old enough for deletion");
-                    return false;
                 }
             } else {
                 logger.debug("file does not exist: " + absoluteFile);
-                return false;
             }
         } catch (Exception e) {
             throw new SmbConnectionException(ConnectionExceptionCode.UNKNOWN, null, e.getMessage(), e);
         }
+        this.disconnect();
+        return status;
     }
     
     /**
@@ -311,22 +313,22 @@ public class SmbClient {
      * @throws SmbConnectionException when a connection error occurs
      */
     public boolean createDirectory(String dirName) throws SmbConnectionException {
+    	    boolean status = false;
         if (dirName != null) {
             try {
                 if (!this.getShare().folderExists(Utilities.cleanPath(dirName))) {
                     this.getShare().mkdir(Utilities.cleanPath(dirName));
                     logger.debug("done creating directory:" + Utilities.cleanPath(dirName));
-                    return true;
+                    status = true;
     				} else {
                     logger.debug("directory already exists: " + Utilities.cleanPath(dirName));
-                    return false;
     	            }
     			} catch (Exception e) {
                 throw new SmbConnectionException(ConnectionExceptionCode.UNKNOWN, null, e.getMessage(), e);
             }
-        } else {
-            return false;
         }
+        this.disconnect();
+        return status;
     }
 
     /**
@@ -338,22 +340,22 @@ public class SmbClient {
      * @throws SmbConnectionException when a connection error occurs
      */
     public boolean deleteDir(String dirName, boolean recursive) throws SmbConnectionException {
+    	    boolean status = false;
         if (dirName != null) {
 			try {
 				if (this.getShare().folderExists(Utilities.cleanPath(dirName))) {
 					this.getShare().rmdir(Utilities.cleanPath(dirName), recursive);
 					logger.debug("done deleting directory:" + Utilities.cleanPath(dirName));
-					return true;
+					status = true;
 				} else {
 	                logger.debug("directory already exists: " + Utilities.cleanPath(dirName));
-	                return false;
 	            }
 			} catch (Exception e) {
 		        throw new SmbConnectionException(ConnectionExceptionCode.UNKNOWN, null, e.getMessage(), e);
 	        }
-		} else {
-			return false;
-		}
+        }
+        this.disconnect();
+	    return status;
     }
 
     /**
@@ -376,6 +378,7 @@ public class SmbClient {
         } catch (Exception e) {
             throw new SmbConnectionException(ConnectionExceptionCode.UNKNOWN, null, e.getMessage(), e);
         }
+        this.disconnect();
         return results;
     }
     
@@ -410,12 +413,10 @@ public class SmbClient {
      * 
      * @param String hostname, hostname to connect to
      * @param String sharename, sharename to connect to
-     * @return DiskShare object
+     * @return void
      */
-    private DiskShare setShare(String hostname, String sharename) throws IOException {
-        Session s = setSession(hostname);
-        this.diskShare = (DiskShare) s.connectShare(sharename);
-        return this.diskShare;
+    private void setShare(String hostname, String sharename) throws IOException {
+        this.diskShare = (DiskShare) this.getSession().connectShare(sharename);
     }
     
     /**
@@ -431,11 +432,10 @@ public class SmbClient {
      * Helper method to create a connection session for a server
      * 
      * @param String hostname, hostname to connect to
-     * @return Session authenticated object
+     * @return void
      */
-    private Session setSession(String hostname) throws IOException { 		
+    private void setSession(String hostname) throws IOException { 		
         Connection c = this.sc.connect(hostname);
         this.smbSession = c.authenticate(ac);
-        return this.smbSession;
     }
 }
