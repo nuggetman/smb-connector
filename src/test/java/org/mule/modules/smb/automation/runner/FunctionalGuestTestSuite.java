@@ -21,20 +21,14 @@ import org.mule.modules.smb.automation.functional.FileWriteTest;
 import org.mule.tools.devkit.ctf.mockup.ConnectorTestContext;
 
 @RunWith(Suite.class)
-@SuiteClasses({
-    FileReadTest.class,
-    FileWriteTest.class,
-    FileDeleteTest.class,
-    DirectoryCreateTest.class,
-    DirectoryListEmptyTest.class,
-    DirectoryDeleteTest.class
-})
+@SuiteClasses({ FileReadTest.class, FileWriteTest.class, FileDeleteTest.class, DirectoryCreateTest.class,
+        DirectoryListEmptyTest.class, DirectoryDeleteTest.class })
 
 public class FunctionalGuestTestSuite {
 
     @BeforeClass
     public static void initialiseSuite() {
-    		System.setProperty("automation-credentials.properties", "automation-credentials-guest.properties");
+        System.setProperty("automation-credentials.properties", "automation-credentials-guest.properties");
         ConnectorTestContext.initialize(SmbConnector.class);
     }
 

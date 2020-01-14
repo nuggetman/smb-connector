@@ -34,34 +34,20 @@ import org.mule.modules.smb.automation.functional.FileWriteTest;
 import org.mule.tools.devkit.ctf.mockup.ConnectorTestContext;
 
 @RunWith(Suite.class)
-@SuiteClasses({
-    FileReadTest.class,
-    FileReadAutoDeleteTest.class,
-    FileWriteTest.class,
-    FileWriteAppendStringTest.class,
-    FileWriteAppendByteArrayTest.class,
-    FileWriteAppendInputStreamTest.class,
-    FileDeleteTest.class,
-    FileFakeDeleteTest.class,
-    DirectoryCreateTest.class,
-    DirectoryCreateDoubleTest.class,
-    DirectoryCreateNullTest.class,
-    DirectoryListEmptyTest.class,
-    DirectoryListEmptyWildcardTest.class,
-    DirectoryListFilesTest.class,
-    DirectoryListFilesWildcardTest.class,
-    DirectoryListFilesWildcardBakTest.class,
-    DirectoryListFilesWildcardTxtTest.class,
-    DirectoryDeleteTest.class,
-    DirectoryDeleteNullTest.class,
-   
+@SuiteClasses({ FileReadTest.class, FileReadAutoDeleteTest.class, FileWriteTest.class, FileWriteAppendStringTest.class,
+        FileWriteAppendByteArrayTest.class, FileWriteAppendInputStreamTest.class, FileDeleteTest.class,
+        FileFakeDeleteTest.class, DirectoryCreateTest.class, DirectoryCreateDoubleTest.class,
+        DirectoryCreateNullTest.class, DirectoryListEmptyTest.class, DirectoryListEmptyWildcardTest.class,
+        DirectoryListFilesTest.class, DirectoryListFilesWildcardTest.class, DirectoryListFilesWildcardBakTest.class,
+        DirectoryListFilesWildcardTxtTest.class, DirectoryDeleteTest.class, DirectoryDeleteNullTest.class,
+
 })
 
 public class FunctionalTestSuite {
 
     @BeforeClass
     public static void initialiseSuite() {
-    		System.setProperty("automation-credentials.properties", "automation-credentials.properties");
+        System.setProperty("automation-credentials.properties", "automation-credentials.properties");
         ConnectorTestContext.initialize(SmbConnector.class);
     }
 
