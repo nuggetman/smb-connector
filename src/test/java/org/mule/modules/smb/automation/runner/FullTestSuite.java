@@ -11,13 +11,8 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
-@SuiteClasses({
-	UnitTestSuite.class,
-	SystemTestSuite.class,
-	FunctionalTestSuite.class,
-	FunctionalAnonymousTestSuite.class,
-	FunctionalGuestTestSuite.class
-})
+@SuiteClasses({ UnitTestSuite.class, FunctionalTestSuite.class, FunctionalAnonymousTestSuite.class,
+        FunctionalGuestTestSuite.class, SystemTestSuite.class })
 
 public class FullTestSuite {
 
