@@ -77,7 +77,7 @@ public class SmbClient {
         try {
             this.getShare().close();
         } catch (IOException e) {
-            logger.debug("disconnection error", e);
+            logger.info("Disconnection error", e);
         }
     }
 
