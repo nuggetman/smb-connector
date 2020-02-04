@@ -77,7 +77,7 @@ public class SmbClient {
         try {
             this.getShare().close();
         } catch (IOException e) {
-            logger.info("Disconnection error", e);
+            logger.info("Async close out of session: " + e.getLocalizedMessage());
         }
     }
 
@@ -89,7 +89,7 @@ public class SmbClient {
             this.getSession().close();
         } catch (Exception e) {
             // do nothing - SMBJ has an async close process
-            logger.debug("Exception closing out session: " + e.getLocalizedMessage());
+            logger.info("Async close out of session delay (ignorable): " + e.getLocalizedMessage());
         }
     }
 
@@ -101,7 +101,7 @@ public class SmbClient {
             this.getSession().getConnection().close();
         } catch (Exception e) {
             // do nothing - SMBJ has an async close process
-            logger.debug("Exception closing out session: " + e.getLocalizedMessage());
+            logger.info("Async close out of connection delay (ignorable): " + e.getLocalizedMessage());
         }
     }
 
