@@ -89,7 +89,7 @@ public class SmbClient {
             this.getSession().close();
         } catch (Exception e) {
             // do nothing - SMBJ has an async close process
-            logger.debug("Exception closing out session ", e.getLocalizedMessage());
+            logger.info("Ignorable (usually) error closing out session ", e.getLocalizedMessage());
         }
     }
 
@@ -101,7 +101,7 @@ public class SmbClient {
             this.getSession().getConnection().close();
         } catch (Exception e) {
             // do nothing - SMBJ has an async close process
-            logger.debug("Exception closing out session ", e.getLocalizedMessage());
+            logger.info("Ignorable (usually) error closing out session ", e.getLocalizedMessage());
         }
     }
 
