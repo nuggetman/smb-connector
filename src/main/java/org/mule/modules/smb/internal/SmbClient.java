@@ -180,7 +180,7 @@ public class SmbClient {
      */
     public boolean connect() throws SmbConnectionException {
         try {
-            logger.debug("connecting to: smb://" + this.getConfig().getHost() + this.getConfig().getShare());
+            logger.debug("connecting to: smb://" + this.getConfig().getHost() + "/" + this.getConfig().getShare());
 
             logger.debug("setting auth context");
             this.setAuthContext();
