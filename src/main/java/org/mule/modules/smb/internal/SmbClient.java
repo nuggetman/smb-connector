@@ -89,7 +89,7 @@ public class SmbClient {
             this.getSession().close();
         } catch (Exception e) {
             // do nothing - SMBJ has an async close process
-            logger.debug("Exception closing out session: " + e.getLocalizedMessage());
+            logger.debug("Exception closing out session ", e.getLocalizedMessage());
         }
     }
 
@@ -101,7 +101,7 @@ public class SmbClient {
             this.getSession().getConnection().close();
         } catch (Exception e) {
             // do nothing - SMBJ has an async close process
-            logger.debug("Exception closing out session: " + e.getLocalizedMessage());
+            logger.debug("Exception closing out session ", e.getLocalizedMessage());
         }
     }
 
@@ -119,7 +119,7 @@ public class SmbClient {
         } catch (Exception e) {
             logger.error("Error checking connection status", e);
         }
-        logger.debug("Connected status:" + c);
+        logger.debug("Connected status ", c);
         return c;
     }
 
@@ -180,7 +180,7 @@ public class SmbClient {
      */
     public boolean connect() throws SmbConnectionException {
         try {
-            logger.debug("connecting to: smb://" + this.getConfig().getHost() + "/" + this.getConfig().getShare());
+            logger.debug("connecting to: smb://", this.getConfig().getHost(), "/", this.getConfig().getShare());
 
             logger.debug("setting auth context");
             this.setAuthContext();
@@ -244,7 +244,7 @@ public class SmbClient {
                     deleteFile(fileName, dirName);
                 }
             }
-            logger.debug("Done reading file", smbFile.getFileName());
+            logger.debug("Done reading file ", smbFile.getFileName());
 
         } catch (MalformedURLException e) {
             throw new SmbConnectionException(ConnectionExceptionCode.UNKNOWN, "READ_ERROR", e.getMessage(), e);
@@ -315,8 +315,8 @@ public class SmbClient {
                 out.flush();
                 out.close();
             } else {
-                logger.error("unsupported object type for file write: " + data.getClass()
-                        + ", supported types are InputStream, String or byte[]");
+                logger.error("unsupported object type for file write ", data.getClass(),
+                        ", supported types are InputStream, String or byte[]");
             }
             f.close();
             out = null;
@@ -360,13 +360,13 @@ public class SmbClient {
                 if (checkIsFileOldEnough(this.getShare().getFileInformation(absoluteFile).getBasicInformation()
                         .getChangeTime().toEpochMillis())) {
                     this.getShare().rm(absoluteFile);
-                    logger.debug("deleted file: " + absoluteFile);
+                    logger.debug("deleted file ", absoluteFile);
                     status = true;
                 } else {
-                    logger.debug("file:" + absoluteFile + " not old enough for deletion");
+                    logger.debug("file ", absoluteFile, " not old enough for deletion");
                 }
             } else {
-                logger.debug("file does not exist: " + absoluteFile);
+                logger.debug("file does not exist ", absoluteFile);
             }
         } catch (Exception e) {
             throw new SmbConnectionException(ConnectionExceptionCode.UNKNOWN, null, e.getMessage(), e);
@@ -390,10 +390,10 @@ public class SmbClient {
             try {
                 if (!this.getShare().folderExists(Utilities.cleanPath(dirName))) {
                     this.getShare().mkdir(Utilities.cleanPath(dirName));
-                    logger.debug("done creating directory:" + Utilities.cleanPath(dirName));
+                    logger.debug("done creating directory ", Utilities.cleanPath(dirName));
                     status = true;
                 } else {
-                    logger.debug("directory already exists: " + Utilities.cleanPath(dirName));
+                    logger.debug("directory already exists ", Utilities.cleanPath(dirName));
                 }
             } catch (Exception e) {
                 throw new SmbConnectionException(ConnectionExceptionCode.UNKNOWN, null, e.getMessage(), e);
@@ -420,10 +420,10 @@ public class SmbClient {
             try {
                 if (this.getShare().folderExists(Utilities.cleanPath(dirName))) {
                     this.getShare().rmdir(Utilities.cleanPath(dirName), recursive);
-                    logger.debug("done deleting directory:" + Utilities.cleanPath(dirName));
+                    logger.debug("done deleting directory ", Utilities.cleanPath(dirName));
                     status = true;
                 } else {
-                    logger.debug("directory already exists: " + Utilities.cleanPath(dirName));
+                    logger.debug("directory already exists ", Utilities.cleanPath(dirName));
                 }
             } catch (Exception e) {
                 throw new SmbConnectionException(ConnectionExceptionCode.UNKNOWN, null, e.getMessage(), e);
