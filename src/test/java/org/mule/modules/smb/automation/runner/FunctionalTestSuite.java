@@ -16,7 +16,6 @@ import org.mule.modules.smb.automation.functional.DirectoryCreateDoubleTestCases
 import org.mule.modules.smb.automation.functional.DirectoryCreateNullTestCases;
 import org.mule.modules.smb.automation.functional.DirectoryCreateTestCases;
 import org.mule.modules.smb.automation.functional.DirectoryDeleteTestCases;
-import org.mule.modules.smb.automation.functional.DirectoryListTestCases;
 import org.mule.modules.smb.automation.functional.DirectoryListFilesWildcardBakTestCases;
 import org.mule.modules.smb.automation.functional.DirectoryListFilesWildcardTestCases;
 import org.mule.modules.smb.automation.functional.DirectoryListFilesWildcardTxtTestCases;
@@ -36,7 +35,7 @@ import org.mule.tools.devkit.ctf.mockup.ConnectorTestContext;
         FileWriteAppendStringTestCases.class, FileWriteAppendByteArrayTestCases.class,
         FileWriteAppendInputStreamTestCases.class, FileDeleteTestCases.class, FileFakeDeleteTestCases.class,
         DirectoryCreateTestCases.class, DirectoryCreateDoubleTestCases.class, DirectoryCreateNullTestCases.class,
-        DirectoryListTestCases.class, DirectoryListTestCases.class, DirectoryListFilesWildcardTestCases.class,
+        DirectoryListTestCases.class, DirectoryListFilesWildcardTestCases.class,
         DirectoryListFilesWildcardBakTestCases.class, DirectoryListFilesWildcardTxtTestCases.class,
         DirectoryDeleteTestCases.class,
 

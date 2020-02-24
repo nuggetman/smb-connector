@@ -13,11 +13,8 @@ public class SmbConnectionException extends ConnectionException {
 
     private static final long serialVersionUID = 1L;
 
-    public SmbConnectionException(ConnectionExceptionCode code, String thirdPartyCode, String message) {
-        super(code, thirdPartyCode, message);
-    }
-
-    public SmbConnectionException(ConnectionExceptionCode code, String thirdPartyCode, String message, Throwable throwable) {
+    public SmbConnectionException(ConnectionExceptionCode code, String thirdPartyCode, String message,
+            Throwable throwable) {
         super(code, thirdPartyCode, message, throwable);
     }
 }

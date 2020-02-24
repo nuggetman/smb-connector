@@ -15,7 +15,7 @@ import org.mule.modules.smb.utils.Utilities;
 
 import com.hierynomus.msdtyp.FileTime;
 
-public class UtilitiesUnitTest {
+public class UtilitiesUnitTestCases {
 
     @Test
     public void normalizePathTest1() {
@@ -31,12 +31,12 @@ public class UtilitiesUnitTest {
     public void normalizePathTest3() {
         assertEquals("path1", Utilities.cleanPath("path1/"));
     }
-    
+
     @Test
     public void normalizePathTest4() {
         assertEquals("path1", Utilities.cleanPath("path1"));
     }
-    
+
     @Test
     public void normalizePathTest5() {
         assertEquals("path1/path2", Utilities.cleanPath("//path1/path2/"));
@@ -51,7 +51,7 @@ public class UtilitiesUnitTest {
     public void normalizePathTest7() {
         assertEquals("path1/path2", Utilities.cleanPath("path1//path2"));
     }
-    
+
     @Test
     public void normalizePathTest8() {
         assertEquals("path1/path2", Utilities.cleanPath("path1/path2"));
@@ -66,7 +66,7 @@ public class UtilitiesUnitTest {
     public void normalizeFileTest2() {
         assertEquals("file1.txt", Utilities.cleanPath("/file1.txt/"));
     }
-    
+
     @Test
     public void normalizeFileTest3() {
         assertEquals("file1.txt", Utilities.cleanPath("/file1.txt"));
@@ -76,46 +76,75 @@ public class UtilitiesUnitTest {
     public void normalizeFileTest4() {
         assertEquals("file1.txt", Utilities.cleanPath("file1.txt"));
     }
-    
+
     @Test
     public void normalizeFileTestNull() {
         assertEquals("", Utilities.cleanPath(null));
     }
-    
+
     @Test
     public void buildPathTestNull() {
-        assertEquals(null, Utilities.buildPath(null,null));
-    }
-    
-    @Test
-    public void buildPathTestPath1() {
-        assertEquals("path1", Utilities.buildPath("path1",null));
-    }
-    
-    @Test
-    public void buildPathTestPath2() {
-        assertEquals("path2", Utilities.buildPath(null,"path2"));
-    }
-    
-    @Test
-    public void buildPathTestPath12() {
-        assertEquals("path1/path2", Utilities.buildPath("path1","path2"));
+        assertEquals(null, Utilities.buildPath(null, null));
     }
 
     @Test
-    public void isNotBlankOrEmptyOrNullTest() {
+    public void buildPathTestPath1() {
+        assertEquals("path1", Utilities.buildPath("path1", null));
+    }
+
+    @Test
+    public void buildPathTestPath2() {
+        assertEquals("path2", Utilities.buildPath(null, "path2"));
+    }
+
+    @Test
+    public void buildPathTestPath12() {
+        assertEquals("path1/path2", Utilities.buildPath("path1", "path2"));
+    }
+
+    @Test
+    public void isNotBlankOrEmptyOrNullTest1() {
         assertTrue(Utilities.isNotBlankOrEmptyOrNull("file1.txt"));
+    }
+
+    @Test
+    public void isNotBlankOrEmptyOrNullTest2() {
         assertFalse(Utilities.isNotBlankOrEmptyOrNull(""));
+    }
+
+    @Test
+    public void isNotBlankOrEmptyOrNullTest3() {
         assertFalse(Utilities.isNotBlankOrEmptyOrNull(null));
     }
 
     @Test
-    public void timeComparisons() {
-    		assertTrue(Utilities.timeCompare(0, 1000));
-    		assertFalse(Utilities.timeCompare(-1, 1000));
-    		assertTrue(Utilities.timeCompare(500, 1000));
-    		assertFalse(Utilities.timeCompare(500, FileTime.now().toEpochMillis()+100000));
+    public void timeComparisonsTest1() {
+        assertTrue(Utilities.timeCompare(0, 1000));
     }
-    
+
+    @Test
+    public void timeComparisonsTest2() {
+        assertTrue(Utilities.timeCompare(-1, 1000));
+    }
+
+    @Test
+    public void timeComparisonsTest3() {
+        assertTrue(Utilities.timeCompare(500, 1000));
+    }
+
+    @Test
+    public void timeComparisonsTest4() {
+        assertFalse(Utilities.timeCompare(500, FileTime.now().toEpochMillis()));
+    }
+
+    @Test
+    public void timeComparisonsTest5() {
+        assertFalse(Utilities.timeCompare(500, FileTime.now().toEpochMillis() + 100000));
+    }
+
+    @Test
+    public void timeComparisonsTest6() {
+        assertTrue(Utilities.timeCompare(500, 500));
+    }
 
 }

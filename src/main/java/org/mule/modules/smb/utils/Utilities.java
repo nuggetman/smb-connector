@@ -13,8 +13,8 @@ import org.slf4j.LoggerFactory;
 import com.hierynomus.msdtyp.FileTime;
 
 public class Utilities {
-	
-	private static final Logger logger = LoggerFactory.getLogger(Utilities.class);
+
+    private static final Logger logger = LoggerFactory.getLogger(Utilities.class);
 
     /**
      * 
@@ -26,19 +26,19 @@ public class Utilities {
      */
     public static String cleanPath(String path) {
         if (path != null) {
-			StringBuilder sb = new StringBuilder(path.replaceAll("(/)+", "/"));
-			if (path.startsWith("/")) {
-				sb.replace(0, 1, "");
-			}
-			if (path.endsWith("/")) {
-				sb.replace(sb.length()-1, sb.length(), "");
-			}
-			return sb.toString();
-		} else {
-			return "";
-		}
+            StringBuilder sb = new StringBuilder(path.replaceAll("(/)+", "/"));
+            if (path.startsWith("/")) {
+                sb.replace(0, 1, "");
+            }
+            if (path.endsWith("/")) {
+                sb.replace(sb.length() - 1, sb.length(), "");
+            }
+            return sb.toString();
+        } else {
+            return "";
+        }
     }
-    
+
     /**
      * 
      * Helper class to concatenate naming for SMB connectivity
@@ -55,15 +55,14 @@ public class Utilities {
             path2 = cleanPath(path2);
             StringBuilder sb = new StringBuilder(path1 + "/" + path2);
             return sb.toString();
-		} else if (path1 == null && path2 != null) {
-			return path2;
-		} else if (path1 != null && path2 == null) {
-			return path1;
-		} else {
-			return null;
-		}
+        } else if (path1 == null && path2 != null) {
+            return path2;
+        } else if (path1 != null && path2 == null) {
+            return path1;
+        } else {
+            return null;
+        }
     }
-  
 
     /**
      * 
@@ -80,25 +79,30 @@ public class Utilities {
             return false;
         }
     }
-    
+
     /**
      * 
-     * @param target, int value to target in ms
-     * @param age, epoch long value of file in ms
+     * @param target,
+     *            int value to target in ms
+     * @param age,
+     *            epoch long value of file in ms
      * @return boolean age has been reached
      */
     public static boolean timeCompare(int target, long age) {
         boolean ready = false;
-        if (target == 0) {
+        long currentAge = 0L;
+        if (target == 0 || target < 0) {
             logger.debug("Time check skipped");
             ready = true;
-        } else if (target > 0) {
-            long currentAge = FileTime.now().toEpochMillis() - age;
-            if (currentAge < 0) {
-                logger.warn("The system clocks appear to be out of sync, either time or timezone");
-            } else if (currentAge > 0 && currentAge < target) {
+        } else {
+            currentAge = FileTime.now().toEpochMillis() - age;
+        }
+        if (currentAge < 0) {
+            logger.warn("The system clocks appear to be out of sync, either time or timezone");
+        } else if (currentAge >= 0) {
+            if (currentAge < target) {
                 logger.debug("Target is not ready yet");
-            } else if (currentAge > 0 && currentAge > target) {
+            } else if (currentAge >= target) {
                 ready = true;
             }
         }

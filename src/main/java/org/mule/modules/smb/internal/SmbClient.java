@@ -84,24 +84,24 @@ public class SmbClient {
     /**
      * Disconnect session
      */
-    private void closeSession() {// NOSONAR
+    private void closeSession() {
         try {
             this.getSession().close();
         } catch (Exception e) {
             // do nothing - SMBJ has an async close process
-            logger.debug("Ignorable (usually) error closing out session ", e.getLocalizedMessage());
+            logger.debug("Ignorable (usually) error closing out session ", e.getLocalizedMessage(), e);
         }
     }
 
     /**
      * Disconnect connection
      */
-    private void closeConnection() {// NOSONAR
+    private void closeConnection() {
         try {
             this.getSession().getConnection().close();
         } catch (Exception e) {
             // do nothing - SMBJ has an async close process
-            logger.debug("Ignorable (usually) error closing out session ", e.getLocalizedMessage());
+            logger.debug("Ignorable (usually) error closing out session ", e.getLocalizedMessage(), e);
         }
     }
 
@@ -198,8 +198,6 @@ public class SmbClient {
             logger.debug("setting smbShare");
             setShare(this.getConfig().getHost(), this.getConfig().getShare());
 
-        } catch (IOException e) {
-            throw new SmbConnectionException(ConnectionExceptionCode.CANNOT_REACH, null, e.getMessage(), e);
         } catch (Exception e) {
             throw new SmbConnectionException(ConnectionExceptionCode.CANNOT_REACH, null, e.getMessage(), e);
         }

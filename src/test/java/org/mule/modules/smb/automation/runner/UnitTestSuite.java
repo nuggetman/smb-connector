@@ -9,11 +9,11 @@ package org.mule.modules.smb.automation.runner;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
-import org.mule.modules.smb.automation.unit.UtilitiesUnitTest;
+import org.mule.modules.smb.automation.unit.UtilitiesUnitTestCases;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-    UtilitiesUnitTest.class
+    UtilitiesUnitTestCases.class
 })
 
 public class UnitTestSuite {

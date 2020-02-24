@@ -9,16 +9,14 @@ package org.mule.modules.smb.automation.runner;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
-import org.mule.modules.smb.automation.system.InvalidValuesConnectivityTest;
-import org.mule.modules.smb.automation.system.ValidValuesConnectivityTest;
-import org.mule.modules.smb.automation.system.ZeroFileageConnectivityTest;
+import org.mule.modules.smb.automation.system.BadHostConnectivityTestCases;
+import org.mule.modules.smb.automation.system.InvalidValuesConnectivityTestCases;
+import org.mule.modules.smb.automation.system.ValidValuesConnectivityTestCases;
+import org.mule.modules.smb.automation.system.ZeroFileageConnectivityTestCases;
 
 @RunWith(Suite.class)
-@SuiteClasses({
-	InvalidValuesConnectivityTest.class,
-    ValidValuesConnectivityTest.class,
-    ZeroFileageConnectivityTest.class
-})
+@SuiteClasses({ InvalidValuesConnectivityTestCases.class, ValidValuesConnectivityTestCases.class,
+        ZeroFileageConnectivityTestCases.class, BadHostConnectivityTestCases.class })
 
 public class SystemTestSuite {
 

@@ -17,7 +17,7 @@ import org.mule.api.ConnectionException;
 import org.mule.modules.smb.config.SmbConnectorConfig;
 import org.mule.tools.devkit.ctf.configuration.util.ConfigurationUtils;
 
-public class ValidValuesConnectivityTest {
+public class ZeroFileageConnectivityTestCases {
 
     private Properties validCredentials;
     private String domain;
@@ -38,8 +38,8 @@ public class ValidValuesConnectivityTest {
         share = validCredentials.getProperty("config.share");
         username = validCredentials.getProperty("config.username");
         password = validCredentials.getProperty("config.password");
-        connectionTimeout = validCredentials.getProperty("config.connectionTimeout");
-        fileage = validCredentials.getProperty("config.fileage");	
+        connectionTimeout = "some string";
+        fileage = "0";	
         config = new SmbConnectorConfig();
         config.connect(domain, host, share, username, password, connectionTimeout, fileage);
     }
@@ -56,14 +56,12 @@ public class ValidValuesConnectivityTest {
 
     @Test
     public void timeoutTest() {
-        config.setTimeout(Integer.parseInt(connectionTimeout));
-        assertTrue(Integer.parseInt(connectionTimeout) == config.getTimeout());
+        assertTrue(config.getTimeout() == 30000);
     }
     
     @Test
     public void fileageTest() {
-        config.setFileage(Integer.parseInt(fileage));
-        assertTrue(Integer.parseInt(fileage) == config.getFileage());
+        assertTrue(config.getFileage() == 0);
     }
 
 }
