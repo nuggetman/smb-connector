@@ -15,9 +15,9 @@ import org.junit.Test;
 import org.mule.modules.smb.SmbConnector;
 import org.mule.tools.devkit.ctf.junit.AbstractTestCase;
 
-public class FileDeleteTest extends AbstractTestCase<SmbConnector> {
+public class FileDeleteTestCases extends AbstractTestCase<SmbConnector> {
 
-    public FileDeleteTest() {
+    public FileDeleteTestCases() {
         super(SmbConnector.class);
     }
 

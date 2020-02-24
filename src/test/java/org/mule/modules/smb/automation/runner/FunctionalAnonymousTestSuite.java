@@ -12,12 +12,12 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 import org.mule.modules.smb.SmbConnector;
-import org.mule.modules.smb.automation.functional.DirectoryAnonListEmptyTest;
-import org.mule.modules.smb.automation.functional.FileAnonReadTest;
+import org.mule.modules.smb.automation.functional.DirectoryAnonListEmptyTestCases;
+import org.mule.modules.smb.automation.functional.FileAnonReadTestCases;
 import org.mule.tools.devkit.ctf.mockup.ConnectorTestContext;
 
 @RunWith(Suite.class)
-@SuiteClasses({ FileAnonReadTest.class, DirectoryAnonListEmptyTest.class })
+@SuiteClasses({ FileAnonReadTestCases.class, DirectoryAnonListEmptyTestCases.class })
 
 public class FunctionalAnonymousTestSuite {
 

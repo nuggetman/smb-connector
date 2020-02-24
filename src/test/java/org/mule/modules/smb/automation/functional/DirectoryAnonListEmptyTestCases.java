@@ -6,26 +6,24 @@
  */
 package org.mule.modules.smb.automation.functional;
 
-import static org.junit.Assert.assertEquals;
-import static org.mule.modules.smb.automation.functional.TestDataBuilder.FILE_CONTENT;
-import static org.mule.modules.smb.automation.functional.TestDataBuilder.FILE_READ_TEST_FILENAME;
+import static org.junit.Assert.assertTrue;
+import static org.mule.modules.smb.automation.functional.TestDataBuilder.DIR_LIST_EMPTY_TEST_NAME;
 
 import org.junit.Test;
-import org.mule.api.ConnectionException;
 import org.mule.modules.smb.SmbConnector;
 import org.mule.tools.devkit.ctf.junit.AbstractTestCase;
 
-public class FileAnonReadTest extends AbstractTestCase<SmbConnector> {
+public class DirectoryAnonListEmptyTestCases extends AbstractTestCase<SmbConnector> {
 
-    public FileAnonReadTest() {
+    public DirectoryAnonListEmptyTestCases() {
         super(SmbConnector.class);
     }
 
     @Test
-    public void verifyFileReadNoDelete() {
+    public void verifyDirListWithNoWildCard() {
         try {
-            assertEquals(FILE_CONTENT, new String(getConnector().fileRead(FILE_READ_TEST_FILENAME, null, false)));
-        } catch (ConnectionException e) {
+            assertTrue(getConnector().directoryList(DIR_LIST_EMPTY_TEST_NAME, null).isEmpty());
+        } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }

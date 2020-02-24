@@ -84,24 +84,24 @@ public class SmbClient {
     /**
      * Disconnect session
      */
-    private void closeSession() {
+    private void closeSession() {// NOSONAR
         try {
             this.getSession().close();
         } catch (Exception e) {
             // do nothing - SMBJ has an async close process
-            logger.info("Ignorable (usually) error closing out session ", e.getLocalizedMessage());
+            logger.debug("Ignorable (usually) error closing out session ", e.getLocalizedMessage());
         }
     }
 
     /**
      * Disconnect connection
      */
-    private void closeConnection() {
+    private void closeConnection() {// NOSONAR
         try {
             this.getSession().getConnection().close();
         } catch (Exception e) {
             // do nothing - SMBJ has an async close process
-            logger.info("Ignorable (usually) error closing out session ", e.getLocalizedMessage());
+            logger.debug("Ignorable (usually) error closing out session ", e.getLocalizedMessage());
         }
     }
 

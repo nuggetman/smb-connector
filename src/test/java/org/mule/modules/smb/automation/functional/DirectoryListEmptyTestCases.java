@@ -6,29 +6,25 @@
  */
 package org.mule.modules.smb.automation.functional;
 
-
-import static org.junit.Assert.assertEquals;
-
-import static org.mule.modules.smb.automation.functional.TestDataBuilder.FILE_READ_AUTODELETE_TEST_FILENAME;
-import static org.mule.modules.smb.automation.functional.TestDataBuilder.FILE_CONTENT;
+import static org.junit.Assert.assertTrue;
+import static org.mule.modules.smb.automation.functional.TestDataBuilder.DIR_LIST_EMPTY_TEST_NAME;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mule.api.ConnectionException;
 import org.mule.modules.smb.SmbConnector;
 import org.mule.tools.devkit.ctf.junit.AbstractTestCase;
 
-public class FileReadAutoDeleteTest extends AbstractTestCase<SmbConnector> {
+public class DirectoryListEmptyTestCases extends AbstractTestCase<SmbConnector> {
 
-    public FileReadAutoDeleteTest() {
+    public DirectoryListEmptyTestCases() {
         super(SmbConnector.class);
     }
 
     @Before
     public void setup() {
         try {
-            getConnector().fileWrite(FILE_READ_AUTODELETE_TEST_FILENAME, null, false, FILE_CONTENT.getBytes(), "UTF-8");
+            getConnector().directoryCreate(DIR_LIST_EMPTY_TEST_NAME);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -36,14 +32,20 @@ public class FileReadAutoDeleteTest extends AbstractTestCase<SmbConnector> {
 
     @After
     public void tearDown() {
-    }
-    
-    @Test
-    public void verifyFileReadWithDelete() {
         try {
-            assertEquals(FILE_CONTENT, new String(getConnector().fileRead(FILE_READ_AUTODELETE_TEST_FILENAME, null, true)));
-        } catch (ConnectionException e) {
+            getConnector().directoryDelete(DIR_LIST_EMPTY_TEST_NAME, true);
+        } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
+
+    @Test
+    public void verifyDirListWithNoWildCard() {
+        try {
+            assertTrue(getConnector().directoryList(DIR_LIST_EMPTY_TEST_NAME, null).isEmpty());
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
 }

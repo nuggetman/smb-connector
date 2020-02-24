@@ -6,25 +6,27 @@
  */
 package org.mule.modules.smb.automation.functional;
 
-import static org.mule.modules.smb.automation.functional.TestDataBuilder.FILE_WRITE_APPEND_BYTEARRAY_TEST_FILENAME;
+import static org.mule.modules.smb.automation.functional.TestDataBuilder.FILE_WRITE_APPEND_STRING_TEST_FILENAME;
 import static org.mule.modules.smb.automation.functional.TestDataBuilder.FILE_CONTENT;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mule.modules.smb.SmbConnector;
 import org.mule.tools.devkit.ctf.junit.AbstractTestCase;
 
-public class FileWriteAppendByteArrayTest extends AbstractTestCase<SmbConnector> {
+public class FileWriteAppendStringTestCases extends AbstractTestCase<SmbConnector> {
 
-    public FileWriteAppendByteArrayTest() {
+    public FileWriteAppendStringTestCases() {
         super(SmbConnector.class);
     }
 
     @Before
     public void setup() {
         try {
-            getConnector().fileWrite(FILE_WRITE_APPEND_BYTEARRAY_TEST_FILENAME, null, false, FILE_CONTENT.getBytes(), "UTF-8");
+            getConnector().fileWrite(FILE_WRITE_APPEND_STRING_TEST_FILENAME, null, false, FILE_CONTENT.toString(), "UTF-8");
+            getConnector().fileWrite(FILE_WRITE_APPEND_STRING_TEST_FILENAME, null, true, FILE_CONTENT.toString(), "UTF-8");
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -33,16 +35,16 @@ public class FileWriteAppendByteArrayTest extends AbstractTestCase<SmbConnector>
     @After
     public void tearDown() {
         try {
-            getConnector().fileDelete(FILE_WRITE_APPEND_BYTEARRAY_TEST_FILENAME, null);
+            getConnector().fileDelete(FILE_WRITE_APPEND_STRING_TEST_FILENAME, null);
         } catch ( Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
 
     @Test
-    public void verifyWriteAppendByteArray() {
+    public void verifyWriteAppendString() {
         try {
-            getConnector().fileWrite(FILE_WRITE_APPEND_BYTEARRAY_TEST_FILENAME, null, true, FILE_CONTENT.getBytes(), "UTF-8");
+            assertEquals(FILE_CONTENT+FILE_CONTENT, new String(getConnector().fileRead(FILE_WRITE_APPEND_STRING_TEST_FILENAME, null, false)));
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }

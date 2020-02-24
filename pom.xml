@@ -64,19 +64,19 @@
           </includes>
         </configuration>
       </plugin>
-       <plugin>
-            <groupId>org.mule.certification</groupId>
-            <artifactId>project-structure-validation</artifactId>
-            <version>1.0.6</version>
-            <executions>
-                <execution>
-                    <phase>package</phase>
-                    <goals>
-                        <goal>validate</goal>
-                    </goals>
-                </execution>
-            </executions>
-        </plugin>
+      <plugin>
+        <groupId>org.mule.certification</groupId>
+        <artifactId>project-structure-validation</artifactId>
+        <version>1.0.6</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>validate</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
 	</build>
 

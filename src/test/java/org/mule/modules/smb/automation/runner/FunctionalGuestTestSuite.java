@@ -12,17 +12,17 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 import org.mule.modules.smb.SmbConnector;
-import org.mule.modules.smb.automation.functional.DirectoryCreateTest;
-import org.mule.modules.smb.automation.functional.DirectoryDeleteTest;
-import org.mule.modules.smb.automation.functional.DirectoryListEmptyTest;
-import org.mule.modules.smb.automation.functional.FileDeleteTest;
-import org.mule.modules.smb.automation.functional.FileReadTest;
-import org.mule.modules.smb.automation.functional.FileWriteTest;
+import org.mule.modules.smb.automation.functional.DirectoryCreateTestCases;
+import org.mule.modules.smb.automation.functional.DirectoryDeleteTestCases;
+import org.mule.modules.smb.automation.functional.DirectoryListTestCases;
+import org.mule.modules.smb.automation.functional.FileDeleteTestCases;
+import org.mule.modules.smb.automation.functional.FileReadTestCases;
+import org.mule.modules.smb.automation.functional.FileWriteTestCases;
 import org.mule.tools.devkit.ctf.mockup.ConnectorTestContext;
 
 @RunWith(Suite.class)
-@SuiteClasses({ FileReadTest.class, FileWriteTest.class, FileDeleteTest.class, DirectoryCreateTest.class,
-        DirectoryListEmptyTest.class, DirectoryDeleteTest.class })
+@SuiteClasses({ FileReadTestCases.class, FileWriteTestCases.class, FileDeleteTestCases.class, DirectoryCreateTestCases.class,
+        DirectoryListTestCases.class, DirectoryDeleteTestCases.class })
 
 public class FunctionalGuestTestSuite {
 

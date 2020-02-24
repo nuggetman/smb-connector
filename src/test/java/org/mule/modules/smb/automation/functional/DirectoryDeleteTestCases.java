@@ -6,7 +6,9 @@
  */
 package org.mule.modules.smb.automation.functional;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mule.modules.smb.automation.functional.TestDataBuilder.DIR_DELETE_FAKE_NAME;
 import static org.mule.modules.smb.automation.functional.TestDataBuilder.DIR_DELETE_TEST_NAME;
 
 import org.junit.Before;
@@ -15,9 +17,9 @@ import org.mule.api.ConnectionException;
 import org.mule.modules.smb.SmbConnector;
 import org.mule.tools.devkit.ctf.junit.AbstractTestCase;
 
-public class DirectoryDeleteTest extends AbstractTestCase<SmbConnector> {
+public class DirectoryDeleteTestCases extends AbstractTestCase<SmbConnector> {
 
-    public DirectoryDeleteTest() {
+    public DirectoryDeleteTestCases() {
         super(SmbConnector.class);
     }
 
@@ -34,6 +36,24 @@ public class DirectoryDeleteTest extends AbstractTestCase<SmbConnector> {
     public void verify() {
         try {
             assertTrue(getConnector().directoryDelete(DIR_DELETE_TEST_NAME, true));
+        } catch (ConnectionException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    @Test
+    public void verifyNull() {
+        try {
+            assertFalse(getConnector().directoryDelete(null, true));
+        } catch (ConnectionException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    @Test
+    public void verifyNoExist() {
+        try {
+            assertFalse(getConnector().directoryDelete(DIR_DELETE_FAKE_NAME, true));
         } catch (ConnectionException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
