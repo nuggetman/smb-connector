@@ -291,7 +291,6 @@ public class SmbClient {
     public boolean writeFile(String fileName, String dirName, boolean append, Object data, String encoding)
             throws SmbConnectionException {
         boolean ret = false;
-        InputStream in = null;
         try {
             if (data instanceof InputStream) {
                 ret = writeFileContent(fileName, dirName, append, IOUtils.toByteArray((InputStream) data));
@@ -308,14 +307,6 @@ public class SmbClient {
         } catch (Exception e) {
             throw new SmbConnectionException(ConnectionExceptionCode.UNKNOWN, SmbConnectionException.WRITE_ERROR,
                     e.getMessage(), e);
-        } finally {
-            if (in != null) {
-                try {
-                    in.close();
-                } catch (Exception e) {
-                    logger.debug(SmbConnectionException.WRITE_ERROR, e);
-                }
-            }
         }
         return ret;
     }
