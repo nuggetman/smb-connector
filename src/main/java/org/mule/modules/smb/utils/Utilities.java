@@ -50,17 +50,33 @@ public class Utilities {
      * @return String of normalized file
      */
     public static String buildPath(String path1, String path2) {
-        if (path1 != null && path2 != null) {
-            path1 = cleanPath(path1);
-            path2 = cleanPath(path2);
-            StringBuilder sb = new StringBuilder(path1 + "/" + path2);
-            return sb.toString();
-        } else if (path1 == null && path2 != null) {
-            return path2;
-        } else if (path1 != null && path2 == null) {
-            return path1;
+        String p1 = path1;
+        String p2 = path2;
+        if (p1 != null && p2 != null) {
+            p1 = cleanPath(p1);
+            p2 = cleanPath(p2);
+            return new StringBuilder(p1 + "/" + p2).toString();
+        } else if (p1 == null ^ p2 == null) {
+            return returnSingleNotNull(p1, p2);
         } else {
             return null;
+        }
+    }
+
+    /*
+     * Private helper class to return non null string
+     * 
+     * @param s1 String 1
+     * 
+     * @param s2 String 2
+     * 
+     * @return non-null instance
+     */
+    private static String returnSingleNotNull(String s1, String s2) {
+        if (s1 == null) {
+            return s2;
+        } else {
+            return s1;
         }
     }
 
@@ -99,10 +115,10 @@ public class Utilities {
         }
         if (currentAge < 0) {
             logger.warn("The system clocks appear to be out of sync, either time or timezone");
-        } else if (currentAge >= 0) {
+        } else {
             if (currentAge < target) {
                 logger.debug("Target is not ready yet");
-            } else if (currentAge >= target) {
+            } else {
                 ready = true;
             }
         }

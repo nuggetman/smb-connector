@@ -10,7 +10,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.MalformedURLException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -19,6 +18,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.io.IOUtils;
 import org.mule.api.ConnectionExceptionCode;
 import org.mule.modules.smb.config.SmbConnectorConfig;
 import org.mule.modules.smb.exception.SmbConnectionException;
@@ -44,11 +44,11 @@ public class SmbClient {
 
     private static final Logger logger = LoggerFactory.getLogger(SmbClient.class);
 
+    private static String connectionId = "001";
+
     private SmbConnectorConfig connectorConfig;
 
     private AuthenticationContext ac = null;
-
-    private SmbConfig smbConfig = null;
 
     private SMBClient sc = null;
 
@@ -119,7 +119,7 @@ public class SmbClient {
         } catch (Exception e) {
             logger.error("Error checking connection status", e);
         }
-        logger.debug("Connected status ", c);
+        logger.debug("Connected status {}", c);
         return c;
     }
 
@@ -129,7 +129,7 @@ public class SmbClient {
      * @return boolean, true if valid
      */
     private boolean shareSessionNull() {
-        return (this.getShare() != null && this.getSession() != null);
+        return this.getShare() != null && this.getSession() != null;
     }
 
     /**
@@ -138,7 +138,7 @@ public class SmbClient {
      * @return boolean, true if connected
      */
     private boolean shareSessionConnected() {
-        return (this.getShare().isConnected() && this.getSession().getConnection().isConnected());
+        return this.getShare().isConnected() && this.getSession().getConnection().isConnected();
     }
 
     /**
@@ -147,7 +147,7 @@ public class SmbClient {
      * @return String, connection id
      */
     public String connectionId() {
-        return "001";
+        return connectionId;
     }
 
     /**
@@ -180,23 +180,23 @@ public class SmbClient {
      */
     public boolean connect() throws SmbConnectionException {
         try {
-            logger.debug("connecting to: smb://", this.getConfig().getHost(), "/", this.getConfig().getShare());
+            logger.debug("connecting to: smb://{}/{}", this.getConfig().getHost(), this.getConfig().getShare());
 
             logger.debug("setting auth context");
             this.setAuthContext();
 
             logger.debug("setting smbConfig");
-            this.smbConfig = SmbConfig.builder().withTimeout(this.getConfig().getTimeout(), TimeUnit.MILLISECONDS)
+            SmbConfig smbConfig = SmbConfig.builder().withTimeout(this.getConfig().getTimeout(), TimeUnit.MILLISECONDS)
                     .withSoTimeout(30, TimeUnit.SECONDS).build();
 
             logger.debug("setting smbClient");
-            sc = new SMBClient(this.smbConfig);
+            sc = new SMBClient(smbConfig);
 
             logger.debug("setting smbSession");
             setSession(this.getConfig().getHost());
 
             logger.debug("setting smbShare");
-            setShare(this.getConfig().getHost(), this.getConfig().getShare());
+            setShare(this.getConfig().getShare());
 
         } catch (Exception e) {
             throw new SmbConnectionException(ConnectionExceptionCode.CANNOT_REACH, null, e.getMessage(), e);
@@ -221,12 +221,13 @@ public class SmbClient {
     public byte[] readFile(String fileName, String dirName, boolean autoDelete) throws SmbConnectionException {
         InputStream is = null;
         ByteArrayOutputStream os = new ByteArrayOutputStream();
+        File smbFile = null;
         try {
             Set<SMB2ShareAccess> s = new HashSet<>();
             s.add(SMB2ShareAccess.FILE_SHARE_DELETE);
             s.add(SMB2ShareAccess.FILE_SHARE_READ);
 
-            File smbFile = this.getShare().openFile(Utilities.buildPath(dirName, fileName),
+            smbFile = this.getShare().openFile(Utilities.buildPath(dirName, fileName),
                     EnumSet.of(AccessMask.GENERIC_READ), null, s, SMB2CreateDisposition.FILE_OPEN, null);
             if (checkIsFileOldEnough(
                     smbFile.getFileInformation().getBasicInformation().getChangeTime().toEpochMillis())) {
@@ -237,21 +238,35 @@ public class SmbClient {
                     os.write(buffer, 0, length);
                 }
                 is.close();
+                is = null;
                 smbFile.close();
+                smbFile = null;
                 if (autoDelete) {
                     deleteFile(fileName, dirName);
                 }
             }
-            logger.debug("Done reading file ", smbFile.getFileName());
+            logger.debug("Done reading file {}", fileName);
 
-        } catch (MalformedURLException e) {
-            throw new SmbConnectionException(ConnectionExceptionCode.UNKNOWN, "READ_ERROR", e.getMessage(), e);
         } catch (UnknownHostException e) {
-            throw new SmbConnectionException(ConnectionExceptionCode.UNKNOWN_HOST, "READ_ERROR", e.getMessage(), e);
-        } catch (IOException e) {
-            throw new SmbConnectionException(ConnectionExceptionCode.UNKNOWN, "READ_ERROR", e.getMessage(), e);
+            throw new SmbConnectionException(ConnectionExceptionCode.UNKNOWN_HOST, SmbConnectionException.READ_ERROR,
+                    e.getMessage(), e);
+        } catch (Exception e) {
+            throw new SmbConnectionException(ConnectionExceptionCode.UNKNOWN, SmbConnectionException.READ_ERROR,
+                    e.getMessage(), e);
+        } finally {
+            if (is != null) {
+                try {
+                    is.close();
+                    is = null;
+                } catch (IOException e) {
+                    logger.error("error closing out file reader", e);
+                }
+            }
+            if (smbFile != null) {
+                smbFile.close();
+            }
+            this.disconnect();
         }
-        this.disconnect();
         return os.toByteArray();
     }
 
@@ -269,74 +284,141 @@ public class SmbClient {
      *            InputStream, byte[] or String of data to write into the file
      * @param encoding,
      *            Character encoding of contents to write
+     * @return boolean, successful if true
      * @throws SmbConnectionException
      *             when a connection error occurs
      */
-    public void writeFile(String fileName, String dirName, boolean append, Object data, String encoding)
+    public boolean writeFile(String fileName, String dirName, boolean append, Object data, String encoding)
             throws SmbConnectionException {
-        OutputStream out = null;
+        boolean ret = false;
+        InputStream in = null;
         try {
-            Set<FileAttributes> fileAttributes = new HashSet<>();
-            fileAttributes.add(FileAttributes.FILE_ATTRIBUTE_NORMAL);
-            Set<SMB2CreateOptions> createOptions = new HashSet<>();
-            createOptions.add(SMB2CreateOptions.FILE_RANDOM_ACCESS);
-            createOptions.add(SMB2CreateOptions.FILE_NON_DIRECTORY_FILE);
-
-            File f;
-            if (append) {
-                f = this.getShare().openFile(Utilities.buildPath(dirName, fileName), EnumSet.of(AccessMask.GENERIC_ALL),
-                        fileAttributes, SMB2ShareAccess.ALL, SMB2CreateDisposition.FILE_OPEN_IF, createOptions);
-            } else {
-                f = this.getShare().openFile(Utilities.buildPath(dirName, fileName), EnumSet.of(AccessMask.GENERIC_ALL),
-                        fileAttributes, SMB2ShareAccess.ALL, SMB2CreateDisposition.FILE_OVERWRITE_IF, createOptions);
-            }
-
-            out = f.getOutputStream(append);
-
             if (data instanceof InputStream) {
-                InputStream in = (InputStream) data;
-                byte[] buffer = new byte[1024];
-                while (in.read(buffer) > -1) {
-                    out.write(buffer);
-                }
-                out.flush();
-                out.close();
-                in.close();
+                ret = writeFileContent(fileName, dirName, append, IOUtils.toByteArray((InputStream) data));
             } else if (data instanceof byte[]) {
                 byte[] dataBytes = (byte[]) data;
-                out.write(dataBytes);
-                out.flush();
-                out.close();
+                ret = writeFileContent(fileName, dirName, append, dataBytes);
             } else if (data instanceof String) {
-                byte[] dataBytes = ((String) data).getBytes(encoding);
-                out.write(dataBytes);
-                out.flush();
-                out.close();
+                ret = writeFileContent(fileName, dirName, append, ((String) data).getBytes(encoding));
             } else {
-                logger.error("unsupported object type for file write ", data.getClass(),
-                        ", supported types are InputStream, String or byte[]");
+                logger.error(
+                        "unsupported object type for file write {}, supported types are InputStream, String or byte[]",
+                        data.getClass());
             }
-            f.close();
-            out = null;
-        } catch (com.hierynomus.mssmb2.SMBApiException e) {
-            throw new SmbConnectionException(ConnectionExceptionCode.UNKNOWN, "WRITE_ERROR", e.getMessage(), e);
-        } catch (MalformedURLException e) {
-            throw new SmbConnectionException(ConnectionExceptionCode.UNKNOWN, "WRITE_ERROR", e.getMessage(), e);
+        } catch (Exception e) {
+            throw new SmbConnectionException(ConnectionExceptionCode.UNKNOWN, SmbConnectionException.WRITE_ERROR,
+                    e.getMessage(), e);
+        } finally {
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (Exception e) {
+                    logger.debug(SmbConnectionException.WRITE_ERROR, e);
+                }
+            }
+        }
+        return ret;
+    }
+
+    /**
+     * Get standardized attributes for file writer
+     * 
+     * @return Set<FileAttributes> Set of FileAttributes for declaring with file
+     *         write
+     */
+    private Set<FileAttributes> getFileWriterAttributes() {
+        Set<FileAttributes> fileAttributes = new HashSet<>();
+        fileAttributes.add(FileAttributes.FILE_ATTRIBUTE_NORMAL);
+        return fileAttributes;
+    }
+
+    /**
+     * Get standardized create options for file writer
+     * 
+     * @return Set<SMB2CreateOptions> Set of create options for declaring with file
+     *         write
+     */
+    private Set<SMB2CreateOptions> getFileWriterCreateOptions() {
+        Set<SMB2CreateOptions> createOptions = new HashSet<>();
+        createOptions.add(SMB2CreateOptions.FILE_RANDOM_ACCESS);
+        createOptions.add(SMB2CreateOptions.FILE_NON_DIRECTORY_FILE);
+        return createOptions;
+    }
+
+    /**
+     * Get standardized create options for file writer
+     * 
+     * * @param append, boolean to declare whether file is appended
+     * 
+     * @return SMB2CreateDisposition FILE_OPEN_IF (for append) or FILE_OVERWRITE_IF
+     */
+    private SMB2CreateDisposition getFileWriterDisposition(boolean append) {
+        SMB2CreateDisposition d;
+        if (append) {
+            d = SMB2CreateDisposition.FILE_OPEN_IF;
+        } else {
+            d = SMB2CreateDisposition.FILE_OVERWRITE_IF;
+        }
+        return d;
+    }
+
+    /**
+     * Write some content to the specified file name
+     * 
+     * @param fileName,
+     *            name of the file to write
+     * @param dirName,
+     *            directory where file should be written
+     * @param append,
+     *            boolean indicating whether to append this new content to the file
+     *            otherwise overwrite
+     * @param data,
+     *            byte[] of data to write into the file
+     * @return boolean, successful if true
+     * @throws SmbConnectionException
+     *             when a connection error occurs
+     */
+    private boolean writeFileContent(String fileName, String dirName, boolean append, byte[] in)
+            throws SmbConnectionException {
+        OutputStream out = null;
+        File f = null;
+        boolean ret = false;
+        try {
+            f = this.getShare().openFile(Utilities.buildPath(dirName, fileName), EnumSet.of(AccessMask.GENERIC_ALL),
+                    getFileWriterAttributes(), SMB2ShareAccess.ALL, getFileWriterDisposition(append),
+                    getFileWriterCreateOptions());
+            out = f.getOutputStream(append);
+
+            IOUtils.write(in, out);
+            ret = true;
         } catch (UnknownHostException e) {
-            throw new SmbConnectionException(ConnectionExceptionCode.UNKNOWN_HOST, "WRITE_ERROR", e.getMessage(), e);
-        } catch (IOException e) {
-            throw new SmbConnectionException(ConnectionExceptionCode.UNKNOWN, "WRITE_ERROR", e.getMessage(), e);
+            throw new SmbConnectionException(ConnectionExceptionCode.UNKNOWN_HOST, SmbConnectionException.WRITE_ERROR,
+                    e.getMessage(), e);
+        } catch (Exception e) {
+            throw new SmbConnectionException(ConnectionExceptionCode.UNKNOWN, SmbConnectionException.WRITE_ERROR,
+                    e.getMessage(), e);
         } finally {
             if (out != null) {
                 try {
                     out.flush();
                     out.close();
-                } catch (IOException e) {
-                    logger.error("error closing out file writer", e);
+                    out = null;
+                } catch (Exception e) {
+                    logger.debug(SmbConnectionException.WRITE_ERROR, e);
                 }
             }
+            if (f != null) {
+                try {
+                    f.close();
+                    f = null;
+                } catch (Exception e) {
+                    logger.debug(SmbConnectionException.WRITE_ERROR, e);
+                }
+            }
+
         }
         this.disconnect();
+        return ret;
     }
 
     /**
@@ -358,13 +440,13 @@ public class SmbClient {
                 if (checkIsFileOldEnough(this.getShare().getFileInformation(absoluteFile).getBasicInformation()
                         .getChangeTime().toEpochMillis())) {
                     this.getShare().rm(absoluteFile);
-                    logger.debug("deleted file ", absoluteFile);
+                    logger.debug("deleted file {}", absoluteFile);
                     status = true;
                 } else {
-                    logger.debug("file ", absoluteFile, " not old enough for deletion");
+                    logger.debug("file {} not old enough for deletion", absoluteFile);
                 }
             } else {
-                logger.debug("file does not exist ", absoluteFile);
+                logger.debug("file does not exist {}", absoluteFile);
             }
         } catch (Exception e) {
             throw new SmbConnectionException(ConnectionExceptionCode.UNKNOWN, null, e.getMessage(), e);
@@ -385,13 +467,14 @@ public class SmbClient {
     public boolean createDirectory(String dirName) throws SmbConnectionException {
         boolean status = false;
         if (dirName != null) {
+            dirName = Utilities.cleanPath(dirName);
             try {
-                if (!this.getShare().folderExists(Utilities.cleanPath(dirName))) {
-                    this.getShare().mkdir(Utilities.cleanPath(dirName));
-                    logger.debug("done creating directory ", Utilities.cleanPath(dirName));
+                if (!this.getShare().folderExists(dirName)) {
+                    this.getShare().mkdir(dirName);
+                    logger.debug("done creating directory {}", dirName);
                     status = true;
                 } else {
-                    logger.debug("directory already exists ", Utilities.cleanPath(dirName));
+                    logger.debug("directory already exists {}", dirName);
                 }
             } catch (Exception e) {
                 throw new SmbConnectionException(ConnectionExceptionCode.UNKNOWN, null, e.getMessage(), e);
@@ -415,13 +498,14 @@ public class SmbClient {
     public boolean deleteDir(String dirName, boolean recursive) throws SmbConnectionException {
         boolean status = false;
         if (dirName != null) {
+            dirName = Utilities.cleanPath(dirName);
             try {
-                if (this.getShare().folderExists(Utilities.cleanPath(dirName))) {
-                    this.getShare().rmdir(Utilities.cleanPath(dirName), recursive);
-                    logger.debug("done deleting directory ", Utilities.cleanPath(dirName));
+                if (this.getShare().folderExists(dirName)) {
+                    this.getShare().rmdir(dirName, recursive);
+                    logger.debug("done deleting directory {}", dirName);
                     status = true;
                 } else {
-                    logger.debug("directory already exists ", Utilities.cleanPath(dirName));
+                    logger.debug("directory already exists {}", dirName);
                 }
             } catch (Exception e) {
                 throw new SmbConnectionException(ConnectionExceptionCode.UNKNOWN, null, e.getMessage(), e);
@@ -488,12 +572,10 @@ public class SmbClient {
      * Helper method to create a connection for a server share
      * 
      * @param String
-     *            hostname, hostname to connect to
-     * @param String
      *            sharename, sharename to connect to
      * @return void
      */
-    private void setShare(String hostname, String sharename) {
+    private void setShare(String sharename) {
         this.diskShare = (DiskShare) this.getSession().connectShare(sharename);
     }
 

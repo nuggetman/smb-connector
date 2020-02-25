@@ -7,9 +7,9 @@
 package org.mule.modules.smb.automation.functional;
 
 import static org.junit.Assert.assertFalse;
-
-import static org.mule.modules.smb.automation.functional.TestDataBuilder.DIR_LIST_FILES_TXT_TEST_NAME;
+import static org.mule.modules.smb.automation.functional.TestDataBuilder.DEFAULT_ENCODING;
 import static org.mule.modules.smb.automation.functional.TestDataBuilder.DIR_LIST_FILES_TXT_TEST_FILE_NAME;
+import static org.mule.modules.smb.automation.functional.TestDataBuilder.DIR_LIST_FILES_TXT_TEST_NAME;
 import static org.mule.modules.smb.automation.functional.TestDataBuilder.FILE_CONTENT;
 import static org.mule.modules.smb.automation.functional.TestDataBuilder.TXTWILDCARD;
 
@@ -20,7 +20,7 @@ import org.mule.modules.smb.SmbConnector;
 import org.mule.tools.devkit.ctf.junit.AbstractTestCase;
 
 public class DirectoryListFilesWildcardTxtTestCases extends AbstractTestCase<SmbConnector> {
-    
+
     public DirectoryListFilesWildcardTxtTestCases() {
         super(SmbConnector.class);
     }
@@ -29,7 +29,8 @@ public class DirectoryListFilesWildcardTxtTestCases extends AbstractTestCase<Smb
     public void setup() {
         try {
             getConnector().directoryCreate(DIR_LIST_FILES_TXT_TEST_NAME);
-            getConnector().fileWrite(DIR_LIST_FILES_TXT_TEST_FILE_NAME, DIR_LIST_FILES_TXT_TEST_NAME, false, FILE_CONTENT, "UTF-8");
+            getConnector().fileWrite(DIR_LIST_FILES_TXT_TEST_FILE_NAME, DIR_LIST_FILES_TXT_TEST_NAME, false,
+                    FILE_CONTENT, DEFAULT_ENCODING);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -43,11 +44,11 @@ public class DirectoryListFilesWildcardTxtTestCases extends AbstractTestCase<Smb
             throw new RuntimeException(e.getMessage(), e);
         }
     }
-    
+
     @Test
     public void verifyDirListWithTxtWildCard() {
         try {
-        		assertFalse(getConnector().directoryList(DIR_LIST_FILES_TXT_TEST_NAME, TXTWILDCARD).isEmpty());
+            assertFalse(getConnector().directoryList(DIR_LIST_FILES_TXT_TEST_NAME, TXTWILDCARD).isEmpty());
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }

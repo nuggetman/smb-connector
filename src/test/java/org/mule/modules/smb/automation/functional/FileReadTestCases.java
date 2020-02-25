@@ -7,8 +7,13 @@
 package org.mule.modules.smb.automation.functional;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mule.modules.smb.automation.functional.TestDataBuilder.DEFAULT_ENCODING;
 import static org.mule.modules.smb.automation.functional.TestDataBuilder.FILE_CONTENT;
 import static org.mule.modules.smb.automation.functional.TestDataBuilder.FILE_READ_TEST_FILENAME;
+
+import java.io.UnsupportedEncodingException;
 
 import org.junit.After;
 import org.junit.Before;
@@ -26,7 +31,7 @@ public class FileReadTestCases extends AbstractTestCase<SmbConnector> {
     @Before
     public void setup() {
         try {
-            getConnector().fileWrite(FILE_READ_TEST_FILENAME, null, false, FILE_CONTENT.getBytes(), "UTF-8");
+            getConnector().fileWrite(FILE_READ_TEST_FILENAME, null, false, FILE_CONTENT, DEFAULT_ENCODING);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -43,11 +48,21 @@ public class FileReadTestCases extends AbstractTestCase<SmbConnector> {
     }
 
     @Test
-    public void verifyFileReadNoDelete() {
+    public void verifyFileReadNoDelete() throws UnsupportedEncodingException {
         try {
             assertEquals(FILE_CONTENT, new String(getConnector().fileRead(FILE_READ_TEST_FILENAME, null, false)));
         } catch (ConnectionException e) {
             throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    @Test
+    public void verifyFileReadNullFail() {
+        try {
+            new String(getConnector().fileRead(null, null, false));
+            fail("Expected an Exception to be thrown");
+        } catch (org.mule.api.ConnectionException connectionException) {
+            assertTrue(connectionException.getMessage().startsWith("STATUS_FILE_IS_A_DIRECTORY (0xc00000ba)"));
         }
     }
 

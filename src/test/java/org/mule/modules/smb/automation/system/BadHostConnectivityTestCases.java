@@ -49,7 +49,7 @@ public class BadHostConnectivityTestCases {
             config.connect(domain, host, share, username, password, connectionTimeout, fileage);
             fail("Expected an Exception to be thrown");
         } catch (org.mule.api.ConnectionException connectionException) {
-            assertEquals(connectionException.getMessage(), "invalid.hostname");
+            assertEquals("invalid.hostname", connectionException.getMessage());
         }
     }
 }

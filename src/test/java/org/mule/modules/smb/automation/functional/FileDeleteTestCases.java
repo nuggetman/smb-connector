@@ -7,8 +7,9 @@
 package org.mule.modules.smb.automation.functional;
 
 import static org.junit.Assert.assertTrue;
-import static org.mule.modules.smb.automation.functional.TestDataBuilder.FILE_DELETE_TEST_FILENAME;
+import static org.mule.modules.smb.automation.functional.TestDataBuilder.DEFAULT_ENCODING;
 import static org.mule.modules.smb.automation.functional.TestDataBuilder.FILE_CONTENT;
+import static org.mule.modules.smb.automation.functional.TestDataBuilder.FILE_DELETE_TEST_FILENAME;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -24,7 +25,7 @@ public class FileDeleteTestCases extends AbstractTestCase<SmbConnector> {
     @Before
     public void setup() {
         try {
-            getConnector().fileWrite(FILE_DELETE_TEST_FILENAME, null, false, FILE_CONTENT.getBytes(), "UTF-8");
+            getConnector().fileWrite(FILE_DELETE_TEST_FILENAME, null, false, FILE_CONTENT.getBytes(), DEFAULT_ENCODING);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }

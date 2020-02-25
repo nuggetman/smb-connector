@@ -7,6 +7,7 @@
 package org.mule.modules.smb.automation.functional;
 
 import static org.junit.Assert.assertFalse;
+import static org.mule.modules.smb.automation.functional.TestDataBuilder.DEFAULT_ENCODING;
 import static org.mule.modules.smb.automation.functional.TestDataBuilder.DIR_LIST_FILES_TEST_FILE_NAME;
 import static org.mule.modules.smb.automation.functional.TestDataBuilder.DIR_LIST_FILES_TEST_NAME;
 import static org.mule.modules.smb.automation.functional.TestDataBuilder.FILE_CONTENT;
@@ -28,7 +29,7 @@ public class DirectoryListTestCases extends AbstractTestCase<SmbConnector> {
         try {
             getConnector().directoryCreate(DIR_LIST_FILES_TEST_NAME);
             getConnector().fileWrite(DIR_LIST_FILES_TEST_FILE_NAME, DIR_LIST_FILES_TEST_NAME, false, FILE_CONTENT,
-                    "UTF-8");
+                    DEFAULT_ENCODING);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }

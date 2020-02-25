@@ -39,6 +39,8 @@ public class SmbConnector {
      *            directory where file is located
      * @param autoDelete,
      *            Should the file be deleted after reading
+     * @param encoding,
+     *            character encoding of contents to write
      * @return The file contents as a byte[]
      * @throws SmbConnectionException
      *             when a connection error occurs
@@ -64,16 +66,17 @@ public class SmbConnector {
      *            file to write.
      * @param encoding,
      *            character encoding of contents to write
+     * @return boolean, true indicates success for the operation
      * @throws SmbConnectionException
      *             when a connection error occurs
      */
     @Processor
-    public void fileWrite(@ConnectionKey @FriendlyName("File Name") @Required String fileName,
+    public boolean fileWrite(@ConnectionKey @FriendlyName("File Name") @Required String fileName,
             @FriendlyName("Directory Name") @Default("") String dirName,
             @FriendlyName("Append to file") @Default("false") boolean append,
             @RefOnly @Default("#[payload]") Object fileContent, @Required @Default("UTF-8") String encoding)
             throws ConnectionException {
-        this.getConfig().getSmbClient().writeFile(fileName, dirName, append, fileContent, encoding);
+        return this.getConfig().getSmbClient().writeFile(fileName, dirName, append, fileContent, encoding);
     }
 
     /**

@@ -13,6 +13,9 @@ public class SmbConnectionException extends ConnectionException {
 
     private static final long serialVersionUID = 1L;
 
+    public static final String READ_ERROR = "READ ERROR";
+    public static final String WRITE_ERROR = "WRITE ERROR";
+
     public SmbConnectionException(ConnectionExceptionCode code, String thirdPartyCode, String message,
             Throwable throwable) {
         super(code, thirdPartyCode, message, throwable);
