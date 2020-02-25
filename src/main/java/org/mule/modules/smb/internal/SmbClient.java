@@ -496,7 +496,7 @@ public class SmbClient {
                     logger.debug("done deleting directory {}", dirName);
                     status = true;
                 } else {
-                    logger.debug("directory already exists {}", dirName);
+                    logger.debug("directory does not exist {}", dirName);
                 }
             } catch (Exception e) {
                 throw new SmbConnectionException(ConnectionExceptionCode.UNKNOWN, null, e.getMessage(), e);
