@@ -1,33 +1,23 @@
-/**
- * Copyright 2018-2020 (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
- * The software in this package is published under the terms of the CPAL v1.0 license,
- * a copy of which has been included with this distribution in the LICENSE.md file.
- */
-package org.mule.modules.smb;
+
+package org.mule.extension.smb;
+
+import org.mule.extension.smb.config.SmbConnectorConfig;
+import org.mule.extension.smb.connection.SmbConnectorConfigConnectionProvider;
+import org.mule.extension.smb.operation.SmbConnectorOperations;
+import org.mule.extension.smb.utils.Utilities;
+import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.extension.api.annotation.Extension;
+import org.mule.runtime.extension.api.annotation.Operations;
+import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
 
 import java.util.List;
 
-import org.apache.logging.log4j.core.config.plugins.validation.constraints.Required;
-import org.mule.api.ConnectionException;
-import org.mule.api.annotations.Config;
-import org.mule.api.annotations.Connector;
-import org.mule.api.annotations.Processor;
-import org.mule.api.annotations.display.FriendlyName;
-import org.mule.api.annotations.licensing.RequiresEnterpriseLicense;
-import org.mule.api.annotations.param.ConnectionKey;
-import org.mule.api.annotations.param.Default;
-import org.mule.api.annotations.param.Optional;
-import org.mule.api.annotations.param.RefOnly;
-import org.mule.modules.smb.config.SmbConnectorConfig;
-import org.mule.modules.smb.exception.SmbConnectionException;
-import org.mule.modules.smb.utils.Utilities;
+@Extension(name = "SMB Connector")
+@ConnectionProviders({ SmbConnectorConfigConnectionProvider.class })
+@Operations(SmbConnectorOperations.class)
+public class SmbExtension {
 
-@Connector(name = "smb", friendlyName = "SMB Connector", minMuleVersion = "3.8.0")
-@RequiresEnterpriseLicense(allowEval = true)
-public class SmbConnector {
 
-    @Config
     SmbConnectorConfig config;
 
     /**
@@ -45,10 +35,8 @@ public class SmbConnector {
      * @throws SmbConnectionException
      *             when a connection error occurs
      */
-    @Processor
-    public byte[] fileRead(@ConnectionKey @FriendlyName("File Name") String fileName,
-            @FriendlyName("Directory Name") @Default("") String dirName,
-            @FriendlyName("Delete after reading") @Default("false") boolean autoDelete) throws ConnectionException {
+    public byte[] fileRead(String fileName, String dirName, boolean autoDelete)
+            throws ConnectionException {
         return this.getConfig().getSmbClient().readFile(fileName, dirName, autoDelete);
     }
 
@@ -62,20 +50,15 @@ public class SmbConnector {
      * @param append,
      *            when true append payload to file, if it exists already
      * @param fileContent,
-     *            a byte[], String or InputStream containing the contents of the
-     *            file to write.
+     *            a byte[], String or InputStream containing the contents of the file to write.
      * @param encoding,
      *            character encoding of contents to write
      * @return boolean, true indicates success for the operation
      * @throws SmbConnectionException
      *             when a connection error occurs
      */
-    @Processor
-    public boolean fileWrite(@ConnectionKey @FriendlyName("File Name") @Required String fileName,
-            @FriendlyName("Directory Name") @Default("") String dirName,
-            @FriendlyName("Append to file") @Default("false") boolean append,
-            @RefOnly @Default("#[payload]") Object fileContent, @Required @Default("UTF-8") String encoding)
-            throws ConnectionException {
+    public boolean fileWrite(String fileName, String dirName, boolean append, Object fileContent,
+                             String encoding) throws ConnectionException {
         return this.getConfig().getSmbClient().writeFile(fileName, dirName, append, fileContent, encoding);
     }
 
@@ -90,9 +73,7 @@ public class SmbConnector {
      * @throws SmbConnectionException
      *             when a connection error occurs
      */
-    @Processor
-    public boolean fileDelete(@ConnectionKey @FriendlyName("File Name") String fileName,
-            @FriendlyName("Directory Name") @Default("") String dirName) throws ConnectionException {
+    public boolean fileDelete(String fileName, String dirName) throws ConnectionException {
         return this.getConfig().getSmbClient().deleteFile(fileName, dirName);
     }
 
@@ -107,9 +88,7 @@ public class SmbConnector {
      * @throws SmbConnectionException
      *             when a connection error occurs
      */
-    @Processor
-    public List<String> directoryList(@ConnectionKey @FriendlyName("Folder Name") @Optional String dirName,
-            @FriendlyName("Wildcard") @Default("*.*") String wildcard) throws ConnectionException {
+    public List<String> directoryList(String dirName, String wildcard) throws ConnectionException {
         String w = wildcard;
         if (!Utilities.isNotBlankOrEmptyOrNull(w)) {
             w = "*.*";
@@ -126,9 +105,7 @@ public class SmbConnector {
      * @throws SmbConnectionException
      *             when a connection error occurs
      */
-    @Processor
-    public boolean directoryCreate(@ConnectionKey @Required @FriendlyName("Folder Name") String dirName)
-            throws ConnectionException {
+    public boolean directoryCreate(String dirName) throws ConnectionException {
         return this.getConfig().getSmbClient().createDirectory(dirName);
     }
 
@@ -143,9 +120,7 @@ public class SmbConnector {
      * @throws SmbConnectionException
      *             when a connection error occurs
      */
-    @Processor
-    public boolean directoryDelete(@ConnectionKey @FriendlyName("Directory Name") String dirName,
-            @FriendlyName("Recursive delete") @Default("false") boolean recursive) throws ConnectionException {
+    public boolean directoryDelete(String dirName, boolean recursive) throws ConnectionException {
         return this.getConfig().getSmbClient().deleteDir(dirName, recursive);
     }
 
@@ -167,4 +142,5 @@ public class SmbConnector {
     public SmbConnectorConfig getConfig() {
         return config;
     }
+
 }

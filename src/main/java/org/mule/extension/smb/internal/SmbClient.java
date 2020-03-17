@@ -4,27 +4,7 @@
  * The software in this package is published under the terms of the CPAL v1.0 license,
  * a copy of which has been included with this distribution in the LICENSE.md file.
  */
-package org.mule.modules.smb.internal;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-
-import org.apache.commons.io.IOUtils;
-import org.mule.api.ConnectionExceptionCode;
-import org.mule.modules.smb.config.SmbConnectorConfig;
-import org.mule.modules.smb.exception.SmbConnectionException;
-import org.mule.modules.smb.utils.Utilities;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+package org.mule.extension.smb.internal;
 
 import com.hierynomus.msdtyp.AccessMask;
 import com.hierynomus.msfscc.FileAttributes;
@@ -39,6 +19,22 @@ import com.hierynomus.smbj.connection.Connection;
 import com.hierynomus.smbj.session.Session;
 import com.hierynomus.smbj.share.DiskShare;
 import com.hierynomus.smbj.share.File;
+import org.apache.commons.io.IOUtils;
+import org.mule.extension.smb.config.SmbConnectorConfig;
+import org.mule.extension.smb.exception.SmbConnectionException;
+import org.mule.extension.smb.utils.Utilities;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.UnknownHostException;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+
+;
 
 public class SmbClient {
 
@@ -165,8 +161,7 @@ public class SmbClient {
 
     /**
      * 
-     * @return SmbConnectorConfig containing configuration parameters for this
-     *         client
+     * @return SmbConnectorConfig containing configuration parameters for this client
      */
     public SmbConnectorConfig getConfig() {
         return this.connectorConfig;
@@ -278,8 +273,7 @@ public class SmbClient {
      * @param dirName,
      *            directory where file should be written
      * @param append,
-     *            boolean indicating whether to append this new content to the file
-     *            otherwise overwrite
+     *            boolean indicating whether to append this new content to the file otherwise overwrite
      * @param data,
      *            InputStream, byte[] or String of data to write into the file
      * @param encoding,
@@ -314,8 +308,7 @@ public class SmbClient {
     /**
      * Get standardized attributes for file writer
      * 
-     * @return Set<FileAttributes> Set of FileAttributes for declaring with file
-     *         write
+     * @return Set<FileAttributes> Set of FileAttributes for declaring with file write
      */
     private Set<FileAttributes> getFileWriterAttributes() {
         Set<FileAttributes> fileAttributes = new HashSet<>();
@@ -326,8 +319,7 @@ public class SmbClient {
     /**
      * Get standardized create options for file writer
      * 
-     * @return Set<SMB2CreateOptions> Set of create options for declaring with file
-     *         write
+     * @return Set<SMB2CreateOptions> Set of create options for declaring with file write
      */
     private Set<SMB2CreateOptions> getFileWriterCreateOptions() {
         Set<SMB2CreateOptions> createOptions = new HashSet<>();
@@ -361,8 +353,7 @@ public class SmbClient {
      * @param dirName,
      *            directory where file should be written
      * @param append,
-     *            boolean indicating whether to append this new content to the file
-     *            otherwise overwrite
+     *            boolean indicating whether to append this new content to the file otherwise overwrite
      * @param data,
      *            byte[] of data to write into the file
      * @return boolean, successful if true

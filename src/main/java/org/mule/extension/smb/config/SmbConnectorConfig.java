@@ -4,26 +4,15 @@
  * The software in this package is published under the terms of the CPAL v1.0 license,
  * a copy of which has been included with this distribution in the LICENSE.md file.
  */
-package org.mule.modules.smb.config;
+package org.mule.extension.smb.config;
 
-import org.mule.api.ConnectionException;
-import org.mule.api.ConnectionExceptionCode;
-import org.mule.api.annotations.Connect;
-import org.mule.api.annotations.ConnectionIdentifier;
-import org.mule.api.annotations.Disconnect;
-import org.mule.api.annotations.TestConnectivity;
-import org.mule.api.annotations.ValidateConnection;
-import org.mule.api.annotations.components.ConnectionManagement;
-import org.mule.api.annotations.display.FriendlyName;
-import org.mule.api.annotations.display.Password;
-import org.mule.api.annotations.param.ConnectionKey;
-import org.mule.api.annotations.param.Optional;
-import org.mule.modules.smb.internal.SmbClient;
-import org.mule.modules.smb.utils.Utilities;
-import org.mule.util.NumberUtils;
+import org.mule.extension.smb.internal.SmbClient;
+import org.mule.extension.smb.utils.Utilities;
+import org.mule.runtime.api.connection.ConnectionException;
 
 
-@ConnectionManagement(friendlyName = "Configuration", configElementName = "config")
+;
+
 public class SmbConnectorConfig {
 
     private SmbClient smbClient = new SmbClient(this);
@@ -38,12 +27,12 @@ public class SmbConnectorConfig {
 
     private String share;
 
-    private int connectionTimeout = 30000;
-    
-    private int fileage = 500;
-    
+    //private int connectionTimeout = 30000;
+
+    //private int fileage = 500;
+
     private boolean guest = false;
-    
+
     private boolean anonymous = false;
 
     /**
@@ -69,7 +58,8 @@ public class SmbConnectorConfig {
     /**
      * Set the share for the config
      *
-     * @param share, share name
+     * @param share,
+     *            share name
      */
     public void setShare(String share) {
         this.share = share;
@@ -87,7 +77,8 @@ public class SmbConnectorConfig {
     /**
      * Set the connect timeout (ms) for the config
      *
-     * @param t, timeout value in ms
+     * @param t,
+     *            timeout value in ms
      */
     public void setTimeout(int t) {
         this.connectionTimeout = t;
@@ -105,7 +96,8 @@ public class SmbConnectorConfig {
     /**
      * Set the domain name for the config
      *
-     * @param d, domain name
+     * @param d,
+     *            domain name
      */
     public void setDomain(String d) {
         this.domain = d;
@@ -123,7 +115,8 @@ public class SmbConnectorConfig {
     /**
      * Set the user name for the config
      *
-     * @param u,  username value
+     * @param u,
+     *            username value
      */
     public void setUsername(String u) {
         this.username = u;
@@ -141,7 +134,8 @@ public class SmbConnectorConfig {
     /**
      * Set the password for the config
      *
-     * @param p, password value
+     * @param p,
+     *            password value
      */
     public void setPassword(String p) {
         this.password = p;
@@ -155,11 +149,12 @@ public class SmbConnectorConfig {
     public String getPassword() {
         return this.password;
     }
-    
+
     /**
      * Set the file age limit (ms) for the config
      *
-     * @param a, file age in ms
+     * @param a,
+     *            file age in ms
      */
     public void setFileage(int a) {
         this.fileage = a;
@@ -173,11 +168,12 @@ public class SmbConnectorConfig {
     public int getFileage() {
         return this.fileage;
     }
-    
+
     /**
      * Set guest credentials
      *
-     * @param g, if true use guest credentials
+     * @param g,
+     *            if true use guest credentials
      */
     public void setGuest(boolean g) {
         this.guest = g;
@@ -195,7 +191,8 @@ public class SmbConnectorConfig {
     /**
      * Set anonymous credentials
      *
-     * @param a, if true use anonymous credentials
+     * @param a,
+     *            if true use anonymous credentials
      * 
      */
     public void setAnonymous(boolean a) {
@@ -223,27 +220,28 @@ public class SmbConnectorConfig {
     /**
      * Connect
      *
-     * @param domain, domain name
-	 * @param host, host name to connect
-     * @param share, share name
-     * @param username, username for connection
-     * @param password, password for connection
-     * @param timeout, connection timeout
-     * @param fileage, file age for actions
-     * @throws ConnectionException if there is a connection issue
+     * @param domain,
+     *            domain name
+     * @param host,
+     *            host name to connect
+     * @param share,
+     *            share name
+     * @param username,
+     *            username for connection
+     * @param password,
+     *            password for connection
+     * @param timeout,
+     *            connection timeout
+     * @param fileage,
+     *            file age for actions
+     * @throws ConnectionException
+     *             if there is a connection issue
      */
-    @Connect
-    @TestConnectivity
-    public void connect(@ConnectionKey @Optional @FriendlyName("Domain") String domain,
-    		@ConnectionKey @FriendlyName("Host") String host,
-        @ConnectionKey @Optional @FriendlyName("Share") String share,
-        @Optional @FriendlyName("Username") String username,
-        @Optional @Password @FriendlyName("Password") String password, 
-        @Optional @FriendlyName("Connection timeout") String timeout,
-        @Optional @FriendlyName("File age (ms)") String fileage) throws ConnectionException {
+    public void connect(String domain, String host, String share, String username, String password, String timeout,
+            String fileage) throws ConnectionException {
 
         try {
-        	
+
             this.setDomain(domain);
             if (username.equalsIgnoreCase("guest")) {
                 this.setGuest(true);
@@ -255,22 +253,19 @@ public class SmbConnectorConfig {
             }
             this.setHost(host);
             this.setShare(Utilities.cleanPath(share));
-            if (NumberUtils.isNumber(timeout)) {
-                this.setTimeout(Integer.parseInt(timeout));
-            }
-            if (NumberUtils.isNumber(fileage)) {
-                this.setFileage(Integer.parseInt(fileage));
-            }
+                //this.setTimeout(timeout);
+                //this.setFileage(fileage);
+
             this.getSmbClient().connect();
         } catch (Exception e) {
-            throw new org.mule.api.ConnectionException(ConnectionExceptionCode.UNKNOWN, null, e.getMessage(), e);
+            throw new org.mule.runtime.api.connection.ConnectionException(ConnectionExceptionCode.UNKNOWN, null,
+                    e.getMessage(), e);
         }
     }
 
     /**
      * Disconnect
      */
-    @Disconnect
     public void disconnect() {
         this.getSmbClient().disconnect();
     }
@@ -280,7 +275,6 @@ public class SmbConnectorConfig {
      * 
      * @return boolean, true if connected
      */
-    @ValidateConnection
     public boolean isConnected() {
         return this.getSmbClient().isConnected();
     }
@@ -290,7 +284,6 @@ public class SmbConnectorConfig {
      * 
      * @return String, client connection id
      */
-    @ConnectionIdentifier
     public String connectionId() {
         return this.getSmbClient().connectionId();
     }

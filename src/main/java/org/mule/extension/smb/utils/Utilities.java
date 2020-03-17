@@ -4,13 +4,11 @@
  * The software in this package is published under the terms of the CPAL v1.0 license,
  * a copy of which has been included with this distribution in the LICENSE.md file.
  */
-package org.mule.modules.smb.utils;
-
-import org.mule.util.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+package org.mule.extension.smb.utils;
 
 import com.hierynomus.msdtyp.FileTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Utilities {
 
@@ -55,7 +53,7 @@ public class Utilities {
         if (p1 != null && p2 != null) {
             p1 = cleanPath(p1);
             p2 = cleanPath(p2);
-            return new StringBuilder(p1 + "/" + p2).toString();
+            return p1 + "/" + p2;
         } else if (p1 == null ^ p2 == null) {
             return returnSingleNotNull(p1, p2);
         } else {

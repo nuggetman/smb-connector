@@ -1,25 +1,24 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.mule.modules</groupId>
-    <artifactId>smb-connector</artifactId>
-    <version>1.2.1-SNAPSHOT</version>
-    <packaging>mule-module</packaging>
+    <groupId>org.mule.extension</groupId>
+    <artifactId>smb</artifactId>
+    <version>2.0.0-SNAPSHOT</version>
+    <packaging>mule-extension</packaging>
     <name>Anypoint SMB Connector</name>
 
     <parent>
-        <groupId>org.mule.tools.devkit</groupId>
-        <artifactId>mule-devkit-parent</artifactId>
-        <version>3.9.8</version>
+        <groupId>org.mule.extensions</groupId>
+        <artifactId>mule-modules-parent</artifactId>
+        <version>1.2.0</version>
     </parent>
 
     <properties>
         <category>Certified</category>
         <licensePath>LICENSE.md</licensePath>
-        <devkit.studio.package.skip>false</devkit.studio.package.skip>
 	    <skipTests>false</skipTests>
-	    <ctf.connector.class>org.mule.modules.smb.SmbConnector</ctf.connector.class>
+	    <!-- ctf.connector.class>SmbConnector</ctf.connector.class -->
     </properties>
     <repositories>
         <repository>
@@ -42,42 +41,53 @@
 		<artifactId>smbj</artifactId>
         <version>0.10.0</version>
       </dependency>
-      
-	<dependency>
+
+	<!--dependency>
 	    <groupId>junit</groupId>
 	    <artifactId>junit</artifactId>
 	    <version>4.12</version>
 	    <scope>test</scope>
-	</dependency>
+	</dependency -->
+    <!--dependency>
+            <groupId>org.mule.tools.dmt</groupId>
+            <artifactId>mule-devkit-shade</artifactId>
+            <version>1.0.0</version>
+        </dependency-->
     </dependencies>
     
     <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.22.0</version>
-        <configuration>
-          <skipTests>${skipTests}</skipTests>
-          <includes>
-            <include>**/FullTestSuite.java</include>
-          </includes>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.mule.certification</groupId>
-        <artifactId>project-structure-validation</artifactId>
-        <version>1.0.6</version>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>validate</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-site-plugin</artifactId>
+                    <version>3.8.2</version>
+                </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.22.0</version>
+                <configuration>
+                    <skipTests>${skipTests}</skipTests>
+                    <includes>
+                        <include>**/FullTestSuite.java</include>
+                    </includes>
+                </configuration>
+            </plugin>
+            <!--plugin>
+                <groupId>org.mule.certification</groupId>
+                <artifactId>project-structure-validation</artifactId>
+                <version>1.0.6</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>validate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin-->
+            </plugins>
 	</build>
 
 	<distributionManagement>
