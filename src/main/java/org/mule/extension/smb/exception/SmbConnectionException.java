@@ -6,18 +6,13 @@
  */
 package org.mule.extension.smb.exception;
 
-import org.mule.runtime.api.connection.ConnectionException;
 
-
-public class SmbConnectionException extends ConnectionException {
+public class SmbConnectionException extends Throwable {
 
     private static final long serialVersionUID = 1L;
 
-    public static final String READ_ERROR = "READ ERROR";
-    public static final String WRITE_ERROR = "WRITE ERROR";
-
-    public SmbConnectionException(ConnectionExceptionCode code, String thirdPartyCode, String message,
-            Throwable throwable) {
-        super(code, thirdPartyCode, message, throwable);
+    public SmbConnectionException(SmbConnectionExceptionCode c, String message,
+                                  Throwable throwable) {
+        //super(thirdPartyCode, message, throwable);
     }
 }

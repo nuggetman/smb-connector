@@ -1,7 +1,9 @@
 
 package org.mule.extension.smb.operation;
 
+import org.mule.extension.smb.SmbExtension;
 import org.mule.extension.smb.config.SmbConnectorConfig;
+import org.mule.extension.smb.exception.SmbConnectionException;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Content;
@@ -19,8 +21,8 @@ public class SmbConnectorOperations {
     public byte[] fileRead(@Connection SmbConnectorConfig connection, @DisplayName("File Name") String fileName,
                            @Optional(defaultValue = "") @DisplayName("Directory Name") String dirName,
                            @Optional(defaultValue = "false") @DisplayName("Delete after reading") boolean autoDelete)
-            throws ConnectionException {
-        SmbConnector connector = new SmbConnector();
+            throws ConnectionException, SmbConnectionException {
+        SmbExtension connector = new SmbExtension();
         connector.setConfig(connection);
         byte[] result = connector.fileRead(fileName, dirName, autoDelete);
         return result;
@@ -33,8 +35,8 @@ public class SmbConnectorOperations {
     public boolean fileWrite(@Connection SmbConnectorConfig connection, @DisplayName("File Name") String fileName,
             @Optional(defaultValue = "") @DisplayName("Directory Name") String dirName,
             @Optional(defaultValue = "false") @DisplayName("Append to file") boolean append,
-            @Content Object fileContent, @Optional(defaultValue = "UTF-8") String encoding) throws ConnectionException {
-        SmbConnector connector = new SmbConnector();
+            @Content Object fileContent, @Optional(defaultValue = "UTF-8") String encoding) throws ConnectionException, SmbConnectionException {
+        SmbExtension connector = new SmbExtension();
         connector.setConfig(connection);
         boolean result = connector.fileWrite(fileName, dirName, append, fileContent, encoding);
         return result;
@@ -45,8 +47,8 @@ public class SmbConnectorOperations {
      * 
      */
     public boolean fileDelete(@Connection SmbConnectorConfig connection, @DisplayName("File Name") String fileName,
-            @Optional(defaultValue = "") @DisplayName("Directory Name") String dirName) throws ConnectionException {
-        SmbConnector connector = new SmbConnector();
+            @Optional(defaultValue = "") @DisplayName("Directory Name") String dirName) throws ConnectionException, SmbConnectionException {
+        SmbExtension connector = new SmbExtension();
         connector.setConfig(connection);
         boolean result = connector.fileDelete(fileName, dirName);
         return result;
@@ -58,8 +60,8 @@ public class SmbConnectorOperations {
      */
     public List<String> directoryList(@Connection SmbConnectorConfig connection,
             @Optional @DisplayName("Folder Name") String dirName,
-            @Optional(defaultValue = "*.*") @DisplayName("Wildcard") String wildcard) throws ConnectionException {
-        SmbConnector connector = new SmbConnector();
+            @Optional(defaultValue = "*.*") @DisplayName("Wildcard") String wildcard) throws ConnectionException, SmbConnectionException {
+        SmbExtension connector = new SmbExtension();
         connector.setConfig(connection);
         List<String> result = connector.directoryList(dirName, wildcard);
         return result;
@@ -70,8 +72,8 @@ public class SmbConnectorOperations {
      * 
      */
     public boolean directoryCreate(@Connection SmbConnectorConfig connection,
-            @DisplayName("Folder Name") String dirName) throws ConnectionException {
-        SmbConnector connector = new SmbConnector();
+            @DisplayName("Folder Name") String dirName) throws ConnectionException, SmbConnectionException {
+        SmbExtension connector = new SmbExtension();
         connector.setConfig(connection);
         boolean result = connector.directoryCreate(dirName);
         return result;
@@ -84,8 +86,8 @@ public class SmbConnectorOperations {
     public boolean directoryDelete(@Connection SmbConnectorConfig connection,
             @DisplayName("Directory Name") String dirName,
             @Optional(defaultValue = "false") @DisplayName("Recursive delete") boolean recursive)
-            throws ConnectionException {
-        SmbConnector connector = new SmbConnector();
+            throws ConnectionException, SmbConnectionException {
+        SmbExtension connector = new SmbExtension();
         connector.setConfig(connection);
         boolean result = connector.directoryDelete(dirName, recursive);
         return result;

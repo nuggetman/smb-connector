@@ -88,7 +88,7 @@ public class Utilities {
      */
     public static boolean isNotBlankOrEmptyOrNull(String string) {
         if (string != null) {
-            return StringUtils.isNotEmpty(string);
+            return string.length() > 0;
         } else {
             return false;
         }

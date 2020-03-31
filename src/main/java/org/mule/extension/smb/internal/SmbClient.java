@@ -21,6 +21,7 @@ import com.hierynomus.smbj.share.DiskShare;
 import com.hierynomus.smbj.share.File;
 import org.apache.commons.io.IOUtils;
 import org.mule.extension.smb.config.SmbConnectorConfig;
+import org.mule.extension.smb.exception.SmbConnectionExceptionCode;
 import org.mule.extension.smb.exception.SmbConnectionException;
 import org.mule.extension.smb.utils.Utilities;
 import org.slf4j.Logger;
@@ -34,7 +35,6 @@ import java.net.UnknownHostException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-;
 
 public class SmbClient {
 
@@ -194,7 +194,7 @@ public class SmbClient {
             setShare(this.getConfig().getShare());
 
         } catch (Exception e) {
-            throw new SmbConnectionException(ConnectionExceptionCode.CANNOT_REACH, null, e.getMessage(), e);
+            throw new SmbConnectionException(SmbConnectionExceptionCode.CANNOT_REACH, e.getMessage(), e);
         }
         return isConnected();
     }
@@ -243,10 +243,10 @@ public class SmbClient {
             logger.debug("Done reading file {}", fileName);
 
         } catch (UnknownHostException e) {
-            throw new SmbConnectionException(ConnectionExceptionCode.UNKNOWN_HOST, SmbConnectionException.READ_ERROR,
+            throw new SmbConnectionException(SmbConnectionExceptionCode.UNKNOWN_HOST,
                     e.getMessage(), e);
         } catch (Exception e) {
-            throw new SmbConnectionException(ConnectionExceptionCode.UNKNOWN, SmbConnectionException.READ_ERROR,
+            throw new SmbConnectionException(SmbConnectionExceptionCode.UNKNOWN,
                     e.getMessage(), e);
         } finally {
             if (is != null) {
@@ -299,7 +299,7 @@ public class SmbClient {
                         data.getClass());
             }
         } catch (Exception e) {
-            throw new SmbConnectionException(ConnectionExceptionCode.UNKNOWN, SmbConnectionException.WRITE_ERROR,
+            throw new SmbConnectionException(SmbConnectionExceptionCode.UNKNOWN,
                     e.getMessage(), e);
         }
         return ret;
@@ -374,10 +374,10 @@ public class SmbClient {
             IOUtils.write(in, out);
             ret = true;
         } catch (UnknownHostException e) {
-            throw new SmbConnectionException(ConnectionExceptionCode.UNKNOWN_HOST, SmbConnectionException.WRITE_ERROR,
+            throw new SmbConnectionException(SmbConnectionExceptionCode.UNKNOWN_HOST,
                     e.getMessage(), e);
         } catch (Exception e) {
-            throw new SmbConnectionException(ConnectionExceptionCode.UNKNOWN, SmbConnectionException.WRITE_ERROR,
+            throw new SmbConnectionException(SmbConnectionExceptionCode.UNKNOWN,
                     e.getMessage(), e);
         } finally {
             if (out != null) {
@@ -386,7 +386,7 @@ public class SmbClient {
                     out.close();
                     out = null;
                 } catch (Exception e) {
-                    logger.debug(SmbConnectionException.WRITE_ERROR, e);
+                    logger.debug(SmbConnectionExceptionCode.WRITE_ERROR.toString(), e);
                 }
             }
             if (f != null) {
@@ -394,7 +394,7 @@ public class SmbClient {
                     f.close();
                     f = null;
                 } catch (Exception e) {
-                    logger.debug(SmbConnectionException.WRITE_ERROR, e);
+                    logger.debug(SmbConnectionExceptionCode.WRITE_ERROR.toString(), e);
                 }
             }
 
@@ -431,7 +431,7 @@ public class SmbClient {
                 logger.debug("file does not exist {}", absoluteFile);
             }
         } catch (Exception e) {
-            throw new SmbConnectionException(ConnectionExceptionCode.UNKNOWN, null, e.getMessage(), e);
+            throw new SmbConnectionException(SmbConnectionExceptionCode.UNKNOWN, e.getMessage(), e);
         }
         this.disconnect();
         return status;
@@ -459,7 +459,7 @@ public class SmbClient {
                     logger.debug("directory already exists {}", dirName);
                 }
             } catch (Exception e) {
-                throw new SmbConnectionException(ConnectionExceptionCode.UNKNOWN, null, e.getMessage(), e);
+                throw new SmbConnectionException(SmbConnectionExceptionCode.UNKNOWN, e.getMessage(), e);
             }
         }
         this.disconnect();
@@ -490,7 +490,7 @@ public class SmbClient {
                     logger.debug("directory does not exist {}", dirName);
                 }
             } catch (Exception e) {
-                throw new SmbConnectionException(ConnectionExceptionCode.UNKNOWN, null, e.getMessage(), e);
+                throw new SmbConnectionException(SmbConnectionExceptionCode.UNKNOWN, e.getMessage(), e);
             }
         }
         this.disconnect();
@@ -519,7 +519,7 @@ public class SmbClient {
                 }
             }
         } catch (Exception e) {
-            throw new SmbConnectionException(ConnectionExceptionCode.UNKNOWN, null, e.getMessage(), e);
+            throw new SmbConnectionException(SmbConnectionExceptionCode.UNKNOWN, e.getMessage(), e);
         }
         this.disconnect();
         return results;

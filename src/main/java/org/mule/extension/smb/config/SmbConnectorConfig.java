@@ -6,6 +6,7 @@
  */
 package org.mule.extension.smb.config;
 
+import org.mule.extension.smb.exception.SmbConnectionException;
 import org.mule.extension.smb.internal.SmbClient;
 import org.mule.extension.smb.utils.Utilities;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -27,9 +28,9 @@ public class SmbConnectorConfig {
 
     private String share;
 
-    //private int connectionTimeout = 30000;
+    private int connectionTimeout = 30000;
 
-    //private int fileage = 500;
+    private int fileage = 500;
 
     private boolean guest = false;
 
@@ -238,7 +239,7 @@ public class SmbConnectorConfig {
      *             if there is a connection issue
      */
     public void connect(String domain, String host, String share, String username, String password, String timeout,
-            String fileage) throws ConnectionException {
+            String fileage) {
 
         try {
 
@@ -257,9 +258,11 @@ public class SmbConnectorConfig {
                 //this.setFileage(fileage);
 
             this.getSmbClient().connect();
+        } catch (SmbConnectionException e) {
+
         } catch (Exception e) {
-            throw new org.mule.runtime.api.connection.ConnectionException(ConnectionExceptionCode.UNKNOWN, null,
-                    e.getMessage(), e);
+            //throw new org.mule.runtime.api.connection.ConnectionException(ConnectionExceptionCode.UNKNOWN, null, e.getMessage(), e);
+
         }
     }
 

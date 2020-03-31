@@ -3,6 +3,7 @@ package org.mule.extension.smb;
 
 import org.mule.extension.smb.config.SmbConnectorConfig;
 import org.mule.extension.smb.connection.SmbConnectorConfigConnectionProvider;
+import org.mule.extension.smb.exception.SmbConnectionException;
 import org.mule.extension.smb.operation.SmbConnectorOperations;
 import org.mule.extension.smb.utils.Utilities;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -36,7 +37,7 @@ public class SmbExtension {
      *             when a connection error occurs
      */
     public byte[] fileRead(String fileName, String dirName, boolean autoDelete)
-            throws ConnectionException {
+            throws ConnectionException, SmbConnectionException {
         return this.getConfig().getSmbClient().readFile(fileName, dirName, autoDelete);
     }
 
@@ -58,7 +59,7 @@ public class SmbExtension {
      *             when a connection error occurs
      */
     public boolean fileWrite(String fileName, String dirName, boolean append, Object fileContent,
-                             String encoding) throws ConnectionException {
+                             String encoding) throws ConnectionException, SmbConnectionException {
         return this.getConfig().getSmbClient().writeFile(fileName, dirName, append, fileContent, encoding);
     }
 
@@ -73,7 +74,7 @@ public class SmbExtension {
      * @throws SmbConnectionException
      *             when a connection error occurs
      */
-    public boolean fileDelete(String fileName, String dirName) throws ConnectionException {
+    public boolean fileDelete(String fileName, String dirName) throws ConnectionException, SmbConnectionException {
         return this.getConfig().getSmbClient().deleteFile(fileName, dirName);
     }
 
@@ -88,7 +89,7 @@ public class SmbExtension {
      * @throws SmbConnectionException
      *             when a connection error occurs
      */
-    public List<String> directoryList(String dirName, String wildcard) throws ConnectionException {
+    public List<String> directoryList(String dirName, String wildcard) throws ConnectionException, SmbConnectionException {
         String w = wildcard;
         if (!Utilities.isNotBlankOrEmptyOrNull(w)) {
             w = "*.*";
@@ -105,7 +106,7 @@ public class SmbExtension {
      * @throws SmbConnectionException
      *             when a connection error occurs
      */
-    public boolean directoryCreate(String dirName) throws ConnectionException {
+    public boolean directoryCreate(String dirName) throws ConnectionException, SmbConnectionException {
         return this.getConfig().getSmbClient().createDirectory(dirName);
     }
 
@@ -120,7 +121,7 @@ public class SmbExtension {
      * @throws SmbConnectionException
      *             when a connection error occurs
      */
-    public boolean directoryDelete(String dirName, boolean recursive) throws ConnectionException {
+    public boolean directoryDelete(String dirName, boolean recursive) throws ConnectionException, SmbConnectionException {
         return this.getConfig().getSmbClient().deleteDir(dirName, recursive);
     }
 
