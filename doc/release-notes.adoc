@@ -19,12 +19,11 @@ The SMB connector allows for connectivity to SMB v1 & v2 shares and can be used 
 |===
 
 === Version 1.2.1 - New features
-* Connector now disconnects the session after each action
-* SMBv3 is supported through the use of SMBJ v0.10.0
+* This is a bug fix release
 
 === Version 1.2.1 - Fixed in this release
-* Resolved issue 18 - Socket timing out causing disconnect errors
-* Resolved issue 15 - Add support for SMBv3
+* Resolved issue 18 - Connector now disconnects the session after each action
+* Resolved issue 15 - SMBv3 is supported through the use of SMBJ v0.10.0
 
 === Version 1.2.1 - Required Libraries
 
