@@ -39,8 +39,6 @@ public class SmbConnector {
      *            directory where file is located
      * @param autoDelete,
      *            Should the file be deleted after reading
-     * @param encoding,
-     *            character encoding of contents to write
      * @return The file contents as a byte[]
      * @throws SmbConnectionException
      *             when a connection error occurs
