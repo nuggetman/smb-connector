@@ -1,5 +1,15 @@
 # SMB Connector Release Notes
 # --------------------------------------------------------------------
+# Version: 1.2.1
+Date: January 2020
+Supported driver:
+SMBJ v0.9.1
+# Supported Mule Runtime Versions:
+Mule 3.8+
+# New Features and Functionality
+* Issue 18 - Altered connectivity behaviour to reconnect each time
+
+# --------------------------------------------------------------------
 # Version: 1.2.0
 Date: July 2019
 Supported driver:
@@ -7,7 +17,10 @@ SMBJ v0.9.1
 # Supported Mule Runtime Versions:
 Mule 3.8+
 # New Features and Functionality
-* Issue 
+* Issue 6 - Resolved wildcard behaviour 
+* Issue 8 - connector now works with public shares
+* Issue 9 - Delete on read behaviour fixed
+* Issue 10 - Directory list now returns only files older than the fileage 
 
 # --------------------------------------------------------------------
 # Version: 1.1.0-unreleased
@@ -16,11 +29,6 @@ Supported driver:
 JCIFS v1.3.19
 # Supported Mule Runtime Versions: 
 Mule 3.8+
-# New Features and Functionality
-* Issue 6 - Resolved wildcard behaviour 
-* Issue 9 - Delete on read behaviour fixed
-* Issue 10 - Directory list now returns only files older than the fileage 
-# Known Issues in this release
 
 # --------------------------------------------------------------------
 # Version: 1.0

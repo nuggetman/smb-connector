@@ -1,5 +1,5 @@
 /**
- * Copyright 2018-2019 (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2018-2020 (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
  * The software in this package is published under the terms of the CPAL v1.0 license,
  * a copy of which has been included with this distribution in the LICENSE.md file.
@@ -12,56 +12,40 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 import org.mule.modules.smb.SmbConnector;
-import org.mule.modules.smb.automation.functional.DirectoryCreateDoubleTest;
-import org.mule.modules.smb.automation.functional.DirectoryCreateNullTest;
-import org.mule.modules.smb.automation.functional.DirectoryCreateTest;
-import org.mule.modules.smb.automation.functional.DirectoryDeleteNullTest;
-import org.mule.modules.smb.automation.functional.DirectoryDeleteTest;
-import org.mule.modules.smb.automation.functional.DirectoryListEmptyTest;
-import org.mule.modules.smb.automation.functional.DirectoryListEmptyWildcardTest;
-import org.mule.modules.smb.automation.functional.DirectoryListFilesTest;
-import org.mule.modules.smb.automation.functional.DirectoryListFilesWildcardBakTest;
-import org.mule.modules.smb.automation.functional.DirectoryListFilesWildcardTest;
-import org.mule.modules.smb.automation.functional.DirectoryListFilesWildcardTxtTest;
-import org.mule.modules.smb.automation.functional.FileDeleteTest;
-import org.mule.modules.smb.automation.functional.FileFakeDeleteTest;
-import org.mule.modules.smb.automation.functional.FileReadAutoDeleteTest;
-import org.mule.modules.smb.automation.functional.FileReadTest;
-import org.mule.modules.smb.automation.functional.FileWriteAppendByteArrayTest;
-import org.mule.modules.smb.automation.functional.FileWriteAppendInputStreamTest;
-import org.mule.modules.smb.automation.functional.FileWriteAppendStringTest;
-import org.mule.modules.smb.automation.functional.FileWriteTest;
+import org.mule.modules.smb.automation.functional.DirectoryCreateDoubleTestCases;
+import org.mule.modules.smb.automation.functional.DirectoryCreateNullTestCases;
+import org.mule.modules.smb.automation.functional.DirectoryCreateTestCases;
+import org.mule.modules.smb.automation.functional.DirectoryDeleteTestCases;
+import org.mule.modules.smb.automation.functional.DirectoryListFilesWildcardBakTestCases;
+import org.mule.modules.smb.automation.functional.DirectoryListFilesWildcardTestCases;
+import org.mule.modules.smb.automation.functional.DirectoryListFilesWildcardTxtTestCases;
+import org.mule.modules.smb.automation.functional.DirectoryListTestCases;
+import org.mule.modules.smb.automation.functional.FileDeleteTestCases;
+import org.mule.modules.smb.automation.functional.FileFakeDeleteTestCases;
+import org.mule.modules.smb.automation.functional.FileReadAutoDeleteTestCases;
+import org.mule.modules.smb.automation.functional.FileReadTestCases;
+import org.mule.modules.smb.automation.functional.FileWriteAppendByteArrayTestCases;
+import org.mule.modules.smb.automation.functional.FileWriteAppendInputStreamTestCases;
+import org.mule.modules.smb.automation.functional.FileWriteAppendStringTestCases;
+import org.mule.modules.smb.automation.functional.FileWriteTestCases;
 import org.mule.tools.devkit.ctf.mockup.ConnectorTestContext;
 
 @RunWith(Suite.class)
-@SuiteClasses({
-    FileReadTest.class,
-    FileReadAutoDeleteTest.class,
-    FileWriteTest.class,
-    FileWriteAppendStringTest.class,
-    FileWriteAppendByteArrayTest.class,
-    FileWriteAppendInputStreamTest.class,
-    FileDeleteTest.class,
-    FileFakeDeleteTest.class,
-    DirectoryCreateTest.class,
-    DirectoryCreateDoubleTest.class,
-    DirectoryCreateNullTest.class,
-    DirectoryListEmptyTest.class,
-    DirectoryListEmptyWildcardTest.class,
-    DirectoryListFilesTest.class,
-    DirectoryListFilesWildcardTest.class,
-    DirectoryListFilesWildcardBakTest.class,
-    DirectoryListFilesWildcardTxtTest.class,
-    DirectoryDeleteTest.class,
-    DirectoryDeleteNullTest.class,
-   
+@SuiteClasses({ FileReadTestCases.class, FileReadAutoDeleteTestCases.class, FileWriteTestCases.class,
+        FileWriteAppendStringTestCases.class, FileWriteAppendByteArrayTestCases.class,
+        FileWriteAppendInputStreamTestCases.class, FileDeleteTestCases.class, FileFakeDeleteTestCases.class,
+        DirectoryCreateTestCases.class, DirectoryCreateDoubleTestCases.class, DirectoryCreateNullTestCases.class,
+        DirectoryListTestCases.class, DirectoryListFilesWildcardTestCases.class,
+        DirectoryListFilesWildcardBakTestCases.class, DirectoryListFilesWildcardTxtTestCases.class,
+        DirectoryDeleteTestCases.class,
+
 })
 
 public class FunctionalTestSuite {
 
     @BeforeClass
     public static void initialiseSuite() {
-    		System.setProperty("automation-credentials.properties", "automation-credentials.properties");
+        System.setProperty("automation-credentials.properties", "automation-credentials.properties");
         ConnectorTestContext.initialize(SmbConnector.class);
     }
 

@@ -4,9 +4,9 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.mule.modules</groupId>
     <artifactId>smb-connector</artifactId>
-    <version>1.2.0</version>
+    <version>1.2.1-SNAPSHOT</version>
     <packaging>mule-module</packaging>
-    <name>Anypoint SMB Connector</name>
+    <name>SMB Connector - Mule 3</name>
 
     <parent>
         <groupId>org.mule.tools.devkit</groupId>
@@ -40,7 +40,7 @@
 	  <dependency>
 	    <groupId>com.hierynomus</groupId>
 		<artifactId>smbj</artifactId>
-        <version>0.9.1</version>
+        <version>0.10.0</version>
       </dependency>
       
 	<dependency>
@@ -64,19 +64,19 @@
           </includes>
         </configuration>
       </plugin>
-       <plugin>
-            <groupId>org.mule.certification</groupId>
-            <artifactId>project-structure-validation</artifactId>
-            <version>1.0.6</version>
-            <executions>
-                <execution>
-                    <phase>package</phase>
-                    <goals>
-                        <goal>validate</goal>
-                    </goals>
-                </execution>
-            </executions>
-        </plugin>
+      <plugin>
+        <groupId>org.mule.certification</groupId>
+        <artifactId>project-structure-validation</artifactId>
+        <version>1.0.6</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>validate</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
 	</build>
 

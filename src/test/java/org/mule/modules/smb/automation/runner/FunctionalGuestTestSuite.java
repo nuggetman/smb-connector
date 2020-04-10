@@ -1,5 +1,5 @@
 /**
- * Copyright 2018-2019 (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2018-2020 (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
  * The software in this package is published under the terms of the CPAL v1.0 license,
  * a copy of which has been included with this distribution in the LICENSE.md file.
@@ -12,29 +12,23 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 import org.mule.modules.smb.SmbConnector;
-import org.mule.modules.smb.automation.functional.DirectoryCreateTest;
-import org.mule.modules.smb.automation.functional.DirectoryDeleteTest;
-import org.mule.modules.smb.automation.functional.DirectoryListEmptyTest;
-import org.mule.modules.smb.automation.functional.FileDeleteTest;
-import org.mule.modules.smb.automation.functional.FileReadTest;
-import org.mule.modules.smb.automation.functional.FileWriteTest;
+import org.mule.modules.smb.automation.functional.DirectoryCreateTestCases;
+import org.mule.modules.smb.automation.functional.DirectoryDeleteTestCases;
+import org.mule.modules.smb.automation.functional.DirectoryListTestCases;
+import org.mule.modules.smb.automation.functional.FileDeleteTestCases;
+import org.mule.modules.smb.automation.functional.FileReadTestCases;
+import org.mule.modules.smb.automation.functional.FileWriteTestCases;
 import org.mule.tools.devkit.ctf.mockup.ConnectorTestContext;
 
 @RunWith(Suite.class)
-@SuiteClasses({
-    FileReadTest.class,
-    FileWriteTest.class,
-    FileDeleteTest.class,
-    DirectoryCreateTest.class,
-    DirectoryListEmptyTest.class,
-    DirectoryDeleteTest.class
-})
+@SuiteClasses({ FileReadTestCases.class, FileWriteTestCases.class, FileDeleteTestCases.class, DirectoryCreateTestCases.class,
+        DirectoryListTestCases.class, DirectoryDeleteTestCases.class })
 
 public class FunctionalGuestTestSuite {
 
     @BeforeClass
     public static void initialiseSuite() {
-    		System.setProperty("automation-credentials.properties", "automation-credentials-guest.properties");
+        System.setProperty("automation-credentials.properties", "automation-credentials-guest.properties");
         ConnectorTestContext.initialize(SmbConnector.class);
     }
 
